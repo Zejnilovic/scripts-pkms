@@ -6,7 +6,7 @@ The Daybook Method is one way of keeping notes for all of your life: work, home 
 
 > **Stop deciding where a thought belongs before you write it down. Write it in the daybook, post what matters, and close the week.**
 
-It asks for no decision about where things go while you write, keeps your words as you wrote them, and survives the weeks you skip. It is plain text files in folders, and it is built to work by hand: a text editor is enough, and even a paper notebook can follow it. The pkm tool speeds up the mechanical parts, and an AI agent can read your week and draft the posting and the close for you to approve ([the agentic layer](https://github.com/Zejnilovic/agentic-pkms/blob/master/docs/methodology.md)).
+It asks for no decision about where things go while you write, keeps your words as you wrote them, and survives the weeks you skip. It is plain text files in folders, and it is built to work by hand: a text editor is enough, and even a paper notebook can follow it. The pkm tool speeds up the mechanical parts, and an AI agent can read your week and draft the posting and the close for you to approve ([the agentic layer](https://github.com/Zejnilovic/agentic-pkms/blob/main/docs/methodology.md)).
 
 Every example comes from two [made-up example vaults](examples/README.md), kept through the same week of November 2026. The **work** vault is about a project called Apollo, a customer called Acme, and two colleagues, Jane Doe and John Roe. The **family** vault is shared by two parents, Alex and Sam, and is about a bathroom, a summer trip, a school form and the bills.
 
@@ -481,7 +481,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 
 **Building on it.** Editors, apps and scripts can work on the same files; the [reference](#reference) is the format. pkm takes extensions the way git does: a program named `pkm-<name>` on your path runs as `pkm <name>`, so anyone can add a calendar, a graph of your links or a sync check without changing pkm.
 
-**With an agent.** An AI agent can read your week, propose what to post, draft the close, check your project tools and quiz you, all through pkm and without rewriting a word of yours. That is the [agentic layer](https://github.com/Zejnilovic/agentic-pkms/blob/master/docs/methodology.md).
+**With an agent.** An AI agent can read your week, propose what to post, draft the close, check your project tools and quiz you, all through pkm and without rewriting a word of yours. That is the [agentic layer](https://github.com/Zejnilovic/agentic-pkms/blob/main/docs/methodology.md).
 
 **The examples.** The [example vaults](examples/README.md) are one week kept with the method, at work and at home. Every example on this page comes from them.
 
