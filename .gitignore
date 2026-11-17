@@ -1,0 +1,8 @@
+# Generated files
+__pycache__/
+.DS_Store
+
+# pkm run by hand on an example vault
+docs/examples/*/.pkm/cache/
+docs/examples/*/.pkm/state
+dist/

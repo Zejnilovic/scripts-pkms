@@ -1,0 +1,134 @@
+# The output contract
+
+This file is the one description of pkm's interface: its commands, what they print, their exit codes and their options. Scripts, editors and agents call pkm, so these hold across releases; a change to any of them is a major version (see [CHANGELOG.md](../CHANGELOG.md)). A test fails when a command or an output field is missing here.
+
+## Commands
+
+`pkm help --all` prints one line per command, `name<TAB>group<TAB>summary`. Each command below is in that list.
+
+| Command | Group | Does | Listing (`--json`, `--abs`, `--limit`) |
+|---|---|---|---|
+| `day` | Capture | the day's page, created when missing; prints its path | no |
+| `add` | Capture | an entry at the end of the day's Log, printed as path:line | no |
+| `todo` | Tasks | a task for today, under its Tasks section; a routine (`--every`) goes to the note named routines, created when missing; prints path:line | no |
+| `done` | Tasks | marks the one open task that matches as done, or as dropped with --drop; moves a routine on | no |
+| `tasks` | Tasks | the open tasks of every note, in groups: overdue, due soon, waiting, the rest | yes, `path:line: text` lines in groups; `--json` adds `group`, `due`, `state` |
+| `upcoming` | Review | birthdays, due tasks, dates and the start dates of hidden tasks in the next days | no |
+| `new` | Notes | a note of a type, made from its template | no |
+| `backlinks` | Find | every line that links a note, by name, slug or alias | yes, `path:line: text` lines |
+| `names` | Find | every note's name, type, path and aliases, by name, from the cache | yes, `name<TAB>type<TAB>path<TAB>aliases` |
+| `index` | Find | brings the cache up to date; --rebuild starts it again | no |
+| `rename` | Notes | renames a note and rewrites every link that names it; --dry-run lists the changes | no |
+| `mv` | Notes | moves a note into a folder; its links keep working | no |
+| `path` | Find | the file a name, slug, alias or link points to | yes, one path per line |
+| `find` | Find | the lines with every word, in any order | yes, `path:line: text` lines |
+| `list` | Find | the notes whose frontmatter matches | yes, `path<TAB>type<TAB>title<TAB>field...` |
+| `tags` | Find | every tag with its count | no |
+| `check` | Check | broken links, duplicate names, alias clashes, secrets, merge conflicts and notices | yes, problems and notices |
+| `evidence` | Check | each summary line (`## Now`, a close page or stdin) must link its source; `--verify` checks the links and lines | no |
+| `cycle` | Review | the period of a cycle holding a date (today by default): name, first and last day; `close` marks the close cycle | no |
+| `since` | Review | what happened since a date, a number of days, or a cycle: notes, log, tasks, marked entries and names; `--about NAME` | yes, `path:line: text` lines in sections; `--json` gives a `kind` per line |
+| `recall` | Review | the recall questions due today or earlier, oldest first; `recall <path:line> yes\|no` moves one on the ladder; `recall add <note> <question>` writes one | yes, `path:line: text` lines |
+| `close` | Review | the close of a period: the first line, then tasks, open questions, what is due, marked entries, names, quiet notes and ideas | no; `--json` gives a `kind` per line |
+| `links` | Find | each web address in the notes, outside code, with its place (`--external`) | yes, `path:line: address` lines; `--json` gives `url` |
+| `get` | Notes | a note or one section of it, between a header and a footer; `--lines` takes a range | no |
+| `post` | Notes | copies lines of a page into a note's section, with the page as their source | no |
+| `strike` | Notes | strikes a line through when it is no longer true, linking today's page | no |
+| `doctor` | Setup | the tools pkm uses, and the settings | no |
+| `init` | Setup | sets up a vault: .pkm/config, .pkm/.gitignore and .pkmignore | no |
+| `vault` | Setup | the vault's folder | no |
+| `vaults` | Setup | the named vaults of the user config | no |
+| `config` | Setup | every setting, its value and where it comes from | no |
+| `templates` | Setup | each template type and where it comes from | no |
+| `version` | Setup | the pkm release; --require checks a minimum | no |
+| `help` | Setup | the usage text; --all lists every command | no |
+
+## Listings
+
+The cache (`index`, in `.pkm/cache` or `PKM_CACHE_DIR`) is a speed-up only: deleting it never changes an answer. `names`, `list`, `path` and `check` read it, and `index` brings it up to date (`--rebuild` starts it again).
+
+`find`, `backlinks`, `tasks`, `check`, `path` and `list` print their results in one of four forms:
+
+- **`path:line: text`** (`find`, `backlinks`, `tasks`): the path from the vault's root, the line number, and the text of the line.
+- **Paths** (`path`): one path per line.
+- **Table rows** (`list`): `path | field | ...`, with the fields `--show` asks for.
+- **Check** (`check`): a `Problems:` and a `Notices:` section, each with `- ` lines. A line with a place is `- path:line: text`; a line without one has no path.
+
+Other commands print what they say in plain text, and take none of these options.
+
+### Options
+
+- **`PKM_NOW=YYYYMMDDHHMMSS`** (environment): fixes the clock: today, the time `add` writes, and the time `since --seen` stores. It is for tests and for backfilling a day; any other value exits `2`.
+- **`--abs`**: paths are absolute, from the vault's folder.
+- **`--json`**: JSON Lines, one object per record, parsed by `jq` and by Python's `json`. Headers and summaries (such as `Checked 12 notes.`) are not records and are left out. Keys:
+  - `path`: the path from the vault's root, or `null` when a record has none (a problem with no place).
+  - `line`: the line number, or `null`.
+  - `text`: the text of the record, or `null`.
+  - `kind`: for `check` only, `problem` or `notice`.
+  - `url`: for `links` only, the address, in place of `text`.
+  - `fields`: for `list` only, the list of the row's fields after its path.
+- **`--limit n`**: the first `n` records only, default 30 (the `limit` setting). When more follow, a footer `... N more (use --limit)` goes to stderr, never to stdout.
+
+## Order
+
+Every listing is deterministic: the same vault gives the same output, in plain and in `--json`, on every run.
+
+- **`find`, `backlinks`, `path`, `list`**: by path in byte order (`LC_ALL=C`), then by line number. `--limit` takes the first records of that order.
+- **`recall`**: by the question's due date, oldest first, then by path and line in byte order.
+- **`names`**: by name, then by path. Day and close pages, and files other than notes, are left out unless `--type` names them. `--json` gives `path`, `line` and `text` as `null`, and `fields` as `[name, type, aliases]`.
+- **`list`**: by path. Each line is `path<TAB>type<TAB>title`, then the fields named by `--show`. `--json` gives the same columns as `fields`, after the type and title.
+- **Later kinds**: a task with `(start D)` is hidden until D: `tasks`, `since`, `close` and the due lines of `upcoming` leave it out, `upcoming` lists it on its start date as `<D> start path:line: text`, and `tasks --all` shows it marked `starts D:`. A `(someday)` task is shown only by `tasks someday` and by the quarterly close (`close --quarter`, or a quarter's first period), and it is left out of the 21-day rule even with a due date. A `(someday)` task with a start date is an ordinary task from that date. A routine on a day page, and an old rule, are `check` problems.
+- **`tasks`**: in groups, each group in its own order:
+  1. **overdue**: due before today, oldest due date first;
+  2. **due soon**: due within `due_soon_days` (7) from today, soonest first;
+  3. **waiting**: waiting for more than `waiting_days` (7), longest wait first;
+  4. **other**: the rest, by due date (undated last), then by the day page's date (undated pages first), then by path and line.
+  `--json` gives each task its `group` (`overdue`, `due_soon`, `waiting_long`, `other`, or `done` for the done view), its `due` date (or `null`) and its `state` (`open`, `done` or `dropped`).
+- **`check`**: its own order, as documented here: the Problems section first, then the Notices section. Within each, problems come in the order the checks run: duplicate names, then links in the order of the vault's files and, within a file, its lines, then alias clashes, then file names that aren't slugs. `--json` keeps the same order.
+
+## Exit codes
+
+- `0`: a match, or a success.
+- `1`: nothing matched or nothing found (a listing with no records), or `check` found problems, or `version --require` is too old.
+- `2`: a wrong call (including an unknown option, such as `--nope`, which prints one line on stderr), a missing tool (ripgrep for searching, jq for `--json`), or no vault.
+
+Errors go to stderr. Output goes to stdout.
+
+## Renames and moves
+
+- `rename <old> <new>` prints `Renamed <old> to <new>: ...` on success. With `--dry-run` it prints one `path:line: before -> after` line per changed line, and the alias change to the note's frontmatter, and writes nothing.
+- `mv <note> <folder>` prints the new path.
+- Both append one line to `.pkm/moves.tsv`: `date<TAB>old<TAB>new`. A rename records names; a move records paths.
+- Exit `0` on success, `1` when refused (a new name already taken, no single note with the old name, a day or close page, a folder that exists) or when a change could not be written. A refusal writes nothing. A failure part-way rolls every file back to its exact bytes, and says so on stderr.
+- Usage errors (a new name with spaces, a folder outside the vault) exit `2`.
+
+## Reading, posting and striking
+
+- **`get <name>[#Section] [--lines a-b]`** prints the note, or one section, between `<<<note <path> lines a-b` and `>>>end`. The name resolves as `path` does, and may be a link such as `[[apollo#Decisions]]`. A section is the text of a heading (any level, any case) up to the next heading of the same or a higher level, without its trailing blank lines. `--lines` takes the note's own line numbers and narrows what is printed. Exit `1` when the note, section or lines are missing, `2` for a malformed range.
+- **`post <path:line[-line]> <note>[#Section]`** copies those lines, verbatim, into the section, with ` ([[<page>]])` after the last one, where `<page>` is the source page's name (a shared vault's page keeps its writer, as `[[2026-11-12-sam]]`). The lines go right after the section's last line, with no blank between list items. An empty section, or a note that ends after its heading, gets a blank line first. A missing section is created at the end as `## <Section>`. It prints `path:line` of the first posted line. Exit `1` (nothing written) when the range contains a heading, when it contains an open task `- [ ]` (the task would show twice in `tasks`), when the target is a day or close page, when the target is missing, or when the entry is already in the note anywhere (it prints that `path:line` and writes nothing). Exit `2` for a malformed source, a source outside the vault, or lines out of range.
+- **`strike <path:line>`** wraps the line's text, after its indent, list marker and task box, in `~~`, and adds ` ([[<today's page>]])`. Today's page is made when it is missing, so the link is never dead. It prints `path:line`. Exit `1` (nothing written) for a blank line, a heading, or a line that is struck already; `2` for a malformed argument.
+- **`links --external [note]`** prints `path:line: address` for each `http(s)` address outside code, bare, or as a Markdown link with the address in its parentheses, once per address on each line, in the order of the listings. Without `--external` it exits `2` with one line that points to `pkm backlinks`.
+- **`evidence [--verify] <note | ->`** checks the list items of a note's `## Now` section, or a close page whole, or stdin (`-`, reported as `-:N:`). A leading `> ` is taken off first, and struck items are skipped. A source is a link to a day page or to a note of `type: source`, a `path:line` naming a vault file, or an `http(s)` address. A link to any other note only says what the line is about. Findings print as `path:line: text` and exit `1`. `--verify` also reports each link that doesn't resolve, and each `path:line` whose file is missing or shorter than the line, and such a line is then not a source. Exit `2` without a note or `-`; exit `1` for a missing note or one without `## Now`.
+- **`list --quiet <days>`** lists the notes the other filters match that no day page in the last `<days>` days links (the days are today and the days before it, by name, slug or alias). Day and close pages are never listed. Exit `2` when `<days>` is not a whole number.
+- **`check --urls`** also GETs each distinct web address (curl, `--max-time 5`, following redirects, 8 at a time). An address that gives no answer is reported as `path:line: no answer: <url>` at each place it is used; a `404` or `410` as `path:line: <status>: <url>`. Other statuses count as answered, since private boards answer with a login page. It needs curl (exit `2` without it). A plain `check` never makes a request.
+
+## Cycles, since and close
+
+- **Cycles** are periods. The week is built in (`1w from monday`). A cycle of your own is set in `.pkm/config`: `cycle_<name>=<N>w from <weekday or date>` (a weekday only for `1w`), or `cycle_<name>=<N>m from <day 1-28 or date>`. A name is lowercase letters, digits and hyphens, not `week`, `last`, `today`, `yesterday`, nor all digits. Periods run both ways from the anchor. `close` names the cycle the close runs on (`week` by default).
+- **`cycle [name] [--date D]`** prints `name<TAB>first<TAB>last` for the period holding the date (today by default), with a fourth field `close` on the close cycle. With no name it prints every cycle. Exit `1` for an unknown name.
+- **Cycle routines**: an undated `(every <cycle>)` is due on the last day of the period holding today. `done` moves a dated one on from its due date: 7N days for an `Nw` cycle, and N months for an `Nm` cycle, on the same day of the month (or the month's last day when it is shorter). An undated one moves to the last day of the next period. It writes `(due D)` before the `(every …)` marker and keeps its box open. `check` reports a `(every <name>)` that names no cycle.
+- **`since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]`** covers the day pages of every writer from the start to today. `last` starts on the date in `.pkm/state` (set by `since --seen`, which stores the date and the time it ran), or the last 7 days. On that date, `last` leaves out the entries timed at or before the stored time; untimed lines on that day stay, and a state with only a date (the older form) starts on that date in full. `since --seen` prints `The next since last starts after <date> <time>.`; `N` is today and the `N-1` days before; a cycle is the period holding yesterday. Sections, each only when it has lines: `== notes` (`path:<title line>: # Title` for notes created in the range), `== log` (`path:line: text` for every line of those day pages, struck ones too, except the title and the `## Tasks` and `## Log` headings), `== tasks` (`path:line: overdue: text` and `path:line: waiting N days: text` for every open task, in path order), `== marked` (`path:line: text` for `! `, `Decided:`, `Idea:` and `?`-ending entries, struck ones left out), `== names` (`name  N mentions  last <today|yesterday|N days ago>`, by count then name). `--about NAME` keeps the lines that link NAME, a line under a `###` heading included when the heading links it, and leaves out `== notes`. `--limit` applies per section, with the footer on stderr. With no line in any section, it prints `Nothing since <date>.` and exits `1`. `--json` gives `kind` (note, log, task, marked, name), with `state` and `days` for a task, and `name`, `count` and `last` (ISO) for a name. `since --seen` writes today's date to `.pkm/state` and prints where the next `since last` starts; with any other argument it exits `2`.
+- **`close [--cycle name] [--date D] [--quarter] [--json]`** closes the period holding yesterday (or the one holding `--date`). Its first line: `== <cycle> <first> to <last>: <n> entries (closes/<year>/<first>-<cycle>.md)`, where the entries are the log lines of the period's day pages. Then only the sections with lines: `== tasks` (overdue tasks, and tasks on a day page 21 days old or more as `open N days:`), `== open` (the period's questions as `question:`, and every waiting task), `== due` (from today to the end of the next period, in the lines `upcoming` prints, without the overdue ones), `== marked` (the period's `!`, `Decided:` and `Idea:` entries), `== names` (`name  N mentions, no note` for a link to no note on three lines or more of day pages), `== quiet` (`path:<title line>: last linked <date>: # Title` for projects not done and people linked 15 to 42 days ago and not in the last 14 days), and `== ideas` (every `Idea:` entry and someday task; in a period holding the first day of January, April, July or October, or with `--quarter`). Exit `0`.
+- **`new close [--cycle name] [--date D]`** writes the close page of the period, at `closes/<year>/<first day>-<cycle>.md`, titled `<Cycle> of <first day>`. It takes no title (exit `2`), and an existing page exits `1` with its path.
+
+## Recall
+
+- **`recall [note] [--json] [--limit n]`** lists the questions due today or earlier as `path:line: text`, oldest date first, then path and line. A question is an entry that ends with `(recall YYYY-MM-DD <N>d)`, outside code; a struck line never comes up. With a note name, only that note's questions. With none due, it exits `1` with one line on stderr: when the next is due, or that there are no questions.
+- **`recall <path:line> yes|no`** rewrites only the mark. `yes` moves the interval to the next rung of 1, 3, 7, 14, 30, 60 and 120 days above the current one (120 stays 120); `no` sets it to `1d`. The next date is today plus the new interval. It keeps the file's line ends and prints the rewritten line as `path:line: text`. A line with no mark exits `1`.
+- **`recall add <note> <question> [--answer <text>]...`** writes `- <question> (recall <tomorrow> 1d)` at the end of the note's `## Questions` section, creating the section at the end of the note when it is missing. Each `--answer` is an indented `  - <text>` line below the question. It keeps the file's line ends and prints `path:line` of the question. It exits `1`, and writes nothing, for a day or close page, a question the note already has (printing that `path:line`), or a note that doesn't exist. A missing question or note name exits `2`.
+- **`check`** flags a malformed mark (a date that isn't `YYYY-MM-DD`, an interval without `d`, a mark that doesn't end the line), and a mark inside a task box. Recall lines never show in `tasks`, `since`, `close` or `upcoming`.
+
+## Settings and files
+
+The settings are in [settings.md](settings.md). Templates and the day's page are described in the [README](../README.md).
+

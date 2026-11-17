@@ -1,0 +1,32 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      # Run every OS to the end, so a failure on one doesn't hide the result of the other.
+      fail-fast: false
+      matrix:
+        # macOS runs the scripts on bash 3.2, the oldest bash they support.
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Full history and tags, so check.py can compare bin/, lib/ and share/ with the last release tag.
+          fetch-depth: 0
+      - name: Install the tools vaults expect
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then brew install ripgrep jq shellcheck; else sudo apt-get update -qq && sudo apt-get install -y -qq ripgrep jq shellcheck; fi
+      - name: Consistency checks
+        run: python3 scripts/check.py
+      - name: Script tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Bench on a synthetic vault of 2000 files
+        run: bash scripts/bench.sh 2000

@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    { "id": "entry", "type": "promptString", "description": "What happened? One line, as you would write it in the log" },
+    { "id": "words", "type": "promptString", "description": "Words to find, in any order" }
+  ],
+  "problemMatchers": [
+    {
+      "name": "pkm",
+      "owner": "pkm",
+      "fileLocation": ["relative", "${workspaceFolder}"],
+      "pattern": {
+        "regexp": "^(?:- )?(.+?):(\\d+): (.*)$",
+        "file": 1,
+        "line": 2,
+        "message": 3
+      }
+    }
+  ],
+  "tasks": [
+    { "label": "pkm: day", "type": "shell", "command": "pkm", "args": ["day"], "problemMatcher": [] },
+    { "label": "pkm: add", "type": "shell", "command": "pkm", "args": ["add", "${input:entry}"], "problemMatcher": [] },
+    { "label": "pkm: find", "type": "shell", "command": "pkm find ${input:words}", "problemMatcher": ["$pkm"] },
+    { "label": "pkm: tasks", "type": "shell", "command": "pkm", "args": ["tasks"], "problemMatcher": ["$pkm"] },
+    { "label": "pkm: check", "type": "shell", "command": "pkm", "args": ["check"], "problemMatcher": ["$pkm"] }
+  ]
+}
