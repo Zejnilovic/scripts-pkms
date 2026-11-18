@@ -97,6 +97,12 @@
 
 set -u
 
+# A range such as [a-z] or [A-Z] means ASCII letters only. In a UTF-8 locale bash 3.2 and other tools collate
+# letters together, so [A-Z] matched "apollo". LC_ALL would override LC_COLLATE, so its value moves to LC_CTYPE:
+# characters stay UTF-8, only the order of ranges is the C one.
+if [ -n "${LC_ALL:-}" ]; then export LC_CTYPE="$LC_ALL"; unset LC_ALL; fi
+export LC_COLLATE=C
+
 # Follow symlinks to the real bin/pkm, so lib/ and share/ are found next to it, however it is put on PATH.
 pkm_self=$0
 while [ -L "$pkm_self" ]; do

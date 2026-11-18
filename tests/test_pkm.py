@@ -356,6 +356,11 @@ class FindTest(VaultCase):
         self.assertIn("archive/daily/2026/2026-01-02.md:1: Apollo kickoff", self.ok("find", "kickoff"))
         self.assertEqual(self.pkm("find", "--live", "kickoff").returncode, 1)
 
+    def test_smart_case_holds_in_a_utf8_locale(self):
+        # In en_US.UTF-8, bash 3.2 lets [A-Z] match lowercase letters, and LC_ALL overrides everything else.
+        for env in ({"LANG": "en_US.UTF-8"}, {"LC_ALL": "en_US.UTF-8"}):
+            self.assertIn("projects/apollo.md", self.ok("find", "apollo", env=env), env)
+
     def test_smart_case(self):
         self.assertIn("projects/apollo.md", self.ok("find", "apollo"))
         self.assertEqual(self.pkm("find", "Apollo").returncode, 0)
