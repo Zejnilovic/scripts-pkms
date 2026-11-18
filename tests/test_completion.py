@@ -156,6 +156,16 @@ class BashTabPress(VaultCase):
 
 
 class Packaging(unittest.TestCase):
+    def test_the_formula_follows_brew_audit_style(self):
+        # brew audit --strict, which the release runs: "Command-line" in the description, and dependencies sorted.
+        text = (REPO / "packaging/pkm.rb").read_text()
+        desc = text.split('desc "')[1].split('"')[0]
+        self.assertNotRegex(desc, r"(?i)command line")
+        self.assertLessEqual(len(desc), 80)
+        self.assertFalse(desc.startswith(("A ", "An ", "The ")), desc)
+        deps = [line.split('"')[1] for line in text.splitlines() if line.strip().startswith("depends_on")]
+        self.assertEqual(deps, sorted(deps))
+
     def test_the_formula_installs_the_completions_and_tests_them(self):
         text = (REPO / "packaging/pkm.rb").read_text()
         self.assertIn('generate_completions_from_executable(bin/"pkm", "completion", shells: [:bash, :zsh])', text)
