@@ -12,7 +12,7 @@
 ev_items_awk() {
   cat <<'AWK'
 { sub(/\r$/, "") }
-NR == 1 && substr($0, 1, 3) == "\357\273\277" { $0 = substr($0, 4) }
+NR == 1 { bom_mark = "\357\273\277"; if (substr($0, 1, length(bom_mark)) == bom_mark) $0 = substr($0, length(bom_mark) + 1) }
 NR == 1 && $0 == "---" { front = 1; next }
 front { if ($0 == "---") front = 0; next }
 /^[ \t]*(```|~~~)/ { fence = !fence; next }

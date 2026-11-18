@@ -24,9 +24,10 @@ awk_tasks() {
     dim[2] = (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) ? 29 : 28
     return d <= dim[m] + 0
   }
-  function emoji_date(s,   i, rest, v) {
-    i = index(s, "\360\237\223\205 "); if (i == 0) return ""
-    rest = substr(s, i + 5); v = match(rest, /[ )]/)
+  function emoji_date(s,   i, m, rest, v) {
+    # Measured, not counted: gawk in a UTF-8 locale counts the emoji as one character, mawk as four bytes.
+    m = "\360\237\223\205 "; i = index(s, m); if (i == 0) return ""
+    rest = substr(s, i + length(m)); v = match(rest, /[ )]/)
     return v ? substr(rest, 1, v - 1) : rest
   }
   FNR == 1 {

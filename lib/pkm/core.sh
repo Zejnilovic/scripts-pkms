@@ -95,8 +95,9 @@ scan() {
     function rel(path) { sub(/^\.\//, "", path); return path }
     function base(path) { sub(/.*\//, "", path); return path }
     # Every line without its carriage return, and without a byte order mark at the start of the file.
+    # Lengths are measured, not counted: gawk in a UTF-8 locale counts characters, mawk counts bytes.
     { sub(/\r$/, "") }
-    FNR == 1 && substr($0, 1, 3) == "\357\273\277" { $0 = substr($0, 4) }
+    FNR == 1 { bom_mark = "\357\273\277"; if (substr($0, 1, length(bom_mark)) == bom_mark) $0 = substr($0, length(bom_mark) + 1) }
   '"$program" < /dev/null
 }
 

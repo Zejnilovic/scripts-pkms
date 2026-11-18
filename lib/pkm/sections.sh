@@ -10,7 +10,7 @@
 # no heading matches.
 section_bounds() {
   awk -v want="$(lowercase "$2")" '
-    { sub(/\r$/, ""); if (NR == 1 && substr($0, 1, 3) == "\357\273\277") $0 = substr($0, 4); blank[NR] = ($0 ~ /^[ \t]*$/) }
+    { sub(/\r$/, ""); if (NR == 1) { bom_mark = "\357\273\277"; if (substr($0, 1, length(bom_mark)) == bom_mark) $0 = substr($0, length(bom_mark) + 1) } blank[NR] = ($0 ~ /^[ \t]*$/) }
     NR == 1 && $0 == "---" { front = 1; next }
     front { if ($0 == "---") front = 0; next }
     /^[ \t]*(```|~~~)/ { fence = !fence; next }
