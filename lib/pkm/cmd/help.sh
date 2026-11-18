@@ -39,6 +39,7 @@ config|Setup|every setting, its value and where it comes from
 templates|Setup|each template type and where it comes from
 version|Setup|the pkm release; --require checks a minimum
 help|Setup|the usage text; --all lists every command
+completion|Setup|the shell's tab completion script, for bash or zsh
 EOF
 }
 

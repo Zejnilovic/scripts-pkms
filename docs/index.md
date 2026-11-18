@@ -27,12 +27,14 @@ The first five minutes are the whole start. Leave notes, links and the close unt
 
 === "With pkm"
 
-    pkm is a small command line that does the mechanical parts: today's page, the open tasks, the links, what the close leaves open. It needs bash, [ripgrep](https://github.com/BurntSushi/ripgrep) and [jq](https://jqlang.org), on macOS, Linux, or Windows with Git Bash.
+    pkm is a small command line that does the mechanical parts: today's page, the open tasks, the links, what the close leaves open. Homebrew installs it with ripgrep, jq and tab completion for bash and zsh:
 
     ```bash
-    git clone https://github.com/Zejnilovic/scripts-pkms && cd scripts-pkms && make install
+    brew install zejnilovic/tap/pkm
     pkm doctor
     ```
+
+    Without Homebrew it needs bash (macOS, Linux, or Windows with Git Bash), [ripgrep](https://github.com/BurntSushi/ripgrep) and [jq](https://jqlang.org); [the README](https://github.com/Zejnilovic/scripts-pkms#install) has the other ways in.
 
     Then, in the folder for your notes:
 

@@ -6,11 +6,16 @@ The method, its example vaults and these docs are also a site: [zejnilovic.githu
 
 ## Install
 
-Needs bash (macOS and Linux; Git Bash on Windows), [ripgrep](https://github.com/BurntSushi/ripgrep) and [jq](https://jqlang.org).
+```bash
+brew install zejnilovic/tap/pkm
+```
+
+Homebrew installs ripgrep and jq with it, and tab completion for bash and zsh. Without Homebrew, pkm needs bash (macOS and Linux; Git Bash on Windows), [ripgrep](https://github.com/BurntSushi/ripgrep) and [jq](https://jqlang.org):
 
 - **From a clone:** `make install` copies pkm to `~/.local` and links `~/.local/bin/pkm`. Use `make install PREFIX=<folder>` for another place.
 - **From a release tarball:** unpack `pkm-<version>.tar.gz` and run `sh install.sh [--prefix <folder>]`. It installs from the folder it is in and downloads nothing.
-- **Homebrew:** from the owner's tap, once released.
+
+Without Homebrew, turn on tab completion in your shell's startup file: `source <(pkm completion zsh)` in `~/.zshrc` (after `compinit`), or `source <(pkm completion bash)` in `~/.bashrc`. It completes commands, options, note names, template types, cycles and named vaults.
 
 Then run `pkm doctor`. It lists the tools pkm uses and any setting it does not understand. Exit 0 means it is ready.
 
@@ -89,6 +94,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `doctor` | The tools pkm uses, and the settings: what is missing or wrong |
 | `version [--require <x.y>]` | The pkm release; with `--require`, exit 0 when it is at least `x.y` |
 | `help [--all]` | The usage text, or every command with its group |
+| `completion bash\|zsh` | The shell's tab completion script; Homebrew installs it for you |
 
 ## Templates
 

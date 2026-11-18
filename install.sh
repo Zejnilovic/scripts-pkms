@@ -38,4 +38,5 @@ case ":$PATH:" in
   *":$prefix/bin:"*) echo "$prefix/bin is on your PATH." ;;
   *) echo "$prefix/bin is not on your PATH: add it, for example with: export PATH=\"$prefix/bin:\$PATH\"" ;;
 esac
+echo "Tab completion: add source <(pkm completion zsh) to ~/.zshrc, or source <(pkm completion bash) to ~/.bashrc."
 "$prefix/bin/pkm" doctor

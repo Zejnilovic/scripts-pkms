@@ -47,8 +47,9 @@ This repo is pkm, the command line for plain Markdown vaults: `bin/pkm`, its mod
 3. **Several changes can share one unreleased version.** Add a bullet to its `CHANGELOG.md` entry for each.
 4. **To release**: commit and push everything to the default branch, then run the **Release** workflow (Actions tab, or `gh workflow run release.yml`; `-f dry_run=true` pushes nothing). It runs the checks, moves the entry into a GitHub release, commits and tags `v<version>`. Don't release by hand. When agentic-pkms needs the new release, say so in its next version.
 5. **The tarball**: `make dist` writes `dist/pkm-<version>.tar.gz` and its `.sha256`. The release workflow attaches both to the GitHub release.
-6. **The Homebrew formula** in `packaging/pkm.rb` is for the owner's tap. After a release, `sh scripts/formula.sh dist/pkm-<version>.tar.gz` fills its `url` and `sha256`. Until then the placeholder stays. `ruby -c` checks its syntax where ruby is installed.
-7. **pkm is not an agd kit.** It has no `kit/`, no `packs.txt` and no `min-agd`, and nothing here installs through agd. Vaults get pkm from a release tarball, a clone or Homebrew.
+6. **The Homebrew formula** in `packaging/pkm.rb` is the template for `Formula/pkm.rb` in Zejnilovic/homebrew-tap. The Release workflow fills its `url` and `sha256` with `scripts/formula.sh` from the tarball it built, pushes it to the tap with the `HOMEBREW_TAP_TOKEN` secret, then installs from the tap on macOS and runs `brew test` and `brew audit`. Here the placeholder stays. The formula installs the completions from `pkm completion`; `ruby -c` checks its syntax where ruby is installed.
+7. **Tab completion** comes from `command_table` and `command_options` in `lib/pkm/cmd/help.sh`, so a new command or option completes with no change; a new argument kind (note names, cycles) goes in `cmd_complete` in `lib/pkm/cmd/completion.sh`, with a test in `tests/test_completion.py`.
+8. **pkm is not an agd kit.** It has no `kit/`, no `packs.txt` and no `min-agd`, and nothing here installs through agd. Vaults get pkm from a release tarball, a clone or Homebrew.
 
 ## Compatibility
 

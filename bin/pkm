@@ -83,6 +83,7 @@
 #   doctor                        the tools pkm uses and the settings: what is missing or wrong (exit 1)
 #   version [--require <x.y>]     the pkm release; with --require, exit 0 when it is at least x.y, else 1 and no output
 #   help                          this text
+#   completion bash|zsh           the shell's tab completion script, for example in ~/.zshrc: source <(pkm completion zsh)
 #
 # Listings: find, backlinks, path, list, tasks and check take --json (JSON Lines), --abs (absolute paths) and --limit n
 # (default 30). A listing with no results exits 1. docs/contract.md is the interface; pkm help --all lists the commands.
@@ -188,6 +189,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/output.sh"
 # shellcheck source=../lib/pkm/extensions.sh
 . "$pkm_home/lib/pkm/extensions.sh"
+# shellcheck source=../lib/pkm/cmd/completion.sh
+. "$pkm_home/lib/pkm/cmd/completion.sh"
 # shellcheck source=../lib/pkm/cmd/help.sh
 . "$pkm_home/lib/pkm/cmd/help.sh"
 # shellcheck source=../lib/pkm/cmd/find.sh
@@ -220,7 +223,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/pkm.XXXXXX") || exit 2
 trap 'rm -rf "$tmp"' EXIT
 
-# Options before the command say which vault to use. help, version, init, vaults and doctor work outside a vault.
+# Options before the command say which vault to use. help, version, init, vaults, doctor and completion work outside a
+# vault.
 vault_option="" vault_name=""
 while [ $# -gt 0 ]; do
   case $1 in
@@ -232,9 +236,11 @@ done
 
 command=${1:-help}
 [ $# -gt 0 ] && shift
+# Tab completion reads the words as typed, vault options included, and never fails a Tab press.
+if [ "$command" = __complete ]; then cmd_complete "$@"; exit 0; fi
 if is_builtin "$command"; then check_options "$command" "$@"; fi
 case "$command" in
-  help|-h|--help|version|--version|init|vaults|doctor) ;;
+  help|-h|--help|version|--version|init|vaults|doctor|completion) ;;
   *) { find_vault && cd "$vault"; } || exit 2 ;;
 esac
 
@@ -277,6 +283,7 @@ case $command in
   templates) cmd_templates "$@" ;;
   version|--version) cmd_version "$@" ;;
   help|-h|--help) cmd_help "$@" ;;
+  completion) cmd_completion "$@" ;;
   *) run_extension "$command" "$@"
      echo "Unknown command: $command" >&2; usage >&2; exit 2 ;;
 esac

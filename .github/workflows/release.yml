@@ -1,7 +1,9 @@
 name: Release
 
 # Releases the "(unreleased)" version in CHANGELOG.md: its notes become a GitHub release, CHANGELOG.md
-# keeps a link, and the release commit is tagged v<version>. Start it from the Actions tab.
+# keeps a link, and the release commit is tagged v<version>. It attaches the tarball, points the formula in
+# Zejnilovic/homebrew-tap at it, and then installs the release from the tap and tests it. Start it from the Actions
+# tab. A dry run does everything but push, and shows the notes and the formula.
 on:
   workflow_dispatch:
     inputs:
@@ -21,6 +23,8 @@ jobs:
     # Release only from the default branch, never from a feature branch.
     if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.notes.outputs.version }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -34,10 +38,12 @@ jobs:
           python3 scripts/check.py
           python3 -m unittest discover -s tests
       - name: Move the notes out of CHANGELOG.md
+        id: notes
         run: |
           NOTES="$RUNNER_TEMP/notes.md"
           version=$(python3 scripts/release.py --notes "$NOTES")
           { echo "VERSION=$version"; echo "NOTES=$NOTES"; } >> "$GITHUB_ENV"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
           # The summary keeps the notes, so a failed last step can be finished by hand:
           # gh release create v<version> --verify-tag --title <version> --notes-file notes.md
           { echo "## Release notes for $version"; echo; cat "$NOTES"; echo; echo '## CHANGELOG.md'; echo
@@ -65,3 +71,41 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "v$VERSION" "dist/pkm-$VERSION.tar.gz" "dist/pkm-$VERSION.tar.gz.sha256"
+      - name: Write the formula
+        run: |
+          git clone -q --depth 1 https://github.com/Zejnilovic/homebrew-tap.git "$RUNNER_TEMP/tap"
+          mkdir -p "$RUNNER_TEMP/tap/Formula"
+          sh scripts/formula.sh "dist/pkm-$VERSION.tar.gz" "$RUNNER_TEMP/tap/Formula/pkm.rb"
+          # The summary keeps the formula, so a failed last step can be finished by hand.
+          { echo '## Formula/pkm.rb in Zejnilovic/homebrew-tap'; echo; echo '```diff'
+            git -C "$RUNNER_TEMP/tap" add -N Formula/pkm.rb
+            git -C "$RUNNER_TEMP/tap" diff
+            echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      # HOMEBREW_TAP_TOKEN: a fine-grained token for Zejnilovic/homebrew-tap with contents write, as in agd.
+      - name: Update the formula in the tap
+        if: ${{ !inputs.dry_run }}
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          cd "$RUNNER_TEMP/tap"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add Formula/pkm.rb
+          git commit -q -m "pkm $VERSION"
+          git push -q "https://x-access-token:$TAP_TOKEN@github.com/Zejnilovic/homebrew-tap.git" HEAD
+
+  verify:
+    # Installs the new release the way people will, with its completions, and runs the formula's test.
+    needs: release
+    if: ${{ !inputs.dry_run }}
+    runs-on: macos-latest
+    steps:
+      - name: Install from the tap and test
+        run: |
+          brew tap zejnilovic/tap
+          brew install zejnilovic/tap/pkm
+          brew test zejnilovic/tap/pkm
+          brew audit --strict --online zejnilovic/tap/pkm
+          test "$(pkm version)" = "${{ needs.release.outputs.version }}"
+          test -f "$(brew --prefix)/share/zsh/site-functions/_pkm"
+          test -f "$(brew --prefix)/etc/bash_completion.d/pkm"

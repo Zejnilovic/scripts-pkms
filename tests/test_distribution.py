@@ -156,6 +156,26 @@ class ReleaseWorkflow(unittest.TestCase):
         self.assertIn("run: make dist", build)
         self.assertNotIn("if:", build)
 
+    def test_the_formula_is_written_from_the_tarball_and_pushed_to_the_tap_only_on_a_real_release(self):
+        names = [step.split("\n")[0] for step in self.steps()]
+        self.assertLess(names.index("Build the tarball"), names.index("Write the formula"))
+        write = self.step_named("Write the formula")[0]
+        self.assertNotIn("if:", write)
+        self.assertIn("Zejnilovic/homebrew-tap", write)
+        self.assertIn('sh scripts/formula.sh "dist/pkm-$VERSION.tar.gz"', write)
+        push = self.step_named("Update the formula in the tap")[0]
+        self.assertIn("if: ${{ !inputs.dry_run }}", push)
+        self.assertIn("secrets.HOMEBREW_TAP_TOKEN", push)
+        self.assertLess(names.index("Attach the tarball to the release"), names.index("Update the formula in the tap"))
+
+    def test_a_job_installs_the_release_from_the_tap_and_tests_it(self):
+        text = (REPO / ".github/workflows/release.yml").read_text()
+        verify = text.split("\n  verify:\n")[1]
+        self.assertIn("needs: release", verify)
+        self.assertIn("if: ${{ !inputs.dry_run }}", verify)
+        for line in ["brew install zejnilovic/tap/pkm", "brew test zejnilovic/tap/pkm", "brew audit --strict --online zejnilovic/tap/pkm"]:
+            self.assertIn(line, verify)
+
     def test_the_tarball_and_its_checksum_are_attached_only_on_a_real_release(self):
         upload = self.step_named("Attach the tarball")[0]
         self.assertIn("if: ${{ !inputs.dry_run }}", upload)

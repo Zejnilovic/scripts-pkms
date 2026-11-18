@@ -42,6 +42,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `templates` | Setup | each template type and where it comes from | no |
 | `version` | Setup | the pkm release; --require checks a minimum | no |
 | `help` | Setup | the usage text; --all lists every command | no |
+| `completion` | Setup | the shell's tab completion script, for `bash` or `zsh`; it calls `pkm __complete`, which is not part of the contract | no |
 
 ## Listings
 
