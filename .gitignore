@@ -6,3 +6,6 @@ __pycache__/
 docs/examples/*/.pkm/cache/
 docs/examples/*/.pkm/state
 dist/
+
+# The documentation site, built by mkdocs
+site/

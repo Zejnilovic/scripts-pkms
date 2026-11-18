@@ -1,0 +1,116 @@
+# The documentation site, https://zejnilovic.github.io/scripts-pkms, built from docs/ by the Docs workflow.
+# It is the home of the Daybook Method and of pkm. The docs stay plain Markdown for GitHub; scripts/site_hooks.py
+# adapts their links and makes the example vaults browsable.
+# Preview it: pip install -r docs/requirements.txt, then mkdocs serve.
+site_name: The Daybook Method
+site_description: A way of keeping notes for work, home and family that asks for no decision while you write. Write it in the daybook, post what matters, close the week. Plain text, by hand first, with pkm when you want speed.
+site_url: https://zejnilovic.github.io/scripts-pkms/
+repo_url: https://github.com/Zejnilovic/scripts-pkms
+repo_name: Zejnilovic/scripts-pkms
+edit_uri: edit/main/docs/
+copyright: MIT License © Sasa Zejnilovic
+
+exclude_docs: |
+  overrides/
+  requirements.txt
+
+hooks:
+  - scripts/site_hooks.py
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font: false
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+extra_css:
+  - stylesheets/daybook.css
+
+extra_javascript:
+  - javascripts/daybook.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Zejnilovic/scripts-pkms
+  sibling:
+    name: The agentic Daybook
+    url: https://zejnilovic.github.io/agentic-pkms/
+    note: an AI agent that drafts the posting and the close for you to approve, with every line linked to its source
+  site_hooks:
+    repo_blob: https://github.com/Zejnilovic/scripts-pkms/blob/main/
+    siblings:
+      https://github.com/Zejnilovic/agentic-pkms/blob/main/docs/: https://zejnilovic.github.io/agentic-pkms/
+    vaults:
+      work:
+        - The work vault
+        - "One person's work vault on Monday 2026-11-16 at 08:30, before the brief and the close: a project called Apollo for a customer called Acme, two colleagues, a course and private coaching notes."
+      family:
+        - The family vault
+        - "A vault shared by two parents, Alex and Sam, on Sunday 2026-11-15 in the evening, before their weekly close: a bathroom, a summer trip, a school form, routines and a shopping list."
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: "¶"
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Home: index.md
+  - The method: method.md
+  - Example vaults:
+      - examples/README.md
+      - examples/work/index.md
+      - examples/family/index.md
+  - pkm:
+      - The file format: format.md
+      - The output contract: contract.md
+      - Settings: settings.md
+      - Editors: editors.md

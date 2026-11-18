@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="The Daybook Method">
+  <rect x="5" y="3" width="22" height="26" rx="2" fill="#fbf8f1" stroke="#1d2433" stroke-width="2"/>
+  <path d="M10 3v26" stroke="#b8382c" stroke-width="1.5"/>
+  <path d="M13 10h10M13 15h10M13 20h7" stroke="#1d2433" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M20.5 23.5l1.8 1.8 3.4-4" fill="none" stroke="#b8382c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

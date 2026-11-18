@@ -2,6 +2,8 @@
 
 pkm is a command line for plain Markdown vaults. A vault is a folder of Markdown files kept by the [Daybook Method](docs/method.md): one page a day, short entries, tasks, links between notes and a close each week. pkm finds the day's page, the open tasks, the links and what the close leaves open. It needs no AI, no editor and no account. Editors, scripts and agents can call the same commands.
 
+The method, its example vaults and these docs are also a site: [zejnilovic.github.io/scripts-pkms](https://zejnilovic.github.io/scripts-pkms/).
+
 ## Install
 
 Needs bash (macOS and Linux; Git Bash on Windows), [ripgrep](https://github.com/BurntSushi/ripgrep) and [jq](https://jqlang.org).

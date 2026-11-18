@@ -1,0 +1,255 @@
+{% extends "main.html" %}
+
+{% block tabs %}{% endblock %}
+
+{% block hero %}
+<div class="db-home">
+
+  <!-- 1. The promise, and a day page that fills in as you watch -->
+  <section class="db-hero">
+    <div class="db-wrap db-hero__grid">
+      <div class="db-hero__text">
+        <p class="db-kicker">A way of keeping notes · for work, home and family</p>
+        <h1 class="db-hero__title">Write it down now.<br><em>Decide where it goes later.</em></h1>
+        <p class="db-lede">
+          Everything goes on today's page as it happens. What matters is posted, word for word, to the note it is about.
+          Once a week you close what is open. Plain text files, done by hand first; a tool and an agent only make it faster.
+        </p>
+        <div class="db-actions">
+          <a class="db-button db-button--ink" href="#try-it-for-a-week">Try it for a week <span aria-hidden="true">→</span></a>
+          <a class="db-button" href="{{ 'method/' | url }}">Read the method</a>
+        </div>
+        <p class="db-hero__fine">No app, no account. A folder and a text editor are enough, and even a paper notebook works.</p>
+      </div>
+
+      <figure class="db-page db-page--hero" aria-label="A day page from the example work vault">
+        <figcaption class="db-page__file">daybook/2026/11/2026-11-10.md</figcaption>
+        <div class="db-page__sheet">
+          <p class="db-line db-line--h1" style="--i:0"># 2026-11-10</p>
+          <p class="db-line db-line--h2" style="--i:1">## Log</p>
+          <p class="db-line db-line--h3" style="--i:2"><span class="db-time">10:00</span> Call with <span class="db-wl">[[acme]]</span> about <span class="db-wl">[[apollo]]</span></p>
+          <p class="db-line" style="--i:3">- <b class="db-mark db-mark--bang">!</b> They may cancel the contract if the demo slips again<span class="db-note" style="--i:3">matters</span></p>
+          <p class="db-line" style="--i:4">- <b class="db-mark">Decided:</b> we cut the mobile app from the first release<span class="db-note" style="--i:4">a decision</span></p>
+          <p class="db-line" style="--i:5">- Their new contact is Marta Kovac<span class="db-note" style="--i:5">a new name</span></p>
+          <p class="db-line" style="--i:6">- I'll send them the revised timeline by Thursday<span class="db-note" style="--i:6">a promise: the close will catch it</span></p>
+          <p class="db-line db-line--cursor" style="--i:7"><span class="db-caret" aria-hidden="true"></span></p>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. The problem -->
+  <section class="db-section db-problems" aria-labelledby="db-problems-title">
+    <div class="db-wrap">
+      <p class="db-kicker">Why another method</p>
+      <h2 id="db-problems-title" class="db-h2">The problem is rarely writing.<br>It is deciding where.</h2>
+      <p class="db-intro">Most systems for personal notes fail in one of three places, and anyone learning something meets a fourth. The method answers each with one move.</p>
+      <ol class="db-ledger">
+        <li class="db-reveal">
+          <span class="db-ledger__no">01</span>
+          <div><h3>Writing stops when it needs a decision.</h3><p>Which folder, which notebook, which tag: the question comes during the call, when it is least welcome, every time.</p></div>
+          <div class="db-ledger__move"><span class="db-hand">so</span> Everything goes on today's page. Nothing to decide while you write.</div>
+        </li>
+        <li class="db-reveal">
+          <span class="db-ledger__no">02</span>
+          <div><h3>What is written cannot be found.</h3><p>Folders reflect how you thought about something on the day you sorted it. A year later they make sense to nobody.</p></div>
+          <div class="db-ledger__move"><span class="db-hand">so</span> Find things by name and link: both a search and a path to walk.</div>
+        </li>
+        <li class="db-reveal">
+          <span class="db-ledger__no">03</span>
+          <div><h3>What is open slips.</h3><p>Tasks and promises stay where they were written. A list that only grows stops being trusted, and is not read.</p></div>
+          <div class="db-ledger__move"><span class="db-hand">so</span> Once a week, every open item gets a decision, where it is.</div>
+        </li>
+        <li class="db-reveal">
+          <span class="db-ledger__no">04</span>
+          <div><h3>What you learn fades.</h3><p>And rereading your notes does little to stop it.</p></div>
+          <div class="db-ledger__move"><span class="db-hand">so</span> Write questions, and ask yourself again after a gap.</div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3. One week, told with the example work vault -->
+  <section class="db-section db-week" aria-labelledby="db-week-title">
+    <div class="db-wrap">
+      <p class="db-kicker">One week in a work vault</p>
+      <h2 id="db-week-title" class="db-h2">Log, mark, post, find, close.</h2>
+      <p class="db-intro">Every line below is from the <a href="{{ 'examples/work/' | url }}">example work vault</a>: a project called Apollo, a customer called Acme, two colleagues and a course. All of it is made up; you can browse every file.</p>
+
+      <ol class="db-steps">
+        <li class="db-step db-reveal">
+          <div class="db-step__label"><span class="db-step__verb">Log</span><span class="db-step__when">Tuesday, 10:00</span></div>
+          <div class="db-step__body">
+            <p>During a call with Acme you write on today's page, with the time, as it happens. No folder, no tag, no form. The page is the inbox, the journal and the record of the day.</p>
+          </div>
+          <div class="db-step__art">
+            <div class="db-card"><span class="db-card__file">2026-11-10.md</span>
+              <code class="db-entry"><span class="db-time">10:00</span> Call with <span class="db-wl">[[acme]]</span> about <span class="db-wl">[[apollo]]</span></code>
+              <code class="db-entry">- Their new contact is Marta Kovac</code>
+            </div>
+          </div>
+        </li>
+
+        <li class="db-step db-reveal">
+          <div class="db-step__label"><span class="db-step__verb">Mark</span><span class="db-step__when">as you write</span></div>
+          <div class="db-step__body">
+            <p>A sign on an entry says what it is. Four cover most of a day, and they are plain characters you can type anywhere.</p>
+          </div>
+          <div class="db-step__art">
+            <dl class="db-marks">
+              <div><dt><code>- [ ]</code></dt><dd>a task, a promise, something you wait for</dd></div>
+              <div><dt><code>?</code></dt><dd>an open question, at the end of the line</dd></div>
+              <div><dt><code>Decided:</code></dt><dd>a decision</dd></div>
+              <div><dt><code>!</code></dt><dd>this matters</dd></div>
+            </dl>
+          </div>
+        </li>
+
+        <li class="db-step db-step--post db-reveal">
+          <div class="db-step__label"><span class="db-step__verb">Post</span><span class="db-step__when">later, or at the close</span></div>
+          <div class="db-step__body">
+            <p>What you will want to find again is copied, word for word, into the note it is about, with a link to its day. The project's decisions can always be checked against the day they were made, and when the two disagree, the day wins.</p>
+            <p class="db-aside">The name comes from bookkeeping: in Pacioli's 1494 description, each transaction went first into a day book and was later <em>posted</em> to its account.</p>
+          </div>
+          <div class="db-step__art db-post">
+            <div class="db-card db-post__from"><span class="db-card__file">2026-11-10.md</span>
+              <code class="db-entry db-post__line">- Decided: we cut the mobile app from the first release</code>
+            </div>
+            <div class="db-post__arrow" aria-hidden="true"><svg viewBox="0 0 120 60"><path d="M6 8 C 50 8, 70 52, 112 50" /><path d="M102 42 L112 50 L101 57" /></svg><span class="db-hand">same words</span></div>
+            <div class="db-card db-post__to"><span class="db-card__file">notes/apollo.md</span>
+              <code class="db-entry db-entry--h">## Decisions</code>
+              <code class="db-entry"><span class="db-post__copy">- Decided: we cut the mobile app from the first release (<span class="db-wl">[[2026-11-10]]</span>)</span></code>
+            </div>
+          </div>
+        </li>
+
+        <li class="db-step db-reveal">
+          <div class="db-step__label"><span class="db-step__verb">Find</span><span class="db-step__when">any time</span></div>
+          <div class="db-step__body">
+            <p>You never remember where you put something; you look for its name. A link names the note, not its folder, so moving a note breaks nothing, and every link is a path back: a note's backlinks are its history, day by day.</p>
+          </div>
+          <div class="db-step__art">
+            <div class="db-card"><span class="db-card__file">lines that link to [[apollo]]</span>
+              <code class="db-entry"><span class="db-loc">2026-11-09:10</span> Standup: <span class="db-wl">[[apollo]]</span> demo moved to 2026-11-20</code>
+              <code class="db-entry"><span class="db-loc">2026-11-10:7</span> Call with <span class="db-wl">[[acme]]</span> about <span class="db-wl">[[apollo]]</span></code>
+              <code class="db-entry"><span class="db-loc">2026-11-11:5</span> [ ] Budget approval from <span class="db-wl">[[john-roe]]</span> for <span class="db-wl">[[apollo]]</span> (waiting 2026-11-11)</code>
+            </div>
+          </div>
+        </li>
+
+        <li class="db-step db-step--close db-reveal">
+          <div class="db-step__label"><span class="db-step__verb">Close</span><span class="db-step__when">Monday 16, fifteen minutes</span></div>
+          <div class="db-step__body">
+            <p>Once a week you read the week and decide on everything still open: a task is <b>done</b>, <b>dated</b>, made <b>someday</b> or <b>dropped</b>; a question or a wait is <b>answered</b>, <b>chased</b> or <b>dropped</b>. Nothing is copied from page to page, and a skipped week costs nothing: the next close finds what is still open.</p>
+          </div>
+          <div class="db-step__art">
+            <ul class="db-close">
+              <li><span>Send John Roe the October invoice, overdue since Friday</span><span class="db-verdict">do it today</span></li>
+              <li><span>The budget approval, waiting five days</span><span class="db-verdict">chase John</span></li>
+              <li><span>Should we move the demo to a Tuesday?</span><span class="db-verdict">answer it</span></li>
+              <li><span>The sprint ended on Sunday: the summary is due</span><span class="db-verdict">draft it today</span></li>
+              <li><span>Tuesday's decision and risk</span><span class="db-verdict">post to Apollo</span></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. The vocabulary -->
+  <section class="db-section db-words" aria-labelledby="db-words-title">
+    <div class="db-wrap">
+      <p class="db-kicker">The whole vocabulary</p>
+      <h2 id="db-words-title" class="db-h2">Eight words carry the method.</h2>
+      <dl class="db-glossary">
+        <div class="db-reveal"><dt>daybook</dt><dd>Your pages, one per day. Every entry goes on today's page first.</dd></div>
+        <div class="db-reveal"><dt>entry</dt><dd>One line you write on a page, usually with the time.</dd></div>
+        <div class="db-reveal"><dt>mark</dt><dd>A sign on an entry that says what it is: a task, a question, a decision, something that matters.</dd></div>
+        <div class="db-reveal"><dt>note</dt><dd>A page about one thing: a person, a project, a trip, a topic, a course.</dd></div>
+        <div class="db-reveal"><dt>link</dt><dd>A note's name in double brackets, <code>[[apollo]]</code>. The link is the relationship.</dd></div>
+        <div class="db-reveal"><dt>post</dt><dd>To copy an entry, word for word, into the note it is about, with a link to its day.</dd></div>
+        <div class="db-reveal"><dt>close</dt><dd>The decision on what is open, once a week or on a cycle you choose.</dd></div>
+        <div class="db-reveal"><dt>recall</dt><dd>A question you wrote, with the next day to ask yourself again.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 5. All of life -->
+  <section class="db-section db-life" aria-labelledby="db-life-title">
+    <div class="db-wrap">
+      <p class="db-kicker">One method for all of your life</p>
+      <h2 id="db-life-title" class="db-h2">A release, a renovation and a busy week<br>use the same pages.</h2>
+      <p class="db-intro">What changes is the vault, not the method. Keep one for work and one shared with your family; each works the same way.</p>
+      <div class="db-pair">
+        <figure class="db-card db-card--tilt-l db-reveal"><span class="db-card__file">work · 2026-11-11.md</span>
+          <code class="db-entry">- [ ] Budget approval from <span class="db-wl">[[john-roe]]</span> for <span class="db-wl">[[apollo]]</span> (waiting 2026-11-11)</code>
+          <figcaption><a href="{{ 'examples/work/' | url }}">Browse the work vault →</a></figcaption>
+        </figure>
+        <figure class="db-card db-card--tilt-r db-reveal"><span class="db-card__file">family · 2026-11-10-sam.md</span>
+          <code class="db-entry">- Decided: we go in the second half of July</code>
+          <code class="db-entry">- Should we take the car or the train?</code>
+          <figcaption><a href="{{ 'examples/family/' | url }}">Browse the family vault →</a></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Honest about the evidence -->
+  <section class="db-section db-evidence" aria-labelledby="db-evidence-title">
+    <div class="db-wrap db-evidence__grid">
+      <div>
+        <p class="db-kicker">What the research supports, and what it doesn't</p>
+        <h2 id="db-evidence-title" class="db-h2">Its parts are studied.<br>The whole is a bet.</h2>
+        <p class="db-intro">Nobody has tested the Daybook Method as a whole, any more than the Bullet Journal or the Zettelkasten. The method makes few claims, and it says how strong each one is.</p>
+        <a class="db-button" href="{{ 'method/' | url }}#why-it-works">Why it works, with sources</a>
+      </div>
+      <table class="db-strength">
+        <thead><tr><th scope="col">Practice</th><th scope="col">Evidence</th></tr></thead>
+        <tbody>
+          <tr><td>Recall: test yourself, after a gap</td><td><span class="db-meter" style="--n:3" aria-hidden="true"></span>Strong</td></tr>
+          <tr><td>Close the week</td><td><span class="db-meter" style="--n:2" aria-hidden="true"></span>Strong for monitoring goals; no study of a weekly close of notes</td></tr>
+          <tr><td>Your words, kept</td><td><span class="db-meter" style="--n:2" aria-hidden="true"></span>A meta-analysis</td></tr>
+          <tr><td>Log first, sort later</td><td><span class="db-meter" style="--n:1" aria-hidden="true"></span>One large field study, of email</td></tr>
+          <tr><td>Lapses break nothing</td><td><span class="db-meter" style="--n:1" aria-hidden="true"></span>One study each</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7. Fit -->
+  <section class="db-section db-fit" aria-labelledby="db-fit-title">
+    <div class="db-wrap db-fit__grid">
+      <div>
+        <p class="db-kicker">Whether it fits you</p>
+        <h2 id="db-fit-title" class="db-h2">Not the best method.<br>One that may fit how you think.</h2>
+      </div>
+      <div class="db-fit__cols">
+        <div class="db-reveal">
+          <h3>It suits you if</h3>
+          <ul>
+            <li>you lose thoughts while deciding where they go;</li>
+            <li>work, home and family each have their own app and list, and each is one more place to check;</li>
+            <li>you want your notes in plain files you own, readable in any editor for as long as text files are.</li>
+          </ul>
+        </div>
+        <div class="db-reveal">
+          <h3>Look elsewhere if</h3>
+          <ul>
+            <li>you need to track a team's work: that belongs on the team's board, and the daybook links to it;</li>
+            <li>you want a visual planner or an art journal;</li>
+            <li>you like to sort as you write. Folders work for some people, and that is fine.</li>
+          </ul>
+        </div>
+        <p class="db-fit__cost"><span class="db-hand">the cost</span> Nothing a day beyond writing, about fifteen minutes a week to close, and nothing at all when you skip.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block content %}
+  <div class="db-home-content">
+    {{ page.content }}
+  </div>
+{% endblock %}

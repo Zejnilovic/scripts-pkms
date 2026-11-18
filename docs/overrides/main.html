@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400;700&display=swap">
+  {% set title = config.site_name if page.is_homepage else page.title ~ " · " ~ config.site_name %}
+  {% set description = page.meta.description if page.meta and page.meta.description else config.site_description %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ description }}">
+{% endblock %}
+
+{% block footer %}
+  {% if config.extra.sibling %}
+    <div class="db-sibling">
+      <div class="md-grid db-sibling__inner">
+        <span class="db-sibling__label">Next door</span>
+        <a href="{{ config.extra.sibling.url }}">{{ config.extra.sibling.name }}</a>
+        <span class="db-sibling__note">{{ config.extra.sibling.note | default("an AI agent that drafts the posting and the close for you to approve, with every line linked to its source") }}</span>
+      </div>
+    </div>
+  {% endif %}
+  {{ super() }}
+{% endblock %}
