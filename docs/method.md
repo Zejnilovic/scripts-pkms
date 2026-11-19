@@ -183,13 +183,15 @@ The tree can go deeper. Going back to study for an MBA, you would make `learning
 
 `part_of` is optional, and it is not a folder: the note stays in `notes/` under its own name, so moving it under another parent changes one line and breaks nothing. Add it when you make the note, or at the close, or never. A note without one is simply not part of anything. pkm counts it as a link, so `pkm backlinks home` lists what belongs to the home, and `pkm rename` keeps it right. Write the name; pkm also reads `"[[home]]"`, the form some editors show as a link.
 
+A tree is also a way to look at work. `pkm tasks --under home` lists the tasks of the home and of every note in it, and the tasks on day pages that are about one of them: a line that links it, or a line under a `###` heading that does. `since`, `list` and `backlinks` take `--under` too.
+
 To see the whole shape of a vault, `pkm overview` lists each area with what belongs to it, then the active projects that belong to none, then the courses, topics and sources, then how many notes are in the archive. It is the one view of a vault that groups notes, and it is made from their frontmatter, so nothing is sorted to get it.
 
 ### Links
 
 A link is a note's name in double brackets: `[[jane-doe]]`, or `[[jane-doe|Jane]]` to show another word. The link is the relationship: there is no separate field for who works on what.
 
-Because a link names the note rather than its folder, moving a note never breaks a link. And every link is a path back. A note's **backlinks**, the lines that link to it, are its history as you wrote it, day by day.
+Because a link names the note rather than its folder, moving a note never breaks a link. And every link is a path back. A note's **backlinks**, the lines that link to it, are its history as you wrote it, day by day. They include the lines under a `###` heading that links it, so the notes of a call under `### Call with [[jane-doe]]` are part of Jane's history.
 
 **Links to the outside.** Tickets, boards, pull requests, bookings and quotes stay where they are. The vault links to them and doesn't copy them: an entry carries the link, `- Reviewed [pull request 42](https://github.com/acme-example/apollo/pull/42)`, and a project's **Links** section says where its work lives, such as the board, the code or the booking. The tool keeps the details and the latest state; your vault keeps what you think, decided and owe, and the way back to the rest.
 
@@ -538,7 +540,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Add a routine to an area | `pkm todo --every 1y --in home "Service the boiler"` | Write the routine under the note's Routines section |
 | See the shape of the vault | `pkm overview` | Search for `type: area` and for `part_of: home` |
 | Find by words | `pkm find mobile app` | Your editor's search across the folder |
-| See a note's history | `pkm backlinks apollo` | Search for `[[apollo` |
+| See a note's history | `pkm backlinks apollo` | Search for `[[apollo`, and read the lines under a heading that has it |
+| See the work of an area | `pkm tasks --under home` | Open each note of the area, and search the day pages for links to them |
 | Rename a note, fixing every link to it | `pkm rename joe-bloggs joe-bloggs-plumber` | Rename the file, add the old name to `aliases:`, and fix each `[[joe-bloggs` you find |
 | Move a finished note to the archive | `pkm mv apollo archive` | Move the file into `archive/`; its links keep working |
 | See what happened since a cycle began | `pkm since sprint --about apollo` | Read the pages since the sprint began, or search for `[[apollo` and keep the recent ones |

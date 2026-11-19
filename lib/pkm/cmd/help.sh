@@ -50,23 +50,23 @@ EOF
 command_options() {
   case $1 in
     find) echo "--live --json --abs --limit" ;;
-    backlinks) echo "--since --json --abs --limit" ;;
+    backlinks) echo "--since --under --json --abs --limit" ;;
     path) echo "--json --abs --limit" ;;
     check) echo "--json --abs --limit --urls" ;;
     links) echo "--external --json --abs --limit" ;;
     recall) echo "--json --abs --limit --answer" ;;
     evidence) echo "--verify" ;;
     get) echo "--lines" ;;
-    list) echo "--all --show --quiet --json --abs --limit" ;;
+    list) echo "--all --show --quiet --under --json --abs --limit" ;;
     overview) echo "--json" ;;
     upcoming) echo "--ics" ;;
     names) echo "--type --json --abs --limit" ;;
     index) echo "--rebuild" ;;
     rename) echo "--dry-run --no-alias" ;;
-    tasks) echo "--all --link --for --stale --json --abs --limit" ;;
+    tasks) echo "--all --link --for --under --stale --json --abs --limit" ;;
     day) echo "--edit" ;;
     cycle) echo "--date" ;;
-    since) echo "--about --seen --json --limit" ;;
+    since) echo "--about --under --seen --json --limit" ;;
     close) echo "--cycle --date --quarter --json" ;;
     add) echo "--day --file" ;;
     todo) echo "--due --high --low --waiting --someday --start --every --in" ;;

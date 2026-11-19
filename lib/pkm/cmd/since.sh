@@ -1,18 +1,22 @@
 # shellcheck shell=bash
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/cmd/since.sh: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]: what happened from
+# lib/pkm/cmd/since.sh: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]: what happened from
 # a date to today, in the day pages of every writer, as sections: == notes (created in the range), == log (every line),
 # == tasks (overdue, and waiting, each with its days), == marked (! Decided: Idea: entries and questions) and == names (the
 # names linked, with their count and last day). Only sections with lines are printed; with none, "Nothing since <date>."
 # and exit 1. last starts on the date in .pkm/state (set by since --seen, with its time), or the last 7 days; on that date it
 # leaves out the entries timed at or before the stored time, and keeps untimed lines. N is today and the N-1 days
-# before. --about NAME keeps the lines about NAME (about.sh): those that link it, a ### heading's links included. Sourced by bin/pkm.
+# before. --about NAME keeps the lines about NAME (about.sh): those that link it, a ### heading's links included.
+# --under <note> keeps the lines of the notes in its tree, and the day page lines about one of them (tree.sh). Sourced by
+# bin/pkm.
 
 # since_build <start>: the records of the sections, US-separated: section, sort keys, path, line, text, state, days, name,
-# count, last, label. Reads $tmp/dg-names, $tmp/dg-pages and $tmp/since-tasks; the environment has ABOUT, TODAY and US.
+# count, last, label. Reads $tmp/dg-names, $tmp/dg-pages and $tmp/since-tasks; the environment has ABOUT, TODAY and US,
+# and for --under, UNDER with the files UNDER_PATHS and UNDER_LINES.
 since_build() {
-  awk -F "$US" -v OFS="$US" -v US="$US" -v ABOUT="$ABOUT" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(awk_dates)"'
+  awk -F "$US" -v OFS="$US" -v US="$US" -v ABOUT="$ABOUT" -v UNDER="${UNDER:-}" -v UNDER_PATHS="${UNDER_PATHS:-}" \
+    -v UNDER_LINES="${UNDER_LINES:-}" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(awk_dates)"'
     function ago(d,  k) { k = ymd(TODAY) - ymd(d); if (k == 0) return "today"; if (k == 1) return "yesterday"; return k " days ago" }
     function pad(n) { return sprintf("%06d", n) }
     function marked_text(t,  s) {
@@ -21,6 +25,14 @@ since_build() {
       if (s ~ /^~~/) return 0
       sub(/^[0-9][0-9]:[0-9][0-9] /, "", s)
       return (s ~ /^! / || s ~ /^Decided:/ || s ~ /^Idea:/ || s ~ /\?[ \t]*$/)
+    }
+    # under(path, line): 1 without --under, else 1 for a line of a note in the tree or a day page line about one.
+    function under(path, line) { return UNDER == "" || (path in tree) || ((path ":" line) in near) }
+    BEGIN {
+      if (UNDER != "") {
+        while ((getline l < UNDER_PATHS) > 0) tree[l] = 1
+        while ((getline l < UNDER_LINES) > 0) near[l] = 1
+      }
     }
     function emit(sec, a, b, c, path, line, text, state, days, name, count, last, label) {
       print sec US a US b US c US path US line US text US state US days US name US count US last US label
@@ -42,6 +54,7 @@ since_build() {
       }
       key = $1 SUBSEP $3
       if (ABOUT != "" && index(allk[key], "|" ABOUT "|") == 0) next
+      if (!under($1, $3)) next
       kept[key] = 1
       emit("2log", $1, pad($3), "", $1, $3, $5, "", "", "", "", "", "")
       if (marked_text($5)) emit("4marked", $1, pad($3), "", $1, $3, $5, "", "", "", "", "", "")
@@ -53,6 +66,7 @@ since_build() {
       if ($6 == 1 && !($12 != "" && $12 <= TODAY)) next       # someday, and not started yet
       key = $1 SUBSEP $2
       if (ABOUT != "" && index(allk[key], "|" ABOUT "|") == 0) next
+      if (!under($1, $2)) next
       if ($4 != "" && $4 < TODAY) {
         emit("3task", $1, pad($2), "", $1, $2, $13, "open", ymd(TODAY) - ymd($4), "", "", "", "overdue")
       } else if ($5 == "?") {
@@ -129,21 +143,29 @@ since_notes() {
   ' -v US="$US"
 }
 
+# under_keep_notes: the notes section records (from since_notes, on stdin) of the notes in $tmp/under-paths.
+under_keep_notes() {
+  local US
+  US=$(printf '\037')
+  awk -F "$US" 'FILENAME == ARGV[1] { tree[$0] = 1; next } $5 in tree' "$tmp/under-paths" -
+}
+
 cmd_since() {
-  local arg="" about="" seen=no limit="" json=no start US ABOUT TODAY
+  local arg="" about="" under="" seen=no limit="" json=no start US ABOUT TODAY
   US=$(printf '\037')
   while [ $# -gt 0 ]; do
     case $1 in
       --seen) seen=yes; shift ;;
       --json) json=yes; shift ;;
       --about) [ $# -ge 2 ] || die 2 "--about needs a name"; about=$2; shift 2 ;;
+      --under) [ $# -ge 2 ] && [ -n "$2" ] || die 2 "--under needs a note, such as apollo"; under=$2; shift 2 ;;
       --limit) [ $# -ge 2 ] || die 2 "--limit needs a whole number"; number "$2" "--limit"; limit=$2; shift 2 ;;
-      *) [ -z "$arg" ] || die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]"; arg=$1; shift ;;
+      *) [ -z "$arg" ] || die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]"; arg=$1; shift ;;
     esac
   done
   TODAY=$today
   if [ "$seen" = yes ]; then
-    [ -z "$arg" ] && [ -z "$about" ] && [ "$json" = no ] && [ -z "$limit" ] || die 2 "pkm since --seen takes no other argument."
+    [ -z "$arg" ] && [ -z "$about" ] && [ -z "$under" ] && [ "$json" = no ] && [ -z "$limit" ] || die 2 "pkm since --seen takes no other argument."
     local seen_time
     seen_time="${now:8:2}:${now:10:2}"
     state_write_since "$today" "$seen_time" || exit $?
@@ -165,16 +187,21 @@ cmd_since() {
   elif cycle_known "$arg"; then
     start=$(cycle_period "$arg" "$(day_add "$today" -1)" | cut -d ' ' -f 1)
   else
-    die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]: $arg is none of them"
+    die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]: $arg is none of them"
   fi
   ABOUT=""
   [ -z "$about" ] || ABOUT=$(about_key "$about")
+  : > "$tmp/under-paths"; : > "$tmp/under-lines"
+  [ -z "$under" ] || under_build "$under"
   digest_pages "$start" "$today"
   digest_names
   task_records no > "$tmp/since-tasks"
   {
-    [ -n "$about" ] || since_notes "$start" "$today"
-    ABOUT=$ABOUT TODAY=$today US=$US SEEN_TIME=$SEEN_TIME since_build "$start"
+    if [ -z "$about" ]; then
+      if [ -n "$under" ]; then since_notes "$start" "$today" | under_keep_notes; else since_notes "$start" "$today"; fi
+    fi
+    UNDER=$under UNDER_PATHS="$tmp/under-paths" UNDER_LINES="$tmp/under-lines" ABOUT=$ABOUT TODAY=$today US=$US \
+      SEEN_TIME=$SEEN_TIME since_build "$start"
   } | LC_ALL=C sort -t "$US" -k1,1 -k2,2 -k3,3 -k4,4 > "$tmp/since-records"
   if [ ! -s "$tmp/since-records" ]; then
     [ "$json" = yes ] || echo "Nothing since $start."

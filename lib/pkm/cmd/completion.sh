@@ -55,7 +55,7 @@ EOF
 complete_value_option() {
   case $1 in
     --vault|-V|--day|--due|--start|--every|--link|--stale|--name|--since|--type|--show|--quiet|--lines|--date|\
-    --about|--limit|--cycle|--answer|--require) return 0 ;;
+    --about|--under|--limit|--cycle|--answer|--require) return 0 ;;
   esac
   return 1
 }
@@ -96,7 +96,7 @@ cmd_complete() {
     --vault) echo :dirs; return ;;
     -V) complete_pkm vaults | cut -f 1; return ;;
     --type) complete_types; return ;;
-    --link|--about) complete_notes; return ;;
+    --link|--about|--under) complete_notes; return ;;
     --cycle) complete_cycles; return ;;
     --every) printf '%s\n' 1d 1w 1m 1y; complete_cycles | grep -vx week; return ;;
     --due|--start|--day) complete_days; return ;;

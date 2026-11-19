@@ -66,14 +66,14 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `todo <text> [--due <day>] [--high\|--low] [--waiting\|--someday\|--start <day>\|--every <N>d\|w\|m\|y or cycle [--in <note>]]` | Adds a task under the Tasks section of the day's page; prints `path:line`. `--every` takes an interval (`1w`) or a cycle name, and writes the routine to the note named `routines` (created when missing), not to the day's page; with `--in <note>`, to that note's Routines section |
 | `done <words\|path:line> [--drop\|--next <day>]` | Marks the one open task that matches as done, or dropped with `--drop`. A routine with an interval, such as `(every 1m)`, keeps its box and moves its due date on; with `--next`, to that day |
 | `moved <path:line> <when>` | Strikes a task or an event whose date changed and writes it again with the new date: below the old line in a note, on today's page from another day, linking that day |
-| `tasks [open\|waiting\|someday\|done [<since>]] [--link <name>] [--for <who>] [--stale <days>] [--all]` | Open tasks of every note, in groups: overdue, due soon, waiting, the rest. `--for` keeps someone's: the lines with a `(for …)` naming them, and a writer's own tasks. `--all` includes `archive/` |
+| `tasks [open\|waiting\|someday\|done [<since>]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]` | Open tasks of every note, in groups: overdue, due soon, waiting, the rest. `--for` keeps someone's: the lines with a `(for …)` naming them, and a writer's own tasks. `--under` keeps those of a note's tree. `--all` includes `archive/` |
 | `upcoming [<days>] [--ics]` | Due tasks, routines included, events, and birthdays, target and warranty dates in the next days; `--ics` writes the events, tasks with a time and birthdays as a calendar file |
 | `new <type> <title> [--name <name>]` | A note in `notes/`, or the type's folder from its setting, made from its template; prints its path. `new close` writes the close page |
 | `names [--type <type>]` | Every note's name, type, path and aliases, from the cache. `--type person` lists the people |
-| `backlinks <name> [--since <date>]` | Every line that links a note, by its file name, slug or alias |
+| `backlinks <name> [--since <date>] [--under <note>]` | Every line that links a note, by its file name, slug or alias, and the lines under a `###` heading that links it |
 | `path <name>` | The file a name, slug, alias or link points to |
 | `find [--live] <word> [<word>...]` | Lines with every word, in any order, as `path:line: text`. Smart case. Searches `archive/` unless `--live` |
-| `list [<field>=<value> ...] [--show <fields>] [--quiet <days>]` | Notes whose frontmatter matches, from the cache: path, type, title, then the fields asked for. `--quiet <days>` lists notes that no day page has linked in that many days |
+| `list [<field>=<value> ...] [--show <fields>] [--quiet <days>] [--under <note>]` | Notes whose frontmatter matches, from the cache: path, type, title, then the fields asked for. `--quiet <days>` lists notes that no day page has linked in that many days; `--under` keeps the notes of a note's tree |
 | `overview [--json]` | The shape of the vault: each area with the notes that are `part_of` it, as a tree, then projects, resources (courses, topics, sources) and other notes with notes under them, then the archive's count. A line is `path:<title line>: <titles from the top> (<type>, <status>)` |
 | `tags` | Every tag with its count |
 | `index [--rebuild]` | Brings the cache in `.pkm/cache` up to date. The cache is a speed-up only |
@@ -83,7 +83,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
 | `links --external [note]` | Each web address in the notes, outside code, as `path:line: address` |
 | `cycle [name] [--date D]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
-| `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `since --seen` marks where the next `since last` starts |
+| `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--under <note>] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `since --seen` marks where the next `since last` starts |
 | `close [--cycle name] [--date D] [--quarter] [--json]` | The close of the period holding yesterday: tasks, open questions, what is due, marked entries, names with no note, quiet projects and people, and ideas |
 | `get <name>[#Section] [--lines a-b]` | A note, or one section of it, between `<<<note` and `>>>end` lines |
 | `post <path:line[-line]> <note>[#Section]` | Copies those lines verbatim into the section, with `([[day]])` after the last one |

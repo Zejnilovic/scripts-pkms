@@ -6,6 +6,8 @@ Version numbers: **major** when a command, option, output format, note name, lin
 
 ## 0.5.0 (unreleased)
 
+- `--under <note>` on `tasks`, `since`, `list` and `backlinks`: only the lines of the notes in that note's tree (`part_of`), and the lines of day pages about one of them, a line under a `###` heading that links one included. `list --under` keeps the notes of the tree.
+- `backlinks` also lists the lines under a `###` heading that links the name, in any file, so the notes of a call under `### Call with [[jane-doe]]` are among Jane's backlinks. Scripts that read `backlinks` get more lines.
 - `since --about` also takes a `[[link]]` or a note's path in the vault, as well as a name, a slug or an alias.
 - Inside: the `part_of` trees (`lib/pkm/tree.sh`) and the lines about a name (`lib/pkm/about.sh`) are shared pieces now, taken out of `overview` and `since`, for `--under` and the backlinks of headings to come. Their output is unchanged.
 

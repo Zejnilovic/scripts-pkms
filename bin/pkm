@@ -20,7 +20,7 @@
 #                                 marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
 #                                 A routine with an interval, such as (every 1m), keeps its box and moves its due date on
 #                                 (--next <day>: to that day, for a routine done early or late)
-#   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--stale <days>] [--all]
+#   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]
 #                                 the open tasks of every note, in groups: overdue, due soon, waiting, the rest
 #                                 (docs/contract.md gives the order). A task is a "- [ ]" line outside code
 #   new <type> <title> [--name <name>]
@@ -28,8 +28,9 @@
 #                                 no template is made from the note template. An existing name fails (exit 1) and says so
 #   upcoming [<days>] [--ics]     due tasks (routines too), events, birthdays, target and warranty dates in the next <days> (14);
 #                                 --ics prints the events, tasks with a time and birthdays as a calendar file
-#   backlinks <name> [--since YYYY-MM-DD]
-#                                 every line that links a note, by its file name, slug or alias, archive included
+#   backlinks <name> [--since YYYY-MM-DD] [--under <note>]
+#                                 every line that links a note, by its file name, slug or alias, archive included, and
+#                                 the lines under a ### heading that links it
 #   names [--type <type>]         every note's name, type, path and aliases, by name, from the cache. Day and close pages
 #                                 are left out unless --type says them: names --type person lists the people
 #   index [--rebuild]             brings the cache (.pkm/cache, or PKM_CACHE_DIR) up to date and says what changed
@@ -38,7 +39,7 @@
 #                                 becomes an alias unless --no-alias; --dry-run lists the changes and writes nothing
 #   mv <note> <folder>            moves a note into a folder; its links keep working. Both record the move in .pkm/moves.tsv
 #   path <name>                   the path of the note, attachment or alias a [[name]] link points to, archive included
-#   list [<field>=<value> ...] [--show <field>,...] [--all] [--quiet <days>]
+#   list [<field>=<value> ...] [--show <field>,...] [--all] [--quiet <days>] [--under <note>]
 #                                 notes whose frontmatter matches, from the cache: path, type, title, then the --show fields;
 #                                 --quiet lists those no day page in the last <days> days links
 #   overview [--json]             the shape of the vault: each area with the notes that are part_of it, then projects,
@@ -64,7 +65,7 @@
 #   links --external [note]       each http(s) address outside code, as path:line: address (links to notes: backlinks)
 #   cycle [name] [--date D]       the period of a cycle holding a date (today): name, first and last day; cycles are set in
 #                                 .pkm/config as cycle_<name>=2w from <weekday|date> or cycle_<name>=1m from <day 1-28|date>
-#   since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]
+#   since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]
 #                                 what happened since then, in sections: notes, log, tasks, marked, names; since --seen
 #                                 marks where the next since last starts (.pkm/state)
 #   recall [note] [--json] [--limit n]

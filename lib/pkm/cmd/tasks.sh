@@ -5,19 +5,21 @@
 # Order: overdue (oldest due first), then due within due_soon_days (soonest first), then waiting for more than
 # waiting_days (longest first), then the rest (by due date, undated last, then by the day page's date, path and line).
 # --for <who> keeps the tasks and questions that are someone's (people.sh): a writer's own tasks and those for them.
+# --under <note> keeps those of the note's tree (tree.sh).
 # Sourced by bin/pkm. Defines functions only.
 
 cmd_tasks() {
-  local view=open all=no stale="" link="" since="" cutoff="" soon waited soon_end waited_cut US for="" key=""
+  local view=open all=no stale="" link="" since="" cutoff="" soon waited soon_end waited_cut US for="" key="" under=""
   while [ $# -gt 0 ]; do
     case $1 in
       --all) all=yes; shift ;;
       --stale) [ $# -ge 2 ] || die 2 "--stale needs a number of days"; number "$2" "--stale"; stale=$2; shift 2 ;;
       --link) [ $# -ge 2 ] || die 2 "--link needs a name"; link=${2%.md}; shift 2 ;;
+      --under) [ $# -ge 2 ] && [ -n "$2" ] || die 2 "--under needs a note, such as apollo"; under=$2; shift 2 ;;
       --for) [ $# -ge 2 ] && [ -n "$2" ] || die 2 "--for needs a name: a writer, or a note such as jane-doe"; for=$2; shift 2 ;;
       open|waiting|someday) view=$1; shift ;;
       "done") view="done"; shift; if [ $# -gt 0 ] && is_date "$1"; then since=$1; shift; fi ;;
-      *) die 2 "Usage: pkm tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--stale <days>] [--all]" ;;
+      *) die 2 "Usage: pkm tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]" ;;
     esac
   done
   if [ "$view" = "done" ]; then all=yes; [ -n "$since" ] || since=$(day_add "$today" -7); fi
@@ -36,6 +38,11 @@ cmd_tasks() {
     awk -F "$US" '{ print $1 ":" $2 }' "$tmp/tasks-for-records" > "$tmp/tasks-for"
     awk -F "$US" -v OFS="$US" '$3 == "question" { print $1, $2, "question", "", "", 0, "", "", "", $8, "", "", $9 }' \
       "$tmp/tasks-for-records" >> "$tmp/tasks-all"
+  fi
+  # --under keeps the tasks of the notes in a note's tree, and those on day pages about one of them (tree.sh).
+  if [ -n "$under" ]; then
+    under_build "$under"
+    under_keep "$tmp/tasks-all"
   fi
   awk -F "$US" -v OFS="$US" -v view="$view" -v since="$since" -v link="$link" -v cutoff="$cutoff" -v all="$all" \
       -v today="$today" -v soon_end="$soon_end" -v waited_cut="$waited_cut" -v forwho="$for" '

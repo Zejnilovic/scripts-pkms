@@ -48,3 +48,42 @@ tree_paths() {
     }
   ' "$tmp/tp-parents" | LC_ALL=C sort > "$2"
 }
+
+# under_build <name>: what --under <name> keeps: $tmp/under-paths, the notes of the tree of the note the name means (a
+# name, slug, alias, [[link]] or path), and $tmp/under-lines, path:line of each day page line about one of them
+# (about.sh). Exits 1 when the name means no note.
+under_build() {
+  local name=$1 top tab US
+  tab=$(printf '\t')
+  US=$(printf '\037')
+  index_ensure
+  name=${name#\[\[}; name=${name%\]\]}; name=${name%%|*}
+  top=$(note_for "$name")
+  [ -n "$top" ] || die 1 "No note named $1: --under takes a note, such as apollo."
+  tree_paths "$top" "$tmp/under-paths"
+  # The day pages that link a note of the tree; the lines about one of them, a ### heading's included.
+  link_build ""
+  awk -F "$tab" 'FILENAME == ARGV[1] { tree[$0] = 1; next } ($6 in tree) && $1 ~ /^daybook\// { print $1 }' \
+    "$tmp/under-paths" "$tmp/lb-links" | LC_ALL=C sort -u > "$tmp/under-days"
+  : > "$tmp/under-lines"
+  [ -s "$tmp/under-days" ] || return 0
+  about_pages "$tmp/under-days" "$tmp/under-pages"
+  about_names "$tmp/under-pages" "$tmp/under-names"
+  awk -F "$US" '
+    FILENAME == ARGV[1] { n = $0; sub(/.*\//, "", n); sub(/\.md$/, "", n); key[n] = 1; next }
+    ($3 in key) && $1 ~ /^daybook\// { print $1 ":" $2 }
+  ' "$tmp/under-paths" "$tmp/under-names" | LC_ALL=C sort -u > "$tmp/under-lines"
+}
+
+# under_keep <records file>: keeps, in place, the US-separated records (path, line, ...) that --under keeps: those of a
+# note in $tmp/under-paths, and the day page lines in $tmp/under-lines. Needs under_build first.
+under_keep() {
+  local US
+  US=$(printf '\037')
+  awk -F "$US" '
+    FILENAME == ARGV[1] { tree[$0] = 1; next }
+    FILENAME == ARGV[2] { line[$0] = 1; next }
+    ($1 in tree) || (($1 ":" $2) in line)
+  ' "$tmp/under-paths" "$tmp/under-lines" "$1" > "$tmp/under-kept"
+  cat "$tmp/under-kept" > "$1"
+}
