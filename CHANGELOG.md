@@ -6,6 +6,7 @@ Version numbers: **major** when a command, option, output format, note name, lin
 
 ## 0.5.0 (unreleased)
 
+- `pkm get <note>[#Section] --plain`: the text to paste for someone outside the vault, with each link as its shown text or the note's title, and without the links to day pages, the markers, the frontmatter and struck lines.
 - `pkm --vaults [<a,b>] tasks|upcoming|since`: the command in each named vault, each under `== vault <name>` with its own paths, and `vault` added in `--json`. With no names it takes the new user setting `vaults=` (such as `vaults=work,family`). It only reads; nothing is copied between vaults.
 - `--json` on `upcoming` (with `date`, `kind`, `time` and `end`), `tags`, `cycle` and `vaults`. `since` and `close` now say how to get jq when `--json` needs it.
 - `--under <note>` on `tasks`, `since`, `list` and `backlinks`: only the lines of the notes in that note's tree (`part_of`), and the lines of day pages about one of them, a line under a `###` heading that links one included. `list --under` keeps the notes of the tree.

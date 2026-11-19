@@ -3,7 +3,7 @@
 . "$pkm_home/lib/pkm/globals.sh"
 # lib/pkm/plain.sh: a line as someone outside the vault reads it: links as their shown text, or the title of the note
 # they name, and, for a summary, without the list mark, the box, the entry's time, the markers and the link to the day
-# the line came from. Used by upcoming --ics. Sourced by bin/pkm. Defines functions only.
+# the line came from. Used by upcoming --ics and get --plain. Sourced by bin/pkm. Defines functions only.
 
 # plain_titles <texts file> <out>: name<TAB>title for each link target in the texts, from the cache (a target that
 # names no note keeps no row).

@@ -55,9 +55,10 @@
 #   tags [--json]                 every tag with its count
 #   check [--urls]                broken links, duplicate names, secrets and merge conflicts (exit 1), and notices;
 #                                 --urls also GETs each web address (curl, 5 s, 8 at once): no answer, 404 or 410 (exit 1)
-#   get <name>[#Section] [--lines a-b]
+#   get <name>[#Section] [--lines a-b] [--plain]
 #                                 a note, or one section (its heading to the next of the same or a higher level), between
-#                                 "<<<note path lines a-b" and ">>>end"; --lines takes the note's own line numbers
+#                                 "<<<note path lines a-b" and ">>>end"; --lines takes the note's own line numbers;
+#                                 --plain prints it for a reader outside the vault: links as text, no sources or markers
 #   post <path:line[-line]> <note>[#Section]
 #                                 copies those lines into the section, verbatim, with " ([[page]])" after the last one,
 #                                 and prints path:line; a missing section is made at the end. Refuses a heading, an open

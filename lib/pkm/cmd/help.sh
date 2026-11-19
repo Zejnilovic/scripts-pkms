@@ -56,7 +56,7 @@ command_options() {
     links) echo "--external --json --abs --limit" ;;
     recall) echo "--json --abs --limit --answer" ;;
     evidence) echo "--verify" ;;
-    get) echo "--lines" ;;
+    get) echo "--lines --plain" ;;
     list) echo "--all --show --quiet --under --json --abs --limit" ;;
     overview|tags|vaults) echo "--json" ;;
     upcoming) echo "--ics --json" ;;

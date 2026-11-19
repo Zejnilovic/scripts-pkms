@@ -541,6 +541,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | See the shape of the vault | `pkm overview` | Search for `type: area` and for `part_of: home` |
 | Find by words | `pkm find mobile app` | Your editor's search across the folder |
 | See a note's history | `pkm backlinks apollo` | Search for `[[apollo`, and read the lines under a heading that has it |
+| Share a section with someone outside the vault | `pkm get apollo#Now --plain` | Copy the section, and take out the links to day pages and the markers |
 | See the work of an area | `pkm tasks --under home` | Open each note of the area, and search the day pages for links to them |
 | Rename a note, fixing every link to it | `pkm rename joe-bloggs joe-bloggs-plumber` | Rename the file, add the old name to `aliases:`, and fix each `[[joe-bloggs` you find |
 | Move a finished note to the archive | `pkm mv apollo archive` | Move the file into `archive/`; its links keep working |
