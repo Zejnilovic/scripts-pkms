@@ -3,6 +3,7 @@ type: writing
 summary:
 form:
 status: idea
+part_of:
 audience:
 venue:
 language:

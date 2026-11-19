@@ -12,6 +12,10 @@
 # name and moved into place, and the manifest last, so an interrupted run leaves a cache that is read again next time.
 # Sourced by bin/pkm. Defines functions only.
 
+# cache_schema: what the cache files hold, written to its version file. A cache of another version, or with none (pkm
+# 0.1.0's), is read again in full, since other rules made its rows. 2: part_of counts as a link.
+cache_schema=2
+
 # cache_dir: the cache folder: PKM_CACHE_DIR, or .pkm/cache in the vault.
 cache_dir() {
   if [ -n "${PKM_CACHE_DIR:-}" ]; then printf '%s\n' "$PKM_CACHE_DIR"; else printf '%s\n' ".pkm/cache"; fi
@@ -33,7 +37,7 @@ pkm_stats() {
 # index_extract <list of notes>: one awk pass. Writes NOTES_OUT (notes.tsv rows) and FIELDS_OUT (fields.tsv rows).
 index_extract() {
   # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
-  scan "$1" "$(awk_links_in)"'
+  scan "$1" "$(awk_links_in)$(awk_part_of)"'
     function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
     function clean(s) { s = trim(s); gsub(/\t/, " ", s); return s }
     function clean_alias(s) { s = trim(s); gsub(/^["'"'"']|["'"'"']$/, "", s); return trim(s) }
@@ -64,6 +68,9 @@ index_extract() {
     }
     state == "front" {
       if ($0 == "---") { state = "body"; curkey = ""; next }
+      # part_of names its note without brackets as well; with them, the link rule above has counted it already.
+      pv = part_of_value($0)
+      if (pv != "" && index(pv, "[[") == 0) { pt = part_of_target(pv); if (pt != "") print path "\t" FNR "\t" pt > ENVIRON["LINKS_OUT"] }
       if (curkey != "" && $0 ~ /^[ \t]+- /) { item = $0; sub(/^[ \t]+- /, "", item); fm[curkey] = (fm[curkey] == "" ? "" : fm[curkey] ", ") trim(item); next }
       if (match($0, /^[A-Za-z0-9_-]+:/)) { curkey = substr($0, 1, RLENGTH - 1); fm[curkey] = trim(substr($0, RLENGTH + 1)); next }
       curkey = ""
@@ -80,6 +87,7 @@ index_update() {
   dir=$(cache_dir)
   tab=$(printf '\t')
   mkdir -p "$dir" || die 2 "Can't create the cache folder $dir."
+  if [ "$(cat "$dir/version" 2>/dev/null)" != "$cache_schema" ]; then rebuild=yes; fi
   if [ "$rebuild" = yes ]; then rm -f "$dir/manifest.tsv" "$dir/notes.tsv" "$dir/fields.tsv" "$dir/names.tsv" "$dir/links.tsv"; fi
   # The manifest is trusted only when the other files agree with it: one note row per note, one name per file. A cache
   # that doesn't agree (a part missing, or a run that stopped) is read again in full.
@@ -128,6 +136,7 @@ index_update() {
   ' "$dir/notes.tsv" "$tmp/idx-now" | LC_ALL=C sort -s -t "$tab" -k1,1 -k3,3 > "$tmp/idx-names"
   # Each file goes to a temporary name in the cache folder and is moved into place; the manifest is written last.
   cp "$tmp/idx-names" "$dir/names.tsv.tmp.$$" && mv "$dir/names.tsv.tmp.$$" "$dir/names.tsv"
+  printf '%s\n' "$cache_schema" > "$dir/version.tmp.$$" && mv "$dir/version.tmp.$$" "$dir/version"
   LC_ALL=C sort -t "$tab" -k1,1 "$tmp/idx-now" > "$dir/manifest.tsv.tmp.$$" && mv "$dir/manifest.tsv.tmp.$$" "$dir/manifest.tsv"
   if [ "$report" = yes ]; then
     echo "Indexed $(wc -l < "$dir/notes.tsv" | tr -d ' ') notes and $(wc -l < "$dir/manifest.tsv" | tr -d ' ') files: $(wc -l < "$tmp/idx-changed" | tr -d ' ') changed, $(wc -l < "$tmp/idx-gone" | tr -d ' ') gone."

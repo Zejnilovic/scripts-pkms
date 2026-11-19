@@ -62,8 +62,8 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | Command | Does |
 |---|---|
 | `day [YYYY-MM-DD] [--edit]` | The day's page, `daybook/<year>/<month>/<date>.md`, created when missing; prints its path. In a shared vault the page is `<date>-<writer>.md`. `--edit` opens it in `$EDITOR` |
-| `add [--day <date>] <text\|->` | An entry at the end of the day's Log, `- HH:MM text`; prints `path:line`. Several lines, or `-` for stdin, go under `### HH:MM` verbatim |
-| `todo <text> [--due <day>] [--high\|--low] [--waiting\|--someday\|--start <day>\|--every <N>d\|w\|m\|y or cycle]` | Adds a task under the Tasks section of the day's page; prints `path:line`. `--every` takes an interval (`1w`) or a cycle name, and writes the routine to the note named `routines` (created when missing), not to the day's page |
+| `add [--day <date>] [--file <path>] <text\|->` | An entry at the end of the day's Log, `- HH:MM text`; prints `path:line`. Several lines, or `-` for stdin, go under `### HH:MM` verbatim. `--file` copies a file to `files/<year>/<month>/<date>-<name>`, never over another, and the entry links it |
+| `todo <text> [--due <day>] [--high\|--low] [--waiting\|--someday\|--start <day>\|--every <N>d\|w\|m\|y or cycle [--in <note>]]` | Adds a task under the Tasks section of the day's page; prints `path:line`. `--every` takes an interval (`1w`) or a cycle name, and writes the routine to the note named `routines` (created when missing), not to the day's page; with `--in <note>`, to that note's Routines section |
 | `done <words\|path:line> [--drop]` | Marks the one open task that matches as done, or dropped with `--drop`. A routine with an interval, such as `(every 1m)`, keeps its box and moves its due date on |
 | `tasks [open\|waiting\|someday\|done [<since>]] [--link <name>] [--stale <days>] [--all]` | Open tasks of every note, in groups: overdue, due soon, waiting, the rest. `--all` includes `archive/` |
 | `upcoming [<days>]` | Due tasks, routines included, and birthdays, target and warranty dates in the next days |
@@ -73,6 +73,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `path <name>` | The file a name, slug, alias or link points to |
 | `find [--live] <word> [<word>...]` | Lines with every word, in any order, as `path:line: text`. Smart case. Searches `archive/` unless `--live` |
 | `list [<field>=<value> ...] [--show <fields>] [--quiet <days>]` | Notes whose frontmatter matches, from the cache: path, type, title, then the fields asked for. `--quiet <days>` lists notes that no day page has linked in that many days |
+| `overview [--json]` | The shape of the vault: each area with the notes that are `part_of` it, as a tree, then projects, resources (courses, topics, sources) and other notes with notes under them, then the archive's count. A line is `path:<title line>: <titles from the top> (<type>, <status>)` |
 | `tags` | Every tag with its count |
 | `index [--rebuild]` | Brings the cache in `.pkm/cache` up to date. The cache is a speed-up only |
 | `rename <old> <new> [--dry-run] [--no-alias]` | Renames a note and rewrites every link to it, keeping the shown text. The old name becomes an alias unless `--no-alias`. `--dry-run` writes nothing |
@@ -98,7 +99,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 
 ## Templates
 
-New notes are made from templates in the vault's `templates/` folder, then your `~/.config/pkm/templates/`, then the defaults: [day](share/pkm/templates/day.md), [note](share/pkm/templates/note.md), [person](share/pkm/templates/person.md), [project](share/pkm/templates/project.md), [topic](share/pkm/templates/topic.md), [source](share/pkm/templates/source.md), [list](share/pkm/templates/list.md), [close](share/pkm/templates/close.md), [course](share/pkm/templates/course.md), [coaching](share/pkm/templates/coaching.md), [writing](share/pkm/templates/writing.md) and [item](share/pkm/templates/item.md). `pkm templates eject <type>` copies one into the vault to change it. A type of your own needs only a template with `type: <type>` in it.
+New notes are made from templates in the vault's `templates/` folder, then your `~/.config/pkm/templates/`, then the defaults: [day](share/pkm/templates/day.md), [note](share/pkm/templates/note.md), [person](share/pkm/templates/person.md), [project](share/pkm/templates/project.md), [area](share/pkm/templates/area.md), [topic](share/pkm/templates/topic.md), [source](share/pkm/templates/source.md), [list](share/pkm/templates/list.md), [close](share/pkm/templates/close.md), [course](share/pkm/templates/course.md), [coaching](share/pkm/templates/coaching.md), [writing](share/pkm/templates/writing.md) and [item](share/pkm/templates/item.md). `pkm templates eject <type>` copies one into the vault to change it. A type of your own needs only a template with `type: <type>` in it.
 
 ## Maintaining pkm
 

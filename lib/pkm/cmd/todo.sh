@@ -5,13 +5,14 @@
 # Sourced by bin/pkm. Defines functions only.
 
 cmd_todo() {
-  local text="" due="" priority="" kind="" start="" rule="" markers page loc
-  local usage_todo="Usage: pkm todo <text> [--due <day>] [--high | --low] [--waiting | --someday | --start <day> | --every <N>d|w|m|y or cycle]"
+  local text="" due="" priority="" kind="" start="" rule="" into="" markers page loc type
+  local usage_todo="Usage: pkm todo <text> [--due <day>] [--high | --low] [--waiting | --someday | --start <day> | --every <N>d|w|m|y or cycle [--in <note>]]"
   local days_help="use YYYY-MM-DD, today, tomorrow, +3d, +2w or a weekday"
   while [ $# -gt 0 ]; do
     case $1 in
       --due) { [ $# -ge 2 ] && due=$(parse_day "$2"); } || die 2 "Not a day: ${2:-} ($days_help)"; shift 2 ;;
       --high|--low) priority=${1#--}; shift ;;
+      --in) [ $# -ge 2 ] && [ -n "$2" ] || die 2 "--in needs a note's name"; into=$2; shift 2 ;;
       --waiting|--someday|--start|--every)
         [ -z "$kind" ] || die 2 "A task is only one of --waiting, --someday, --start and --every."
         kind=${1#--}
@@ -31,6 +32,7 @@ cmd_todo() {
     esac
   done
   [ -n "$text" ] || die 2 "$usage_todo"
+  [ -z "$into" ] || [ "$kind" = every ] || die 2 "--in is for a routine: give it --every too, such as --every 1y --in $into"
   markers=""
   [ -z "$due" ] || markers="$markers (due $due)"
   [ -z "$priority" ] || markers="$markers ($priority)"
@@ -43,6 +45,16 @@ cmd_todo() {
   if [ "$kind" = every ]; then
     # A routine lives in a note, so it goes to the note named routines (made when missing), not to today's page.
     index_ensure
+    if [ -n "$into" ]; then
+      # --in puts the routine with what it is about, at the end of the note's Routines section (made when missing).
+      page=$(resolve_note "$into")
+      [ -n "$page" ] || die 1 "No note named $into: make it with pkm new area \"$into\", or name another."
+      type=$(note_type "$page")
+      case $type in day|close) die 1 "$page is a $type page, and a page is a record: a routine lives in a note." ;; esac
+      loc=$(section_add "$page" Routines "- [ ] $text$markers" no) || exit $?
+      echo "$page:$loc"
+      return 0
+    fi
     page=$(resolve_note routines)
     [ -n "$page" ] || page=$(routines_note_create) || exit $?
     loc=$(append_task_line "$page" "- [ ] $text$markers") || exit $?

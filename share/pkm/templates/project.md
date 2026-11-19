@@ -1,6 +1,7 @@
 ---
 type: project
 status: active
+part_of:
 target:
 summary:
 aliases:

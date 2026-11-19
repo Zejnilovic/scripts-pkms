@@ -6,7 +6,7 @@
 # same: [[old]] becomes [[new]], [[old#h]] becomes [[new#h]], and a link written with other words keeps them as its
 # display ([[Jane Doe]] becomes [[jane-roe|Jane Doe]]). Environment for the awk programs: OLD, NEW, TEXTS (the link texts
 # that resolve to the note), CHANGES (where the changed lines are reported), SELF (yes for the note itself) and ALIAS
-# (yes unless --no-alias).
+# (yes unless --no-alias). The program needs awk_part_of after it.
 
 # awk_rename_links: rewrites the links of one file, line by line, and writes each changed line to CHANGES.
 awk_rename_links() {
@@ -56,7 +56,20 @@ awk_rename_links() {
     close(ENVIRON["TEXTS"])
     OLD = ENVIRON["OLD"]; NEW = ENVIRON["NEW"]
   }
-  FNR == 1 { fence = 0; file = FILENAME }
+  FNR == 1 { fence = 0; file = FILENAME; front = ($0 ~ /^---\r?$/); if (front) { print; next } }
+  # In the frontmatter, part_of names its note without brackets too (awk_part_of); a value in brackets is rewritten below,
+  # as any link. The quotes and the line ending stay as they were.
+  front && $0 ~ /^---\r?$/ { front = 0; print; next }
+  front {
+    v = part_of_value($0)
+    if (v != "" && index(v, "[[") == 0 && (part_of_target(v) in T)) {
+      q = substr(v, 1, 1); if (q != "\"" && q != "'") q = ""
+      b = $0; sub(/\r$/, "", b); a = "part_of: " q NEW q
+      print file ":" FNR ": " b " -> " a >> ENVIRON["CHANGES"]
+      print a (($0 ~ /\r$/) ? "\r" : "")
+      next
+    }
+  }
   /^[ \t]*(```|~~~)/ { fence = !fence; print; next }
   fence { print; next }
   {

@@ -1,6 +1,6 @@
 # The pkm file format: Format 1
 
-This is the file format pkm reads and writes, version 1. A vault says which version it uses in `.pkm/config` (`format=1`, written by `pkm init`). pkm reads Format 1 only, and `pkm doctor` reports any other value. A change to any rule here is a new format number and a major pkm release. The reasons are in [method.md](method.md).
+This is the file format pkm reads and writes, version 1. A vault says which version it uses in `.pkm/config` (`format=1`, written by `pkm init`). pkm reads Format 1 only, and `pkm doctor` reports any other value. A change to any rule here is a new format number and a major pkm release, except a new key or folder that vaults may use or leave out, which keeps the number: pkm 0.2.0 added `part_of` and `files/` to Format 1. The reasons are in [method.md](method.md).
 
 ## 1. Text
 
@@ -17,6 +17,7 @@ This is the file format pkm reads and writes, version 1. A vault says which vers
 | `notes/<name>.md` | A note. A type's new notes go in the folder its `folder_<type>` setting names, when it is set; otherwise in `notes/` |
 | `closes/<YYYY>/<first day>-<cycle>.md` | A close page |
 | `archive/` | Finished notes, moved here with their names kept |
+| `files/<YYYY>/<MM>/<YYYY-MM-DD>-<name>` | A file that arrived on a day, linked from that day's page (`add --file`). Any other file in the vault works too: a link names it by its file name |
 | `templates/` | The vault's templates (the folder is set by `templates`) |
 | `.pkm/config` | The vault's settings |
 | `.pkm/cache/`, `.pkm/state`, `.pkm/moves.tsv` | pkm's own files: the cache (a speed-up that is safe to delete), the date of the last `since --seen`, and the log of renames and moves |
@@ -46,9 +47,10 @@ A note may start with frontmatter: a line `---`, the keys, and a closing line `-
 
 | Key | Use |
 |---|---|
-| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks |
+| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks. `overview` groups notes by the type of their top note: `area`; `project` and `writing`; `course`, `topic` and `source` |
+| `part_of` | The one note this note belongs to, as a name (`part_of: home`) or a link (`part_of: "[[home]]"`). It is a link (see 6). A list (`[home, car]`), a note that names itself and a circle are `check` problems |
 | `aliases` | Other names for the note: `[Jane, J. Doe]`, or indented `  - Jane` lines below the key |
-| `status` | `upcoming` skips a note whose status is `done`, `dropped`, `published`, `sold`, `gone` or `archived` |
+| `status` | `upcoming` skips a note whose status is `done`, `dropped`, `published`, `sold`, `gone` or `archived`, and so does `overview` for a top note other than an area. `idea` marks a note for something not started |
 | `birthday`, `target`, `deadline`, `warranty` | Dates that `upcoming` lists. A birthday recurs yearly on its month and day |
 
 Any other key is stored, and `pkm list key=value` matches it. The title is the first line that starts with `# ` after the frontmatter, or the file name without `.md` when there is none.
@@ -59,6 +61,7 @@ Any other key is stored, and `pkm list key=value` matches it. The title is the f
 2. A link resolves in this order, anywhere in the vault: the file name; the slug of the link's text (`[[Jane Doe]]` is `jane-doe`); an alias in a note's frontmatter.
 3. A day page is linked by its date: `[[2026-11-10]]`, or `[[2026-11-10-sam]]` in a shared vault.
 4. A web address is any `http://` or `https://` address outside code.
+5. A `part_of:` line in the frontmatter is a link to the note it names, written with or without brackets: `backlinks` lists it, `check` reports it when it names no note, and `rename` rewrites it.
 
 ## 7. Tasks
 
@@ -80,7 +83,7 @@ Any other key is stored, and `pkm list key=value` matches it. The title is the f
 
 ## 8. Routines
 
-A routine is a task with `(every <rule>)`, and it lives in a note, not on a day page: `check` flags one on a day page, since a day page is a record. `todo --every` writes it to the note named `routines`, which it creates when there is none. The rule is one of:
+A routine is a task with `(every <rule>)`, and it lives in a note, not on a day page: `check` flags one on a day page, since a day page is a record. `todo --every` writes it to the note named `routines`, which it creates when there is none, or with `--in <note>` to the end of that note's `## Routines` section. The rule is one of:
 
 - an interval: a number and `d`, `w`, `m` or `y`, such as `(every 1m)`. Its task needs a due date. `done` moves the due date on by one interval and keeps the box open;
 - a cycle name from `.pkm/config`, such as `(every sprint)`. Without a due date, it is due on the last day of the period holding today. `done` moves it on by one period.

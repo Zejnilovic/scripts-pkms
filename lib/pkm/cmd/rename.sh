@@ -51,7 +51,7 @@ cmd_rename() {
   while IFS= read -r f; do
     [ -n "$f" ] || continue
     i=$((i + 1))
-    OLD=$old NEW=$new TEXTS="$work/texts" CHANGES="$work/changes" awk "$(awk_rename_links)" "$f" > "$work/new/$i" || die 1 "Can't rewrite $f."
+    OLD=$old NEW=$new TEXTS="$work/texts" CHANGES="$work/changes" awk "$(awk_rename_links)$(awk_part_of)" "$f" > "$work/new/$i" || die 1 "Can't rewrite $f."
     if [ "$f" = "$oldpath" ]; then
       plan_self=$i
       if [ "$noalias" = no ]; then

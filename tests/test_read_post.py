@@ -294,13 +294,13 @@ class ExampleVault(unittest.TestCase):
         config.mkdir(exist_ok=True)
         (config / "config").write_text("writer=sam\n")
         lines = (vault / "notes/bathroom.md").read_text().splitlines()
-        lines[11] = "- [[joe-bloggs-plumber|Joe]] can start on 2026-12-01 ([[2026-11-09-alex]])"
+        lines[12] = "- [[joe-bloggs-plumber|Joe]] can start on 2026-12-01 ([[2026-11-09-alex]])"
         (vault / "notes/bathroom.md").write_text("\n".join(lines) + "\n")
-        out = self.ok(vault, "strike", "notes/bathroom.md:12", now="20261112090000").strip()
-        self.assertEqual(out, "notes/bathroom.md:12")
+        out = self.ok(vault, "strike", "notes/bathroom.md:13", now="20261112090000").strip()
+        self.assertEqual(out, "notes/bathroom.md:13")
         method_line = (REPO / "docs/method.md").read_text().splitlines()[120]
         self.assertEqual(method_line, "- ~~[[joe-bloggs-plumber|Joe]] can start on 2026-12-01 ([[2026-11-09-alex]])~~ ([[2026-11-12-sam]])")
-        self.assertEqual((vault / "notes/bathroom.md").read_text().splitlines()[11], method_line)
+        self.assertEqual((vault / "notes/bathroom.md").read_text().splitlines()[12], method_line)
 
 
 if __name__ == "__main__":

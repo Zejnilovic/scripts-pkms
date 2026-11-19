@@ -32,7 +32,7 @@ Eight words carry the method:
 | **daybook** | Your pages, one per day. Every entry goes on today's page first. |
 | **entry** | One line you write on a page, usually with the time: `- 14:20 John says the budget needs sign-off` |
 | **mark** | A sign on an entry that says what it is: a task, a question, a decision, something important, an idea, something no longer true, a question to recall |
-| **note** | A page about one thing: a person, a project, a trip, a topic, a course |
+| **note** | A page about one thing: a person, a project, an area you look after, a topic, a course |
 | **link** | A note's name in double brackets, `[[apollo]]`. The link is the relationship. |
 | **post** | To copy an entry, word for word, into the note it is about, with a link to its day |
 | **close** | The decision on what is open, once a week or on the cycle you choose: a task is done, dated, made someday or dropped; a question or a wait is answered, chased or dropped |
@@ -125,7 +125,7 @@ Nothing replaces the line, and nothing needs to: there is simply no date any mor
 
 ### Notes
 
-A note is about one thing: a person, a project, a trip, a topic, a course. It lives in one flat folder, `notes/`, and its file name is its name, in lowercase with hyphens: `notes/jane-doe.md`.
+A note is about one thing: a person, a project, a trip, an area you look after, a topic, a course. It lives in one flat folder, `notes/`, and its file name is its name, in lowercase with hyphens: `notes/jane-doe.md`.
 
 A few lines at the top, between `---` markers, say what it is. All are optional:
 
@@ -143,7 +143,8 @@ aliases: [Apollo]
 
 | Kind | For | Sections |
 |---|---|---|
-| Project | Anything with an end: a release, a trip, a renovation | **Now** (a few lines on where things stand), Goals, People, Links, Risks, Decisions, Later |
+| Project | Anything with an end: a release, a trip, a renovation, a degree | **Now** (a few lines on where things stand), Goals, People, Links, Risks, Decisions, Later |
+| Area | Something you look after that never ends: a home, a car, money, your health, a team you lead, your learning | **Now**, Routines, People, Links, Ideas |
 | Person | A colleague, a child, a plumber | How to reach them at the top, then the entries posted to them; Ideas, for gifts |
 | Organization | A customer, an employer, a school | As for a person |
 | List | Shopping, packing, things to take | The list itself |
@@ -154,6 +155,33 @@ Make a note when a name keeps coming back, about three times, or when you have s
 
 **When two things share a name**, name each by what tells them apart: `joe-bloggs-plumber` and `joe-bloggs-football` in the family vault, or `symphony-2026` and `symphony-acme` at work, much as Wikipedia does with its titles.[^wikipedia-dab] The method adds no random IDs to names, because you type links and read them, and `[[joe-bloggs-7f3a]]` tells you nothing. Clashes are rare, so you deal with one only when it happens. When a second Joe Bloggs arrives, rename the first by what tells him apart, and keep his old name as an alias. Fix the links you already wrote to him, because fixing a link is one of the changes a past page allows: `pkm rename` does that for you and keeps what each page shows, and by hand you search for `[[joe-bloggs` and fix each one. From then on you write the full name for both. `[[joe-bloggs-plumber|Joe]]` still shows just "Joe" on the page.
 
+### Where a note belongs
+
+Some things never end. A home needs repairs, insurance and a plumber's number; a team you lead has its routines and its people; your learning goes on long after any one course. Each is an **area**, a note with `type: area`, and the projects, courses and lists that come and go within it can say so:
+
+```markdown
+---
+type: project
+status: active
+part_of: home
+summary: New pipes and a new bath; [[joe-bloggs-plumber]] has no start date yet
+---
+```
+
+`part_of` names one note, the one this note belongs to. A note has at most one, so what belongs where reads as a tree. In the family vault, the home is an area, with the boiler's routine in it, and the bathroom and the shopping list belong to it:
+
+```text
+home           area
+├── bathroom   project
+└── groceries  list
+```
+
+The tree can go deeper. Going back to study for an MBA, you would make `learning` an area, the MBA a project that is `part_of: learning` and ends with the degree, and each of its courses `part_of: mba`. Everything else a note touches is a link: a strategy course can link `[[team]]` as often as it likes, and the team's backlinks find it. One parent keeps the tree something you can read, and the links carry the rest.
+
+`part_of` is optional, and it is not a folder: the note stays in `notes/` under its own name, so moving it under another parent changes one line and breaks nothing. Add it when you make the note, or at the close, or never. A note without one is simply not part of anything. pkm counts it as a link, so `pkm backlinks home` lists what belongs to the home, and `pkm rename` keeps it right. Write the name; pkm also reads `"[[home]]"`, the form some editors show as a link.
+
+To see the whole shape of a vault, `pkm overview` lists each area with what belongs to it, then the active projects that belong to none, then the courses, topics and sources, then how many notes are in the archive. It is the one view of a vault that groups notes, and it is made from their frontmatter, so nothing is sorted to get it.
+
 ### Links
 
 A link is a note's name in double brackets: `[[jane-doe]]`, or `[[jane-doe|Jane]]` to show another word. The link is the relationship: there is no separate field for who works on what.
@@ -161,6 +189,14 @@ A link is a note's name in double brackets: `[[jane-doe]]`, or `[[jane-doe|Jane]
 Because a link names the note rather than its folder, moving a note never breaks a link. And every link is a path back. A note's **backlinks**, the lines that link to it, are its history as you wrote it, day by day.
 
 **Links to the outside.** Tickets, boards, pull requests, bookings and quotes stay where they are. The vault links to them and doesn't copy them: an entry carries the link, `- Reviewed [pull request 42](https://github.com/acme-example/apollo/pull/42)`, and a project's **Links** section says where its work lives, such as the board, the code or the booking. The tool keeps the details and the latest state; your vault keeps what you think, decided and owe, and the way back to the rest.
+
+**Files.** Some things arrive as files: a quote as a PDF, a photo of a receipt, a scan of a school form. A file goes in a folder for its month, `files/2026/11/`, and that day's page gets an entry that links it, so the file is found the way everything else is, by its day and by the words next to it. In the family vault, the plumber's quote came on Wednesday:
+
+```markdown
+- 17:30 [[joe-bloggs-plumber|Joe]]'s quote came: 4,200 for new pipes and the bath: [pipes-quote.pdf](../../../files/2026/11/2026-11-11-pipes-quote.pdf)
+```
+
+`pkm add --file pipes-quote.pdf "[[joe-bloggs-plumber|Joe]]'s quote came"` copies the file there, with the date in front of its name, and writes the entry. There is no inbox of files to sort later: the entry is where the file was filed, and posting the entry takes its link along.
 
 ### Posting
 
@@ -186,6 +222,8 @@ Post what you will want to find from the note: decisions, risks, ideas, facts ab
 
 Some things are for later, maybe much later: a business idea, a gift for a birthday next year, a project that would help but not now. Mark them `Idea:` and post them where you will look when they matter: a gift idea to the person, a project idea to the project's **Later** section, a business idea to a note of its own. In the family vault, Sam's idea of a photo book for Nana's birthday went to Nana's note; at work, the idea of a self-service export went to Apollo's Later.
 
+**An idea grows where it is.** Most ideas stay one line. One that keeps coming back, or gathers enough to keep, gets a note of its own, of the kind it would become, with `status: idea`: a business idea is a project, an article is a piece of writing, a course you might take is a course. When you start it, the status becomes `active`; when you let it go, `dropped`, and the note goes to the archive. The note never changes kind or name on the way, so every link to it stays right, and `pkm list status=idea` is every idea that has a note.
+
 Ideas wait. They are not part of the weekly close, and nothing reminds you of them until you want it to. A task you are not ready to decide gets `(someday)` and waits the same way; a question you want to keep for later becomes one, such as `- [ ] Decide whether we move house (someday)`. Once a quarter, the close also looks at them: start, keep or drop each. To bring one back on a date, add `(start 2027-09-01)`.
 
 ### Lists and routines
@@ -205,7 +243,7 @@ Ideas wait. They are not part of the weekly close, and nothing reminds you of th
 - [ ] Submit the timesheet (due 2026-11-20) (every 1w)
 ```
 
-The first three are from the family vault's routines, the last two from the work vault's. A routine that follows a cycle is due on the last day of a period: the sprint summary was due on 2026-11-15, the last day of the first sprint. Write a new one without a due date, and it is due on the last day of the current period.
+The first three are from the family vault's routines, the last two from the work vault's. A routine lives in the note named `routines` unless you put it with what it is about: the boiler service in the home's area, the sprint summary in the team's. `pkm todo --every 1y "Service the boiler"` writes it to `routines`, and `--in home` writes it to the home's Routines section. pkm finds a routine in any note, so moving one is cutting a line and pasting it, and a search for `(every ` still lists them all. A routine that follows a cycle is due on the last day of a period: the sprint summary was due on 2026-11-15, the last day of the first sprint. Write a new one without a due date, and it is due on the last day of the current period.
 
 When you do it, you move its due date on by one interval, or one period of its cycle, instead of ticking it, and write what you did on today's page if you want a record. On 11 November Alex wrote `- 12:10 Paid the electricity bill` and moved the bill on to 2026-12-11. A routine with no due date gets one, the last day of the next period. Nothing generates copies of a task, and a routine you haven't done stays overdue, in the brief and at every close, until you do it. Birthdays need no routine: a `birthday:` line in a person's note is enough.
 
@@ -321,7 +359,7 @@ Each day, open today's page and write as things happen. Mark what you think of; 
 
 Each week, or each cycle, close.
 
-Now and then, move finished notes to the archive, start a hub when a topic outgrows your memory of it, and answer your recall questions on their day.
+Now and then, move finished notes to the archive, give a new project or course its area, start a hub when a topic outgrows your memory of it, and answer your recall questions on their day.
 
 ### A family
 
@@ -350,7 +388,7 @@ What paper cannot do is search. Finding something from a year ago takes an index
 3. **Write first, decide later, in one place.** Everything starts on today's page, because a decision about where something goes, at the moment of writing, is what makes people stop writing. The one exception is a fact that clearly belongs to one thing, such as a phone number, which can go straight into its note.
 4. **Your words, kept.** Posting copies an entry; it never paraphrases it. Material you generate yourself is remembered better than material you read,[^bertsch2007] and a paraphrase would be someone else's words.
 5. **Every derived line links its source.** A posted line, a Now line or a line on a close page links the day it came from, and a struck line links the day you learned it, so each can be checked. When the two disagree, the day wins, because the day was written when it happened.
-6. **Names, not places.** Things are found by name and link, so a note can move without breaking anything. Folders say when something happened (the daybook, the close pages), that it is finished (the archive), or that it is private (a folder you keep apart, for example for notes about the people you manage).
+6. **Names, not places.** Things are found by name and link, so a note can move without breaking anything. Where a note belongs is one line in it, `part_of`, never its folder. Folders say when something happened (the daybook, the close pages, the files), that it is finished (the archive), or that it is private (a folder you keep apart, for example for notes about the people you manage).
 7. **Nothing is deleted.** Finished things move to the archive, with their names, and what is no longer true is struck through, because a note you deleted cannot be found when you need it again.
 8. **Lapses break nothing.** No streaks, no backlog to copy forward, no catching up. A missed day is a missing page. A missed week leaves its open items open, and the next close finds them.[^lally2010][^silverman2022]
 9. **Decide open items on a rhythm.** Not in the moment, and not never: once a week, or once a cycle you choose.
@@ -393,6 +431,7 @@ flowchart LR
   GTD["Getting Things Done:<br/>capture, reflect"] --> DB
   ZK["Zettelkasten:<br/>notes, links, own words"] --> DB
   LS["Daily pages in<br/>Logseq and Roam"] --> DB
+  SB["PARA and the Second Brain:<br/>areas, the archive, ideas that grow"] --> DB
   SR["Spaced repetition:<br/>growing intervals"] --> DB
   PIM["Research on re-finding:<br/>search, names, paths"] --> DB
 ```
@@ -404,7 +443,8 @@ flowchart LR
 | Getting Things Done[^gtd] | Capture everything; reflect regularly on what is open | No clarifying or organizing every item into lists | Contexts, many lists |
 | Zettelkasten[^zettelkasten][^luhmann] | Notes in your own words; links between them | Notes per thing, made when they earn it | IDs, processing every capture into a permanent note |
 | Logseq and Roam | The daily page as the landing place; backlinks as history | Plain files, any editor | Outliner blocks, block references |
-| PARA[^forte-para] | An archive for what is finished | Folders say only time, lifecycle and privacy | Sorting every note into one of four folders |
+| PARA[^forte-para] | Areas, responsibilities with no end; an archive for what is finished | An area is a note, and a note names the one it belongs to with `part_of`; folders say only time, lifecycle and privacy; `pkm overview` groups notes much as PARA's folders would | Sorting every note into one of four folders |
+| Building a Second Brain[^forte-basb] | Keep what resonates; ideas grow into things you make and share | An idea grows on its own note, by its status, without moving | Progressive summarization: layers of bold and highlight over your own notes |
 | Spaced repetition[^wozniak1990] | Questions asked again at growing intervals | Kept in your notes, on a fixed ladder | Decks, a separate app |
 | Research on re-finding[^whittaker2011][^bergman2008][^teevan2004] | Elaborate filing did not improve finding | Names and links give the paths people like to browse | |
 
@@ -432,6 +472,7 @@ The descriptions of other methods come from their authors' own pages, not from a
 - **One vault for everything.** Your family reads the family vault, and your employer may own the work one. Keep each part of life in its own vault.
 - **Skipping the close for months.** Nothing is lost, but nothing gets decided either. Close the current week and let the old items surface through the three-week rule.
 - **Studying your summaries.** Write questions instead, and answer them from memory.
+- **Sorting instead of writing.** `part_of` is for notes you want to find by browsing an area. A note without one is fine, and an area with one project in it is a project.
 - **Collecting instead of writing.** Pasting articles into notes feels like progress. Write what you think about the source, and link it.
 
 ## Who it is not for, and what it costs
@@ -464,6 +505,9 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Log an entry on today's page | `pkm add "John says the budget needs sign-off"` | Open today's page and write `- 14:20 John says…` under Log |
 | Log in another vault | `pkm -V family add "Paid the rent"` | Open the other vault's folder and do the same |
 | Open a day's page | `pkm day`, `pkm day 2026-11-10` | Open `daybook/2026/11/2026-11-10.md`, or make it with its title |
+| Log a file that arrived | `pkm add --file quote.pdf "Quote for the pipes"` | Put it in `files/2026/11/` with the date in front of its name, and link it from today's page |
+| Add a routine to an area | `pkm todo --every 1y --in home "Service the boiler"` | Write the routine under the note's Routines section |
+| See the shape of the vault | `pkm overview` | Search for `type: area` and for `part_of: home` |
 | Find by words | `pkm find mobile app` | Your editor's search across the folder |
 | See a note's history | `pkm backlinks apollo` | Search for `[[apollo` |
 | Rename a note, fixing every link to it | `pkm rename joe-bloggs joe-bloggs-plumber` | Rename the file, add the old name to `aliases:`, and fix each `[[joe-bloggs` you find |
@@ -509,6 +553,10 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | A recall question | `(recall <next date> <interval>d)`, answer indented below | `(recall 2026-11-16 7d)` |
 | A posted line | The entry's words, then `([[<day>]])` | `- Decided: we cut the mobile app ([[2026-11-10]])` |
 | A list | A note with `type: list`; its boxes are not tasks | `notes/groceries.md` |
+| An area | A note with `type: area` | `notes/home.md` |
+| Where a note belongs | `part_of: <name>` in its frontmatter, at most one; also `"[[<name>]]"` | `part_of: home` |
+| An idea with a note | `status: idea` on a note of the kind it would become | `status: idea` |
+| A file | `files/<year>/<month>/<date>-<name>`, linked from the page of the day it arrived | `files/2026/11/2026-11-12-pipes-quote.pdf` |
 | A week | Monday to Sunday | |
 | A cycle | `cycle_<name>=<length> from <start>` in `.pkm/config`; the length a number of weeks or months, such as `1w`, `2w` or `1m`; the start a weekday (for `1w`), a date, or a day of the month from 1 to 28 | `cycle_sprint=2w from 2026-11-02`, `cycle_pay=1m from 15` |
 | The close cycle | `close=<name>` in `.pkm/config`; the week unless set; pkm closes the period that holds yesterday, so a close on a period's last day or the day after closes that period | `close=sprint` |
@@ -560,6 +608,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 [^ghibellini2025]: R. Ghibellini and B. Meier, [*Interruption, Recall and Resumption: A Meta-Analysis of the Zeigarnik and Ovsiankina Effects*](https://doi.org/10.1057/s41599-025-05000-w).
 
 [^urry2021]: Heather L. Urry and others, [*Don't Ditch the Laptop Just Yet: A Direct Replication of Mueller and Oppenheimer's (2014) Study 1 Plus Mini Meta-Analyses Across Similar Studies*](https://doi.org/10.1177/0956797620965541).
+
+[^forte-basb]: Tiago Forte, [*Building a Second Brain: The Definitive Introductory Guide*](https://fortelabs.com/blog/basboverview/).
 
 [^zettelkasten]: Zettelkasten.de, [*Introduction to the Zettelkasten Method*](https://zettelkasten.de/introduction/).
 

@@ -65,7 +65,7 @@ class VersionTest(VaultCase):
         self.assertEqual(self.pkm("version", "--require", "0.1.0").returncode, 0)
 
     def test_require_exits_1_with_no_output_when_too_old(self):
-        result = self.pkm("version", "--require", "0.2")
+        result = self.pkm("version", "--require", "0.3")
         self.assertEqual((result.returncode, result.stdout, result.stderr), (1, "", ""))
 
     def test_require_exits_2_on_a_bad_argument(self):

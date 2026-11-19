@@ -1,6 +1,7 @@
 ---
 type: project
 status: active
+part_of: home
 summary: New pipes and a new bath; [[joe-bloggs-plumber]] has no start date yet
 aliases: [Bathroom]
 ---

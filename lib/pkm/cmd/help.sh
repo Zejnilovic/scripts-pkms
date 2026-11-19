@@ -24,6 +24,7 @@ mv|Notes|moves a note into a folder; its links keep working
 path|Find|the file a name, slug, alias or link points to
 find|Find|the lines with every word, in any order
 list|Find|the notes whose frontmatter matches
+overview|Find|the shape of the vault: areas, projects and resources, each with the notes that are part of it
 tags|Find|every tag with its count
 check|Check|broken links, duplicate names, alias clashes, secrets, merge conflicts and notices
 evidence|Check|each summary line must link its source; --verify checks the links, paths and lines
@@ -56,6 +57,7 @@ command_options() {
     evidence) echo "--verify" ;;
     get) echo "--lines" ;;
     list) echo "--all --show --quiet --json --abs --limit" ;;
+    overview) echo "--json" ;;
     names) echo "--type --json --abs --limit" ;;
     index) echo "--rebuild" ;;
     rename) echo "--dry-run --no-alias" ;;
@@ -64,8 +66,8 @@ command_options() {
     cycle) echo "--date" ;;
     since) echo "--about --seen --json --limit" ;;
     close) echo "--cycle --date --quarter --json" ;;
-    add) echo "--day" ;;
-    todo) echo "--due --high --low --waiting --someday --start --every" ;;
+    add) echo "--day --file" ;;
+    todo) echo "--due --high --low --waiting --someday --start --every --in" ;;
     done) echo "--drop" ;;
     new) echo "--name" ;;
     templates) echo "--user" ;;

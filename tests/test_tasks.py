@@ -261,7 +261,7 @@ class ExampleVaultsAcceptance(unittest.TestCase):
             self.assertFalse(any("Quote from" in line for line in tasks))
             up = self.run_in(vault, ["upcoming", "7"], "20261115200000").stdout
             self.assertIn("2026-11-15 due daybook/2026/11/2026-11-10-sam.md:5", up)
-            self.assertIn("2026-11-15 due notes/routines.md:12", up)
+            self.assertIn("2026-11-15 due notes/routines.md:11", up)
             self.assertIn("2026-11-20 due notes/routines.md:9", up)
             done = self.run_in(vault, ["done", "electricity"], "20261115200000")
             self.assertEqual(done.returncode, 0, done.stderr)

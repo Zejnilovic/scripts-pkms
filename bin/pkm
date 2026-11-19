@@ -6,12 +6,15 @@
 # Usage: pkm [--vault <folder>] [-V <name>] <command> [arguments]
 #   day [YYYY-MM-DD] [--edit]     the day's page, daybook/<year>/<month>/<date>.md, created when missing; prints its
 #                                 path. --edit opens it in $EDITOR. In a shared vault the page is <date>-<writer>.md
-#   add [--day <date>] <text|->   an entry at the end of the day's Log: "- HH:MM text", printed as path:line. Several lines,
-#                                 or - for stdin, go under a "### HH:MM" heading, verbatim
-#   todo <text> [--due <day>] [--high | --low] [--waiting | --someday | --start <day> | --every <N>d|w|m|y or cycle]
+#   add [--day <date>] [--file <path>] <text|->
+#                                 an entry at the end of the day's Log: "- HH:MM text", printed as path:line. Several lines,
+#                                 or - for stdin, go under a "### HH:MM" heading, verbatim. --file copies a file to
+#                                 files/<year>/<month>/<date>-<name> (never over another) and the entry links it
+#   todo <text> [--due <day>] [--high | --low] [--waiting | --someday | --start <day> | --every <N>d|w|m|y or cycle [--in <note>]]
 #                                 a task for today, under the Tasks section of its page. A day is YYYY-MM-DD, today, tomorrow, +3d,
 #                                 +2w or a weekday. --every makes a routine: 1d, 1w, 1m or 1y, or a cycle from the settings. It goes
-#                                 to the note named routines (created when missing), not to today's page. --start hides the task
+#                                 to the note named routines (created when missing), not to today's page, or with --in <note> to
+#                                 that note's Routines section. --start hides the task
 #                                 until that day; --someday keeps it out of the weekly views
 #   done <words | path:line> [--drop]
 #                                 marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
@@ -36,6 +39,9 @@
 #   list [<field>=<value> ...] [--show <field>,...] [--all] [--quiet <days>]
 #                                 notes whose frontmatter matches, from the cache: path, type, title, then the --show fields;
 #                                 --quiet lists those no day page in the last <days> days links
+#   overview [--json]             the shape of the vault: each area with the notes that are part_of it, then projects,
+#                                 resources (courses, topics, sources) and other notes with notes under them, then the
+#                                 archive's count; a line is path:<title line>: <titles from the top> (<type>, <status>)
 #   find [--live] <word> [<word>...]
 #                                 the lines with every word, in any order, as path:line: text. Smart case: a word
 #                                 with a capital letter matches exactly. The archive is searched too, unless --live
@@ -199,6 +205,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/init.sh"
 # shellcheck source=../lib/pkm/cmd/backlinks.sh
 . "$pkm_home/lib/pkm/cmd/backlinks.sh"
+# shellcheck source=../lib/pkm/cmd/overview.sh
+. "$pkm_home/lib/pkm/cmd/overview.sh"
 # shellcheck source=../lib/pkm/cmd/list.sh
 . "$pkm_home/lib/pkm/cmd/list.sh"
 # shellcheck source=../lib/pkm/cmd/new.sh
@@ -255,6 +263,7 @@ case $command in
   backlinks) output_command backlinks "$@" ;;
   path) output_command path "$@" ;;
   list) output_command list "$@" ;;
+  overview) cmd_overview "$@" ;;
   names) output_command names "$@" ;;
   index) cmd_index "$@" ;;
   rename) cmd_rename "$@" ;;

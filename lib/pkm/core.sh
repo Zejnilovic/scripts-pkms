@@ -6,7 +6,7 @@
 
 # scripts/bump.sh sets this, and scripts/check.py matches it with VERSION.
 # shellcheck disable=SC2034 # read by bin/pkm (version) and by cmd/version.sh
-pkm_version=0.1.0
+pkm_version=0.2.0
 
 die() { code=$1; shift; printf '%s\n' "$*" >&2; exit "$code"; }
 
@@ -162,6 +162,33 @@ awk_links_in() {
       if (t != "") out[++n] = t
     }
     return n
+  }
+AWK
+}
+
+# awk_part_of: the awk functions for part_of, the frontmatter key that names the one note a note belongs to.
+# part_of_value(line) is the value of a "part_of:" line, trimmed, or "" for any other line. part_of_target(value) is the
+# name it gives, without quotes, brackets, shown text, heading or folder: "home", "[[home]]" and "[[notes/home|Home]]"
+# all give home. A list ([home, car]) gives "" and part_of_list(value) is 1, since a note belongs to one note only.
+awk_part_of() {
+  cat <<'AWK'
+
+  function part_of_value(line,   v) {
+    if (line !~ /^part_of:/) return ""
+    v = substr(line, 9); sub(/\r$/, "", v); gsub(/^[ \t]+|[ \t]+$/, "", v)
+    return v
+  }
+  function part_of_list(v) {
+    gsub(/^["']|["']$/, "", v)
+    return (v ~ /^\[/ && v !~ /^\[\[[^]]*\]\]$/) || (v !~ /^\[\[/ && index(v, ","))
+  }
+  function part_of_target(v) {
+    if (part_of_list(v)) return ""
+    gsub(/^["']|["']$/, "", v)
+    if (v ~ /^\[\[.*\]\]$/) v = substr(v, 3, length(v) - 4)
+    sub(/\|.*/, "", v); sub(/#.*/, "", v); sub(/\^.*/, "", v); sub(/.*\//, "", v)
+    gsub(/^[ \t]+|[ \t]+$/, "", v)
+    return v
   }
 AWK
 }

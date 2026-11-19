@@ -285,12 +285,12 @@ class ExampleCopies(unittest.TestCase):
         self.assertEqual(self.pkm(vault, "path", "apollo").stdout.strip(), "archive/apollo.md")
         self.assertEqual(self.pkm(vault, "check").returncode, 0)
 
-    def test_family_dry_run_lists_bathroom_line_twelve_and_writes_nothing(self):
+    def test_family_dry_run_lists_bathroom_line_thirteen_and_writes_nothing(self):
         vault = self.copy("family")
         before = snapshot(vault)
         result = self.pkm(vault, "rename", "joe-bloggs-plumber", "joe-bloggs-plumbing", "--dry-run")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("notes/bathroom.md:12: ", result.stdout)
+        self.assertIn("notes/bathroom.md:13: ", result.stdout)
         self.assertEqual(snapshot(vault), before)
 
 

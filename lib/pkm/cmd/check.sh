@@ -59,6 +59,7 @@ cmd_check() {
   touch "$tmp/dead-problems" "$tmp/link-notices"
   cat "$tmp/dead-problems" >> "$tmp/problems"
   cat "$tmp/link-notices" >> "$tmp/notices"
+  check_part_of >> "$tmp/problems"
   # Alias clashes: an alias on two notes leaves links to it unclear.
   awk -F '\t' '
     $1 == "A" { key = $2 SUBSEP $3; if (!(key in seen)) { seen[key] = 1; count[$2]++; paths[$2] = paths[$2] ", " $3 } }
@@ -140,4 +141,44 @@ cmd_check() {
   if [ -s "$tmp/notices" ]; then echo; echo "Notices:"; cat "$tmp/notices"; fi
   [ -s "$tmp/problems" ] && return 1
   echo "No problems found."
+}
+
+# check_part_of: the problems of part_of, after link_build: a list where one note belongs (part_of names one note), a
+# note that names itself, and notes that name each other in a circle, which no tree can show. A circle is reported
+# once, at the part_of line of its first note by name, as its names in order and back to the first.
+check_part_of() {
+  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
+  scan "$tmp/notes" "$(awk_part_of)"'
+    FNR == 1 { file = rel(FILENAME); front = ($0 == "---"); next }
+    front && $0 ~ /^---\r?$/ { front = 0; next }
+    front {
+      v = part_of_value($0)
+      if (v != "" && part_of_list(v)) print "L\t" file "\t" FNR
+      else if (v != "") print "P\t" file "\t" FNR
+    }
+  ' > "$tmp/part-of-lines"
+  awk -F '\t' '
+    function name(p,   n) { n = p; sub(/.*\//, "", n); sub(/\.md$/, "", n); return n }
+    FILENAME == ARGV[1] {
+      if ($1 == "L") print "- " $2 ":" $3 ": part_of names one note: keep one, and link the others"
+      else { want[$2 SUBSEP $3] = 1; where[$2] = $3 }
+      next
+    }
+    ($1 SUBSEP $2) in want && $6 != "" { parent[$1] = $6 }
+    END {
+      for (p in parent) if (parent[p] == p) { print "- " p ":" where[p] ": part_of names the note itself"; delete parent[p] }
+      for (p in parent) {
+        # Follow the parents from p; a circle is found when the walk comes back to p.
+        q = parent[p]; steps = 0
+        while (q in parent && q != p && steps < 1000) { q = parent[q]; steps++ }
+        if (q != p) continue
+        first = p; q = parent[p]
+        while (q != p) { if (name(q) < name(first)) first = q; q = parent[q] }
+        if (first != p || (first in told)) continue
+        told[first] = 1; ring = name(first); q = parent[first]
+        while (q != first) { ring = ring ", " name(q); q = parent[q] }
+        print "- " first ":" where[first] ": part_of goes round in a circle: " ring ", " name(first) ": take it out of one of them"
+      }
+    }
+  ' "$tmp/part-of-lines" "$tmp/lb-links" | LC_ALL=C sort
 }
