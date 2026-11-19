@@ -7,7 +7,7 @@
 # names linked, with their count and last day). Only sections with lines are printed; with none, "Nothing since <date>."
 # and exit 1. last starts on the date in .pkm/state (set by since --seen, with its time), or the last 7 days; on that date it
 # leaves out the entries timed at or before the stored time, and keeps untimed lines. N is today and the N-1 days
-# before. --about NAME keeps the lines that link NAME, a ### heading's links included. Sourced by bin/pkm.
+# before. --about NAME keeps the lines about NAME (about.sh): those that link it, a ### heading's links included. Sourced by bin/pkm.
 
 # since_build <start>: the records of the sections, US-separated: section, sort keys, path, line, text, state, days, name,
 # count, last, label. Reads $tmp/dg-names, $tmp/dg-pages and $tmp/since-tasks; the environment has ABOUT, TODAY and US.
@@ -168,12 +168,7 @@ cmd_since() {
     die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--limit n] [--json]: $arg is none of them"
   fi
   ABOUT=""
-  if [ -n "$about" ]; then
-    local target
-    target=$(resolve_note "$about")
-    if [ -n "$target" ]; then ABOUT=$(basename "$target" .md)
-    else printf '%s\n' "$about" > "$tmp/since-about"; link_slugs "$tmp/since-about" "$tmp/since-about-slug"; ABOUT=$(cut -f 2 "$tmp/since-about-slug"); fi
-  fi
+  [ -z "$about" ] || ABOUT=$(about_key "$about")
   digest_pages "$start" "$today"
   digest_names
   task_records no > "$tmp/since-tasks"

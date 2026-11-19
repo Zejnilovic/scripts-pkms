@@ -116,6 +116,9 @@ class SinceOnTheWorkExample(ExampleCopy):
         self.assertIn("daybook/2026/11/2026-11-10.md:9: - ! They may cancel the contract if the demo slips again", out["log"])
         self.assertIn("daybook/2026/11/2026-11-10.md:12: - I'll send them the revised timeline by Thursday", out["log"])
         self.assertNotIn("daybook/2026/11/2026-11-12.md:7: - 09:30 Sent [[acme]] the revised timeline", out["log"])
+        same = self.ok(self.vault, "since", "2026-11-09", "--about", "apollo")
+        for name in ["[[apollo]]", "notes/apollo.md"]:
+            self.assertEqual(self.ok(self.vault, "since", "2026-11-09", "--about", name), same, name)
 
     def test_json_gives_a_kind_per_line_and_task_state_and_days(self):
         rows = [json.loads(line) for line in self.ok(self.vault, "since", "2026-11-09", "--json").splitlines()]

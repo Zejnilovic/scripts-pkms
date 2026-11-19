@@ -4,6 +4,11 @@ What changed in pkm. The next version's changes are collected here; each release
 
 Version numbers: **major** when a command, option, output format, note name, link syntax, frontmatter field or folder is renamed or removed, since agentic-pkms skills, editors and existing notes depend on them; **minor** for new commands, options and templates; **patch** for fixes. Before 1.0, a minor version may also need manual changes; its notes list them under "Manual steps". Each release is a git tag (`v0.1.0`), and `pkm version` shows which one is installed.
 
+## 0.5.0 (unreleased)
+
+- `since --about` also takes a `[[link]]` or a note's path in the vault, as well as a name, a slug or an alias.
+- Inside: the `part_of` trees (`lib/pkm/tree.sh`) and the lines about a name (`lib/pkm/about.sh`) are shared pieces now, taken out of `overview` and `since`, for `--under` and the backlinks of headings to come. Their output is unchanged.
+
 ## Released
 
 - [0.4.0](https://github.com/Zejnilovic/scripts-pkms/releases/tag/v0.4.0) (2026-11-19)

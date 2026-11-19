@@ -6,7 +6,7 @@
 # areas (type area), projects (project or writing, not done or dropped), resources (course, topic, source, not done or
 # dropped) and other (a note of another kind with notes under it), then the number of notes in archive/. In a tree, the
 # notes come by name, each under its parent. A line is path:<title line>: <the titles from the top> (<type>, <status>).
-# Day and close pages, and notes in the archive, are not in the trees. Sourced by bin/pkm. Defines functions only.
+# Day and close pages, and notes in the archive, are not in the trees (tree.sh). Sourced by bin/pkm. Defines functions only.
 
 cmd_overview() {
   local json=no arg US tab
@@ -22,12 +22,7 @@ cmd_overview() {
   US=$(printf '\037')
   tab=$(printf '\t')
   index_ensure
-  # Each note's part_of, as the name it gives, resolved as a link is (by name, slug or alias).
-  awk -F "$tab" -v OFS="$tab" "$(awk_part_of)"'
-    $2 == "part_of" { t = part_of_target($3); if (t != "") print $1, t }
-  ' "$(cache_dir)/fields.tsv" > "$tmp/ov-parts"
-  cut -f2 "$tmp/ov-parts" | LC_ALL=C sort -u > "$tmp/ov-targets"
-  link_build "$tmp/ov-targets"
+  tree_parents "$tmp/ov-parents"
   awk -F "$tab" -v US="$US" '
     function name(p,   n) { n = p; sub(/.*\//, "", n); sub(/\.md$/, "", n); return n }
     function closed(s) { return s ~ /^(done|dropped|published|sold|gone|archived)$/ }
@@ -47,8 +42,7 @@ cmd_overview() {
       by_name(kids, n)
       for (i = 1; i <= n; i++) if (kids[i] != "") show(kids[i], sec, depth + 1, text " / ", p)
     }
-    FILENAME == ARGV[1] { resolved[$1] = ($2 == "dead") ? "" : $3; next }
-    FILENAME == ARGV[2] { want[$1] = $2; next }
+    FILENAME == ARGV[1] { up[$1] = $2; next }
     {
       if ($3 == "day" || $3 == "close") next
       if ($1 ~ /^archive\//) { archived++; next }
@@ -56,8 +50,8 @@ cmd_overview() {
     }
     END {
       for (i = 1; i <= n; i++) {
-        p = all[i]; q = (p in want) ? resolved[want[p]] : ""
-        if (q != "" && q != p && (q in note)) { parent[p] = q; children[q] = children[q] p "\n"; haskids[q] = 1 }
+        p = all[i]
+        if (p in up) { q = up[p]; parent[p] = q; children[q] = children[q] p "\n"; haskids[q] = 1 }
       }
       by_name(all, n)
       for (s = 1; s <= 4; s++)
@@ -74,7 +68,7 @@ cmd_overview() {
         }
       if (archived > 0) print 5 US (++order) US "" US "" US "" US "" US "" US archived " " (archived == 1 ? "note" : "notes") " in archive/"
     }
-  ' "$tmp/lb-resolved" "$tmp/ov-parts" "$(cache_dir)/notes.tsv" > "$tmp/ov-records"
+  ' "$tmp/ov-parents" "$(cache_dir)/notes.tsv" > "$tmp/ov-records"
   [ -s "$tmp/ov-records" ] || die 1 "Nothing to show: no areas, projects, courses, topics or sources yet."
   # The line of each note's title, the first "# " line after its frontmatter (1 when it has none).
   awk -F "$US" '$3 != "" { print $3 }' "$tmp/ov-records" > "$tmp/ov-files"

@@ -147,6 +147,10 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/plain.sh"
 # shellcheck source=../lib/pkm/people.sh
 . "$pkm_home/lib/pkm/people.sh"
+# shellcheck source=../lib/pkm/tree.sh
+. "$pkm_home/lib/pkm/tree.sh"
+# shellcheck source=../lib/pkm/about.sh
+. "$pkm_home/lib/pkm/about.sh"
 # shellcheck source=../lib/pkm/tasks.sh
 . "$pkm_home/lib/pkm/tasks.sh"
 # shellcheck source=../lib/pkm/index.sh
