@@ -3,12 +3,13 @@
 . "$pkm_home/lib/pkm/globals.sh"
 # lib/pkm/tasks.sh: the tasks of the vault, from the line scanner (lines.sh): its records of kind task. Their markers:
 # (due D) or 📅 D, (waiting D), (someday), (high), (low), (every RULE), (start D), and (done D) or (dropped D) once
-# closed. A relative date (friday, +3d, today, tomorrow) is read against the date of the day page the task is on, in awk
-# (dates.sh awk_dates), so no task starts a process.
-# Sourced by bin/pkm. Defines functions only.
+# closed. A task with an (at …) is due on the event's first day (events.sh) unless it has a (due …). A relative date
+# (friday, +3d, today, tomorrow) is read against the date of the day page the task is on, in awk (dates.sh awk_dates),
+# so no task starts a process. Sourced by bin/pkm. Defines functions only.
 
 # awk_tasks: reads the scanner's records (lines.sh) and prints the tasks in the fields of task_records. It needs
-# awk_dates and awk_markers in front of it. A routine goes to the file in RELOUT instead, for task_records to check its rule.
+# awk_dates, awk_markers and awk_events in front of it. A routine goes to the file in RELOUT instead, for task_records
+# to check its rule.
 awk_tasks() {
   cat <<'AWK'
   $3 != "task" { next }
@@ -30,6 +31,11 @@ awk_tasks() {
       else if (!relative_word(due)) problem = "cannot read the due date " due
       else if (day == "") problem = "relative date " due " is outside a day page: write its date"
       else if ((due_iso = day_word(due, day)) == "") problem = "cannot read the due date " due
+    }
+    # A task with an (at …) is due on the event's first day, unless it has its own (due …).
+    if (due == "" && mhas(m, "at")) {
+      p = event_when(mval(m, "at"), day)
+      if (p == "") due_iso = EV_FIRST; else problem = p
     }
     if (problem == "" && waiting != "" && waiting != "?" && !is_day(waiting)) problem = "cannot read the waiting date " waiting
     if (problem == "" && start != "" && !is_day(start)) problem = "cannot read the start date " start
@@ -54,7 +60,7 @@ task_records() {
   # The dates are read in awk. A routine goes to task-raw, and its rule is checked below, one routine at a time.
   : > "$tmp/task-raw"
   line_records "$1" > "$tmp/task-lines"
-  RELOUT="$tmp/task-raw" awk -F '\037' -v OFS='\037' "$(awk_dates)$(awk_markers)$(awk_tasks)" "$tmp/task-lines" > "$tmp/task-plain"
+  RELOUT="$tmp/task-raw" awk -F '\037' -v OFS='\037' "$(awk_dates)$(awk_markers)$(awk_events)$(awk_tasks)" "$tmp/task-lines" > "$tmp/task-plain"
   local US file line state due_iso waiting someday prio closed rule day start text problem
   US=$(printf '\037')
   : > "$tmp/task-records"

@@ -10,7 +10,7 @@ add|Capture|an entry at the end of the day's Log, printed as path:line
 todo|Tasks|a task for today, under its Tasks section; prints path:line
 done|Tasks|marks the one open task that matches as done, or as dropped with --drop; moves a routine on
 tasks|Tasks|the open tasks of every note, in groups: overdue, due soon, waiting, the rest
-upcoming|Review|birthdays, due tasks and dates in the next days
+upcoming|Review|birthdays, due tasks, events and dates in the next days
 cycle|Review|the period of a cycle holding a date: its first and last day
 since|Review|what happened since a date: notes, log, tasks, marked entries and names
 close|Review|the close of a period: tasks, open questions, what is due, marked entries, names, quiet notes and ideas

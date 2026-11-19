@@ -1,8 +1,8 @@
 # shellcheck shell=bash
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/cmd/upcoming.sh: pkm upcoming: the tasks due in the next days (routines included), overdue ones, and the
-# birthday:, target:, deadline: and warranty: dates in that window. Prints DATE KIND path:line: text, by date.
+# lib/pkm/cmd/upcoming.sh: pkm upcoming: the tasks due in the next days (routines included), overdue ones, the
+# birthday:, target:, deadline: and warranty: dates in that window, and the events on each of their days (events.sh). Prints DATE KIND path:line: text, by date.
 # Sourced by bin/pkm. Defines functions only.
 
 cmd_upcoming() {
@@ -50,5 +50,7 @@ upcoming_lines() {
       print $4, kind, $1 ":" $2 ": " $13
     }
   ' | LC_ALL=C sort > "$tmp/upcoming-tasks"
-  cat "$tmp/upcoming-dates" "$tmp/upcoming-tasks" | LC_ALL=C sort
+  # Each line gets a sort key: itself, or for an event, its date and start time, so a day's events come by time.
+  { awk '{ print $0 "\037" $0 }' "$tmp/upcoming-dates" "$tmp/upcoming-tasks"; event_lines "$today" "$end"; } \
+    | LC_ALL=C sort | cut -d "$US" -f 2-
 }

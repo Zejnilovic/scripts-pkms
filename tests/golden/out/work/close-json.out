@@ -4,6 +4,7 @@ exit 0
 {"kind":"open","path":"daybook/2026/11/2026-11-11.md","line":5,"text":"- [ ] Budget approval from [[john-roe]] for [[apollo]] (waiting 2026-11-11)","state":"open","days":5,"name":null,"count":null,"last":null,"label":"waiting 5 days"}
 {"kind":"open","path":"daybook/2026/11/2026-11-12.md","line":9,"text":"- 17:40 Decide with the team: should we move the demo to a Tuesday?","state":null,"days":null,"name":null,"count":null,"last":null,"label":"question"}
 {"kind":"due","path":null,"line":null,"text":"2026-11-19 birthday notes/jane-doe.md:4: birthday: 1990-11-19","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-20 due daybook/2026/11/2026-11-12.md:11: - [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"due","path":null,"line":null,"text":"2026-11-20 due notes/routines.md:8: - [ ] Submit the timesheet (due 2026-11-20) (every 1w)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"marked","path":"daybook/2026/11/2026-11-10.md","line":9,"text":"- ! They may cancel the contract if the demo slips again","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"marked","path":"daybook/2026/11/2026-11-10.md","line":10,"text":"- Decided: we cut the mobile app from the first release","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}

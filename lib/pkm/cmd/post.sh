@@ -5,7 +5,7 @@
 # " ([[<page>]])" after the last line, where <page> is the source page's name. The lines go right after the section's last
 # line, with no blank between list items. An empty section, or a note that ends after its heading, gets a blank line and
 # then the lines. A missing section is created at the end as "## <Section>". Refuses (exit 1) a range with a heading, an
-# open task (it would show twice in tasks), a day or close target, and a missing target. A malformed source, a source
+# open task (it would show twice in tasks), an event (it would show twice in upcoming), a day or close target, and a missing target. A malformed source, a source
 # outside the vault, or lines out of range exit 2. Prints path:line of the first posted line. Sourced by bin/pkm.
 
 # final_line_copy <file> <copy>: a copy of the file that ends with a line end, so an entry written after its last line starts on
@@ -78,6 +78,13 @@ cmd_post() {
     && die 1 "A range with a heading can't be posted: post the lines under the heading instead."
   grep -qE '^[[:space:]]*[-*+][[:space:]]+\[ \]' "$tmp/post-lines" \
     && die 1 "An open task stays where it was written: posting it would show it twice in tasks."
+  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
+  awk "$(awk_markers)"'
+    { t = $0; sub(/^[ \t]+/, "", t); gsub(/\t/, " ", t); b = t; sub(/^[-*+] (\[.\] )?/, "", b) }
+    substr(b, 1, 2) != "~~" && t !~ /^- \[.\] / && mhas(line_markers(t), "at") { found = 1 }
+    END { exit !found }
+  ' "$tmp/post-lines" \
+    && die 1 "An event stays where it was written: posting it would show it twice in upcoming."
 
   case $target in
     *'#'*) name=${target%%#*}; section=${target#*#}; [ -n "$section" ] || die 2 "The section name after # is missing." ;;

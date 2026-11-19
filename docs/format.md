@@ -77,9 +77,11 @@ Any other key is stored, and `pkm list key=value` matches it. The title is the f
 | `(high)`, `(low)` | Priority |
 | `(start <date>)` | Hidden until the date: left out of `tasks`, `since`, `close` and `upcoming`'s due lines (`upcoming` lists it by its start date). `tasks --all` shows it, marked `starts <date>` |
 | `(every <rule>)` | A routine, see 8 |
+| `(at <when>)` or `(@ <when>)` | A time: the task is due on the day of its `(at …)` unless it has a `(due …)`, see Events |
 | `(done <date>)`, `(dropped <date>)` | Closed on the date. `done` writes these |
 
 4. A date is `YYYY-MM-DD`. On a day page it may also be a weekday (`friday`), `today`, `tomorrow`, `+3d` or `+2w`, counted from that page's date. `todo` writes the date it resolved.
+5. **The marker keys.** A key is lowercase and is the first word inside the parentheses. `due`, `start`, `waiting`, `someday`, `high`, `low`, `done` and `dropped` belong to tasks; `recall` to questions; `at` and `@` to events and tasks (see Events); `every` to routines and events; `until` and `skip` to events that come back. Reserved for a later pkm, and not to be used for anything else: `for`, followed by a link or a writer's name (whose move it is), and durations, `(1h30)`, `(1h)` and `(40m)`. Parentheses whose first word is not a key are text. `at`, `@` and `for` are also everyday words, so their parentheses are text unless the next word could start a value: a date, a weekday, `today`, `tomorrow` or `+…` after `at` or `@`, as in `(at friday 14:00)` but not `(at the office)`; a link or a writer's name after `for`, as in `(for [[jane-doe]])` but not `(for now)`. Any other key whose value can't be read is a `check` problem.
 
 ## 8. Routines
 
@@ -93,6 +95,17 @@ The rules `day`, `weekday`, `monday, thursday`, `month on <1-31>` and `year on <
 ### Recall questions
 
 A recall question is an entry that ends with a recall mark: `(recall <date> <N>d)`, the day to ask it and the current interval in days, such as `- When is the median better than the mean? (recall 2026-11-16 7d)`. The indented lines under it are the answer. `pkm recall add <note> <question> --answer <text>` writes one at the end of the note's `## Questions` section, as the owner's words. Marks outside code count; a struck line never comes up. `recall` lists the questions due on or before today; `recall <path:line> yes|no` moves one up the ladder of 1, 3, 7, 14, 30, 60 and 120 days, or back to 1 day. A recall line never shows in tasks, since, close or upcoming.
+
+### Events
+
+An event is something that happens at a time. It is a line outside code and frontmatter with `(at <when>)` or `(@ <when>)` after its text; the two are the same marker. Lines on close pages, in `archive/`, and in a note whose `status` is closed (as for `upcoming` in 5) are not read as events.
+
+1. `<when>` is one of: `<date>` (the whole day); `<date> HH:MM`; `<date> HH:MM-HH:MM`; `<date> to <date>` (several whole days). Times use the 24-hour clock and are local: pkm knows no time zones. A range's dash may be `-` or `–`; an end before its start is on the next day, as in a night shift, `22:00-06:00`. The last day of `to` comes after the first.
+2. The date follows 7.4: on a day page it may be relative, counted from that page's date.
+3. Without a task box, the line is an event: it is never in `tasks` or the close's `== tasks`, and never overdue. With a box, it is a task with a time, due on the event's first day unless it has its own `(due …)`.
+4. An event comes back with `(every <n><d|w|m|y>)`, an interval and never a cycle, in a note and without a box. Its times are counted from the date in its `(at …)`, each from that date rather than from the time before: from 2026-01-31, `(every 1m)` gives 2026-02-28, then 2026-03-31. `(until <date>)` is the last day it can happen, and `(skip <date>)` takes out the time on that date; a line may hold several `(skip …)`. pkm never rewrites the line.
+5. A struck line is not an event. An event that changes is struck, and written again with its new time. An event stays where it was written: `post` refuses one, as it does an open task, since a copy would show twice in `upcoming` and in a calendar. A line that links the day it came from keeps that link before its markers: `- Dentist ([[2026-11-12-sam]]) (at 2026-12-04 10:00)`.
+6. `check` reports an `(at …)` or `(@ …)` whose next word starts a value (5) but that can't be read as a whole, such as `(at friday 25:00)`; a relative date outside a day page; a time range whose start and end are the same; an `(every …)` with an `(at …)` on a day page or in a task box, or one that isn't an interval; and `(until …)` or `(skip …)` anywhere but on an event that comes back.
 
 ## 9. Cycles and the close
 

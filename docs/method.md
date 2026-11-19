@@ -31,7 +31,7 @@ Eight words carry the method:
 |---|---|
 | **daybook** | Your pages, one per day. Every entry goes on today's page first. |
 | **entry** | One line you write on a page, usually with the time: `- 14:20 John says the budget needs sign-off` |
-| **mark** | A sign on an entry that says what it is: a task, a question, a decision, something important, an idea, something no longer true, a question to recall |
+| **mark** | A sign on an entry that says what it is: a task, an event, a question, a decision, something important, an idea, something no longer true, a question to recall |
 | **note** | A page about one thing: a person, a project, an area you look after, a topic, a course |
 | **link** | A note's name in double brackets, `[[apollo]]`. The link is the relationship. |
 | **post** | To copy an entry, word for word, into the note it is about, with a link to its day |
@@ -108,6 +108,7 @@ A mark says what an entry is. There are few, on purpose, and all are optional: m
 | `- Decided: we go in the second half of July` | A decision |
 | `- ! They may cancel the contract` | Important: something you want to see again |
 | `- Idea: a photo book of the summer for Nana` | An idea: something for later, maybe much later |
+| `- Parents' evening (at 2026-11-19 17:30)` | An event: something that happens at a time |
 | `~~Joe can start on 2026-12-01~~` | No longer true: struck through, still readable |
 | `(recall 2026-11-16 7d)` | A question to recall, with its next day and current interval |
 
@@ -247,6 +248,30 @@ The first three are from the family vault's routines, the last two from the work
 
 When you do it, you move its due date on by one interval, or one period of its cycle, instead of ticking it, and write what you did on today's page if you want a record. On 11 November Alex wrote `- 12:10 Paid the electricity bill` and moved the bill on to 2026-12-11. A routine with no due date gets one, the last day of the next period. Nothing generates copies of a task, and a routine you haven't done stays overdue, in the brief and at every close, until you do it. Birthdays need no routine: a `birthday:` line in a person's note is enough.
 
+### Events
+
+An event is something that happens at a time: a lecture, a shift, an appointment, a parents' evening. You don't do it, so it is never ticked and never overdue; once its time has passed, it is over. Write it as an entry, on the page of the day you heard about it, with `(at …)` at the end. On Saturday Alex wrote:
+
+```markdown
+- 11:40 [[school]]: parents' evening (at 2026-11-19 17:30-19:00)
+```
+
+`(at …)` takes a day, `(at 2026-11-26)`, for something that lasts the day, such as Mia's museum trip; a day and a time, `(at 2026-11-20 14:00)`; a time range, `(at 2026-11-19 17:30-19:00)`; or several days, `(at 2026-12-08 to 2026-12-10)`. On a day page the day can also be a weekday, `today`, `tomorrow` or `+2w`, counted from the page's date, as with a due date. Times use the 24-hour clock and are the local time where you are. `(@ …)` is the same marker, quicker to type on a phone. The Bullet Journal gives events a sign of their own, a circle;[^bujo] here the marker carries the date as well, so a search, or pkm, can put them in order.
+
+**The box decides.** Something you have to do at a time is a task with a time: `- [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)`. It is due on the day of its `(at …)`, and overdue if it is still open after that. Without a box, the line is an event, and nothing about it is ever overdue.
+
+**When an event changes**, strike the line and write the new one, as with anything no longer true. The struck line keeps the old date, so you can still see that it moved. Like a task, an event stays where you wrote it and isn't posted: a copy would come up twice.
+
+**An event that comes back**, such as a weekly lecture or a team's sync, is written once, in the note it belongs to, with the day of its first time and `(every …)`. `(until …)` ends it, and `(skip …)` takes out one time. Mia's football is in her note:
+
+```markdown
+- Football training with [[joe-bloggs-football|Joe]] (at 2026-11-03 17:00-18:00) (every 1w) (skip 2026-11-17)
+```
+
+When Joe said on Thursday that there was no training next Tuesday, Sam added `(skip 2026-11-17)`. pkm works out each time from the line, and the line itself never moves on, as a routine's does, because there is nothing to tick. An event comes back on an interval, such as `(every 1w)` or `(every 2w)`.
+
+**Your calendar.** `pkm upcoming` lists events with the dated tasks and birthdays, by day and time, and the close looks at the ones before the next close. pkm never reads a calendar app: a meeting already in your work calendar stays there, and the vault keeps what no calendar holds, such as what you heard at the school gate. The other way does work: `pkm upcoming --ics` writes the vault's events, the tasks with a time and the birthdays as a calendar file, which a calendar app can import or subscribe to and show beside its own. You write only in the vault; the calendar only reads.
+
 ### Closing
 
 Once a week, you close the week. Pick a time that suits the vault: Friday afternoon at work, Sunday evening at home. The week runs Monday to Sunday. It takes about fifteen minutes:
@@ -257,7 +282,7 @@ flowchart TD
   T --> D{"Do, date,<br/>someday or drop?"}
   R --> Q["Open questions<br/>and everything waiting"]
   Q --> A{"Answer, chase<br/>or drop?"}
-  R --> U["What comes due next:<br/>routines, dates, birthdays"]
+  R --> U["What comes next:<br/>routines, dates,<br/>events, birthdays"]
   R --> P["Post what matters"]
   R --> N["What keeps coming back,<br/>and what has gone quiet"]
   D --> W["Optional: a close page"]
@@ -270,7 +295,7 @@ flowchart TD
 1. Read the week's pages, or list the week's entries with pkm.
 2. For every overdue task, and every task open for three weeks or more: **do** it this week, **date** it, make it **someday**, or **drop** it. A promise you didn't mark becomes a task on today's page, quoting its entry.
 3. For every open question and everything you are waiting for: **answer** it, **chase** it, or **drop** it.
-4. Look at what comes due before the next close: routines, dated tasks, birthdays.
+4. Look at what comes before the next close: routines, dated tasks, events, birthdays.
 5. Post what matters: decisions, risks, ideas, new facts about people and projects.
 6. Name what keeps coming back, with a new note or a hub, and look at what has gone quiet: a project or a person nobody mentioned for two weeks.
 7. If you like, write three to five lines on the week in a close page, `closes/2026/2026-11-09-week.md`, each with a link to its day.
@@ -286,7 +311,7 @@ The close is where the Bullet Journal's migration of open tasks[^bujo] and the r
 - The task to send John Roe the October invoice is overdue since Friday: you do it today.
 - The budget approval has waited five days: you chase John.
 - "Should we move the demo to a Tuesday?" is still open: you answer it, or decide to raise it with the team.
-- The sprint ended on Sunday, so the sprint summary is due: you draft it today. Coming up this week: the timesheet on Friday, and Jane Doe's birthday on Thursday.
+- The sprint ended on Sunday, so the sprint summary is due: you draft it today. Coming up this week: Jane Doe's birthday on Thursday, then the demo for Acme at 14:00 and the timesheet, both on Friday.
 - Tuesday's decision and risk are posted to Apollo, and Marta Kovac, a new contact at Acme, gets a note.
 - Nothing has been quiet for two weeks yet; the vault is a week old.
 
@@ -307,7 +332,7 @@ The close page, if you keep one:
 - It was pay day, so moving the holiday savings is due: Alex does it, and moves the routine on to 2026-12-15.
 - "Should we take the car or the train?" is still open: they choose the train, and Sam writes `- Decided: we take the train` on today's page.
 - The plumber has no new start date: Alex writes a wait on today's page, `- [ ] A start date from [[joe-bloggs-plumber]] (waiting 2026-11-12)`.
-- Coming due: the car insurance on 2026-11-20, which Alex marked to compare first.
+- Coming up: the parents' evening on Thursday at 17:30, which Sam takes, and the car insurance on 2026-11-20, which Alex marked to compare first.
 - July is posted to the summer trip's Decisions.
 
 ### Your cycle
@@ -469,6 +494,7 @@ The descriptions of other methods come from their authors' own pages, not from a
 - **A tag for everything.** People and projects are links. Keep tags for a few themes that cut across them.
 - **Turning the daybook into a task list.** Tasks are marks among entries. The list of open tasks is something you look at, not a page you keep.
 - **Routines on day pages.** A page is a record, and a routine's date moves. Keep routines in a note.
+- **Copying your calendar.** A meeting that is in a calendar already stays there. Write an event when no calendar holds it.
 - **One vault for everything.** Your family reads the family vault, and your employer may own the work one. Keep each part of life in its own vault.
 - **Skipping the close for months.** Nothing is lost, but nothing gets decided either. Close the current week and let the old items surface through the three-week rule.
 - **Studying your summaries.** Write questions instead, and answer them from memory.
@@ -493,7 +519,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | What you marked important | `- !`, or `! ` after the time |
 | Ideas | `Idea:` |
 | What is no longer true | `~~` |
-| Routines | `(every ` |
+| Routines, and events that come back | `(every ` |
+| Events | `(at `, `(@ ` |
 | Recall questions | `(recall ` |
 | Where the work lives | `https://` |
 | A note's history | `[[apollo` |
@@ -514,6 +541,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Move a finished note to the archive | `pkm mv apollo archive` | Move the file into `archive/`; its links keep working |
 | See what happened since a cycle began | `pkm since sprint --about apollo` | Read the pages since the sprint began, or search for `[[apollo` and keep the recent ones |
 | List open tasks | `pkm tasks` | Search for `- [ ]` |
+| See what comes next: dated tasks, events, birthdays | `pkm upcoming` | Search for `(due `, `(at ` and `birthday:` |
+| Show the vault's events in a calendar app | `pkm upcoming --ics > daybook.ics` | Write them in the calendar too |
 | Tick a task, or move a routine on | `pkm done invoice` | Write `x` in the box, or change a routine's due date |
 | Strike a line that is no longer true | `pkm strike <path:line>` | Wrap it in `~~` and add a link to today |
 | List the links to the outside | `pkm links --external apollo` | Read the note's Links section |
@@ -545,6 +574,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | A due date | `(due <date>)`; on a page also a weekday, `today`, `tomorrow`, `+3d`, `+2w`, counted from that page's date | `(due 2026-11-20)` |
 | Waiting, start, someday, priority | `(waiting <date>)`, `(start <date>)`, `(someday)`, `(high)` | `(waiting 2026-11-11)` |
 | A routine | A task with `(every <number><unit>)`, the unit `d`, `w`, `m` or `y`, and a due date, or with `(every <cycle>)`, kept in a note; when done, its due date moves on by one interval or one period; a cycle routine with no due date is due on the last day of the current period | `- [ ] Pay the rent (due 2026-12-01) (every 1m)`, `- [ ] Send the sprint summary (every sprint)` |
+| An event | An entry ending in `(at <when>)` or `(@ <when>)`; `<when>` is a date, a date and `HH:MM`, a date and `HH:MM-HH:MM`, or `<date> to <date>`; on a page the date can also be a weekday, `today`, `tomorrow`, `+3d` or `+2w`, counted from that page's date; with a task box it is a task, due on that date | `- Parents' evening (at 2026-11-19 17:30-19:00)` |
+| An event that comes back | An event in a note with `(every <number><unit>)`, the unit `d`, `w`, `m` or `y`, counted from the date in its `(at …)`; `(until <date>)` ends it, and `(skip <date>)` takes out one time; never in a task box | `(at 2026-11-03 17:00-18:00) (every 1w) (skip 2026-11-17)` |
 | A question | An entry ending in `?` | `- Should we take the car or the train?` |
 | A decision | An entry starting `Decided:` | `- Decided: we cut the mobile app` |
 | Important | An entry starting `!` after the time | `- 09:12 ! Acme may cancel` |

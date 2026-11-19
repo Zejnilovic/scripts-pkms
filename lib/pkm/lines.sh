@@ -8,7 +8,8 @@
 # awk_markers: the awk functions that read a record's markers (field 5: the text inside each pair of parentheses whose
 # first word is a marker key, in the order written, separated by tabs). mval(m, key) is the value of the first
 # "(key …)" ("" when there is none), mhas(m, key) is 1 when one is written with a value or a space, and mflag(m, key) is 1
-# when "(key)" is written alone.
+# when "(key)" is written alone. line_markers(s) is the markers field of a line's text: (at …) and (@ …) count only with a
+# value after them (at_value), and (@ …) is recorded as (at …).
 awk_markers() {
   cat <<'AWK'
 function mval(m, key,   n, a, i) {
@@ -26,6 +27,23 @@ function mflag(m, key,   n, a, i) {
   for (i = 1; i <= n; i++) if (a[i] == key) return 1
   return 0
 }
+function line_markers(s,   out, i, rest, j, c, key, sp) {
+  out = ""; rest = s
+  while ((i = index(rest, "(")) > 0) {
+    rest = substr(rest, i + 1); j = index(rest, ")"); if (j == 0) break
+    c = substr(rest, 1, j - 1); sp = index(c, " ")
+    key = sp ? substr(c, 1, sp - 1) : c
+    if (key == "@") { c = "at" substr(c, 2); key = "at" }
+    if (key == "at" && !at_value(substr(c, 4))) continue
+    if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip)$/) out = out (out == "" ? "" : "\t") c
+  }
+  return out
+}
+function at_value(v,   w) {
+  w = tolower(v); sub(/ .*/, "", w)
+  return w ~ /^[0-9][0-9][0-9][0-9]-/ || w ~ /^\+/ || w == "today" || w == "tomorrow" || \
+    w ~ /^(mon|monday|tue|tues|tuesday|wed|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)$/
+}
 AWK
 }
 
@@ -34,28 +52,11 @@ AWK
 # 5 markers (see awk_markers; a 📅 date is added as "due <date>" when the line has no (due …)), 6 the day page's date (or
 # empty), 7 the writer of a shared vault's day page (2026-11-14-alex.md: alex), 8 the note's type and 9 its status (from
 # its frontmatter, or empty), 10 the text: the line without its indent, tabs as spaces.
-# A line with (recall …) is a question, box or not (check reports the box). Another box line is a task. Without a box, a line with (at …) or (@ …) followed by a
-# value (a date, a weekday, today, tomorrow or +…) is an event, and any other line with a marker is an entry. The keys are
-# those of docs/format.md 7.5; (at …) and (@ …) without a value are text, and (@ …) is recorded as (at …).
+# A line with (recall …) is a question, box or not (check reports the box). Another box line is a task. Without a box,
+# a line with (at …) or (@ …) followed by a value (a date, a weekday, today, tomorrow or +…) is an event, and any other
+# line with a marker is an entry. The keys are those of docs/format.md 7.5.
 awk_lines() {
   cat <<'AWK'
-  function line_markers(s,   out, i, rest, j, c, key, sp) {
-    out = ""; rest = s
-    while ((i = index(rest, "(")) > 0) {
-      rest = substr(rest, i + 1); j = index(rest, ")"); if (j == 0) break
-      c = substr(rest, 1, j - 1); sp = index(c, " ")
-      key = sp ? substr(c, 1, sp - 1) : c
-      if (key == "@") { c = "at" substr(c, 2); key = "at" }
-      if (key == "at" && !at_value(substr(c, 4))) continue
-      if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip)$/) out = out (out == "" ? "" : "\t") c
-    }
-    return out
-  }
-  function at_value(v,   w) {
-    w = tolower(v); sub(/ .*/, "", w)
-    return w ~ /^[0-9][0-9][0-9][0-9]-/ || w ~ /^\+/ || w == "today" || w == "tomorrow" || \
-      w ~ /^(mon|monday|tue|tues|tuesday|wed|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)$/
-  }
   function emoji_date(s,   i, m, rest, v) {
     # Measured, not counted: gawk in a UTF-8 locale counts the emoji as one character, mawk as four bytes.
     m = "\360\237\223\205 "; i = index(s, m); if (i == 0) return ""

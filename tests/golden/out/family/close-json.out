@@ -3,6 +3,7 @@ exit 0
 {"kind":"open","path":"daybook/2026/11/2026-11-10-sam.md","line":13,"text":"- Should we take the car or the train?","state":null,"days":null,"name":null,"count":null,"last":null,"label":"question"}
 {"kind":"due","path":null,"line":null,"text":"2026-11-15 due daybook/2026/11/2026-11-10-sam.md:5: - [ ] Ask [[nana]] which July dates suit her (due 2026-11-15)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"due","path":null,"line":null,"text":"2026-11-15 due notes/routines.md:11: - [ ] Move 200 to the holiday savings (due 2026-11-15) (every pay)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-19 event daybook/2026/11/2026-11-14-alex.md:9: - 11:40 [[school]]: parents' evening (at 2026-11-19 17:30-19:00)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"due","path":null,"line":null,"text":"2026-11-20 due notes/routines.md:9: - [ ] Renew the car insurance (due 2026-11-20) (every 1y)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"marked","path":"daybook/2026/11/2026-11-10-sam.md","line":11,"text":"- Decided: we go in the second half of July","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
 {"kind":"marked","path":"daybook/2026/11/2026-11-12-sam.md","line":8,"text":"- 12:40 Idea: a photo book of the summer for [[nana]]'s birthday","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}

@@ -25,7 +25,7 @@
 #   new <type> <title> [--name <name>]
 #                                 a note in notes/ (or folder_<type> from the settings), made from its template; a type with
 #                                 no template is made from the note template. An existing name fails (exit 1) and says so
-#   upcoming [<days>]             due tasks (routines too), birthdays, target and warranty dates in the next <days> (14)
+#   upcoming [<days>]             due tasks (routines too), events, birthdays, target and warranty dates in the next <days> (14)
 #   backlinks <name> [--since YYYY-MM-DD]
 #                                 every line that links a note, by its file name, slug or alias, archive included
 #   names [--type <type>]         every note's name, type, path and aliases, by name, from the cache. Day and close pages
@@ -137,6 +137,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/links.sh"
 # shellcheck source=../lib/pkm/lines.sh
 . "$pkm_home/lib/pkm/lines.sh"
+# shellcheck source=../lib/pkm/events.sh
+. "$pkm_home/lib/pkm/events.sh"
 # shellcheck source=../lib/pkm/tasks.sh
 . "$pkm_home/lib/pkm/tasks.sh"
 # shellcheck source=../lib/pkm/index.sh

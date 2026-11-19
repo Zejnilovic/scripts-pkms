@@ -112,8 +112,12 @@ cmd_check() {
     }
   ' -v markers="$conflict_markers" >> "$tmp/problems"
 
-  # A task marker that can't be read, or a relative date outside a day page, is a problem in the task's place.
-  task_records yes | awk -F "$(printf '\037')" '$11 != "" { print "- " $1 ":" $2 ": " $11 }' >> "$tmp/problems"
+  # A task marker that can't be read, or a relative date outside a day page, is a problem in the task's place. So is an
+  # event that can't be read, or whose (every …), (until …) or (skip …) can't be used (docs/format.md, Events 6).
+  {
+    task_records yes | awk -F "$(printf '\037')" '$11 != "" { print "- " $1 ":" $2 ": " $11 }'
+    event_problems
+  } >> "$tmp/problems"
 
   # Web addresses are checked only when asked (--urls): one GET per distinct address, 8 at a time, 5 s each. An address
   # that doesn't answer, or answers 404 or 410, is reported at each place it is used. Other statuses count as answered.

@@ -8,6 +8,7 @@ daybook/2026/11/2026-11-11.md:5: waiting 5 days: - [ ] Budget approval from [[jo
 daybook/2026/11/2026-11-12.md:9: question: - 17:40 Decide with the team: should we move the demo to a Tuesday?
 == due
 2026-11-19 birthday notes/jane-doe.md:4: birthday: 1990-11-19
+2026-11-20 due daybook/2026/11/2026-11-12.md:11: - [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)
 2026-11-20 due notes/routines.md:8: - [ ] Submit the timesheet (due 2026-11-20) (every 1w)
 == marked
 daybook/2026/11/2026-11-10.md:9: - ! They may cancel the contract if the demo slips again

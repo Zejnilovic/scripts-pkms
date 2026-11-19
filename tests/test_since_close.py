@@ -104,9 +104,9 @@ class SinceOnTheWorkExample(ExampleCopy):
             self.assertTrue(match, line)
             names[match.group(1)] = (int(match.group(2)), match.group(3))
         self.assertEqual(names.get("john-roe"), (4, "today"))
-        self.assertEqual(names.get("apollo"), (3, "5 days ago"))
-        self.assertEqual(list(names)[0], "john-roe")
-        self.assertLess(list(names).index("acme"), list(names).index("apollo"))
+        self.assertEqual(names.get("apollo"), (4, "4 days ago"))
+        # Most mentions first; names with as many mentions come by name.
+        self.assertEqual(list(names)[:3], ["acme", "apollo", "john-roe"])
 
     def test_the_sections_are_in_order_and_empty_ones_are_left_out(self):
         self.assertEqual(list(self.parts), ["log", "tasks", "marked", "names"])
