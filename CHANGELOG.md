@@ -10,7 +10,7 @@ Version numbers: **major** when a command, option, output format, note name, lin
 - pkm reads the dates of tasks in awk, so a vault with many relative dates (`(due friday)`, `(due +3d)`) no longer starts a process per task. A date that isn't on the calendar, such as `2026-02-30`, is now a `check` problem on macOS too, where BSD `date` had accepted it.
 - pkm reads every marked line of the vault in one pass, which events and later features build on. The output of `tasks`, `upcoming`, `close`, `since` and `check` is unchanged.
 - pkm reads events. `upcoming` and the close's `== due` list each on its days, a day's events by start time, and one that comes back on each of its times; `tasks` never shows one, and none is ever overdue. A task with an `(at …)` is due on its day. `check` reports an event it can't read, a time range that ends when it starts, and an `(every …)`, `(until …)` or `(skip …)` that can't be used. `post` refuses an event, as it does an open task. Events on close pages, in `archive/` and in closed notes are not read.
-- TODO: `pkm upcoming --ics` writes the events as a calendar file.
+- `pkm upcoming --ics` prints the vault's events, its open tasks with an `(at …)` and its birthdays as an iCalendar file, which a calendar app can import or subscribe to. An event that comes back is one entry with its rule and skips; times are local, with no time zone. Each entry's title is the line in plain words: links as their shown text or their note's title, without the time and the markers.
 
 ## Released
 

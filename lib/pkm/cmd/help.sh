@@ -58,6 +58,7 @@ command_options() {
     get) echo "--lines" ;;
     list) echo "--all --show --quiet --json --abs --limit" ;;
     overview) echo "--json" ;;
+    upcoming) echo "--ics" ;;
     names) echo "--type --json --abs --limit" ;;
     index) echo "--rebuild" ;;
     rename) echo "--dry-run --no-alias" ;;
