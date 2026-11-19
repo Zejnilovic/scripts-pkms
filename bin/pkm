@@ -16,9 +16,10 @@
 #                                 to the note named routines (created when missing), not to today's page, or with --in <note> to
 #                                 that note's Routines section. --start hides the task
 #                                 until that day; --someday keeps it out of the weekly views
-#   done <words | path:line> [--drop]
+#   done <words | path:line> [--drop | --next <day>]
 #                                 marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
 #                                 A routine with an interval, such as (every 1m), keeps its box and moves its due date on
+#                                 (--next <day>: to that day, for a routine done early or late)
 #   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--stale <days>] [--all]
 #                                 the open tasks of every note, in groups: overdue, due soon, waiting, the rest
 #                                 (docs/contract.md gives the order). A task is a "- [ ]" line outside code
@@ -56,6 +57,8 @@
 #                                 copies those lines into the section, verbatim, with " ([[page]])" after the last one,
 #                                 and prints path:line; a missing section is made at the end. Refuses a heading, an open
 #                                 task, or a day or close page as the target (exit 1)
+#   moved <path:line> <when>      strikes a task or an event whose date changed and writes it again with the new date:
+#                                 below it in a note, on today's page from another day's page, linking that day
 #   strike <path:line>            wraps the line's text in ~~ and adds " ([[today's page]])", making today's page if it is
 #                                 missing; refuses a blank line, a heading or a struck line (exit 1)
 #   links --external [note]       each http(s) address outside code, as path:line: address (links to notes: backlinks)
@@ -176,6 +179,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/get.sh"
 # shellcheck source=../lib/pkm/cmd/post.sh
 . "$pkm_home/lib/pkm/cmd/post.sh"
+# shellcheck source=../lib/pkm/cmd/moved.sh
+. "$pkm_home/lib/pkm/cmd/moved.sh"
 # shellcheck source=../lib/pkm/cmd/strike.sh
 . "$pkm_home/lib/pkm/cmd/strike.sh"
 # shellcheck source=../lib/pkm/cmd/links.sh
@@ -290,6 +295,7 @@ case $command in
   get) cmd_get "$@" ;;
   post) cmd_post "$@" ;;
   strike) cmd_strike "$@" ;;
+  moved) cmd_moved "$@" ;;
   links) output_command links "$@" ;;
   doctor) cmd_doctor ;;
   init) cmd_init ;;

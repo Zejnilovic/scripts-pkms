@@ -119,7 +119,7 @@ cmd_complete() {
     evidence:0) echo -; complete_notes ;;
     recall:0) echo add; complete_notes ;;
     recall:1) [ "$first" != add ] || complete_notes ;;
-    post:0|strike:0) echo :files ;;
+    post:0|strike:0|moved:0) echo :files ;;
     post:1) complete_notes ;;
     mv:1) echo :dirs ;;
     cycle:0) complete_cycles ;;

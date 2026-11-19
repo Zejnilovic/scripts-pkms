@@ -6,7 +6,7 @@
 
 # scripts/bump.sh sets this, and scripts/check.py matches it with VERSION.
 # shellcheck disable=SC2034 # read by bin/pkm (version) and by cmd/version.sh
-pkm_version=0.3.0
+pkm_version=0.4.0
 
 die() { code=$1; shift; printf '%s\n' "$*" >&2; exit "$code"; }
 

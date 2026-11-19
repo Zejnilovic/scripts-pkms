@@ -260,7 +260,7 @@ An event is something that happens at a time: a lecture, a shift, an appointment
 
 **The box decides.** Something you have to do at a time is a task with a time: `- [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)`. It is due on the day of its `(at …)`, and overdue if it is still open after that. Without a box, the line is an event, and nothing about it is ever overdue.
 
-**When an event changes**, strike the line and write the new one, as with anything no longer true. The struck line keeps the old date, so you can still see that it moved. Like a task, an event stays where you wrote it and isn't posted: a copy would come up twice.
+**When an event changes**, strike the line and write the new one, as with anything no longer true; `pkm moved <path:line> <when>` does both, and the new line links the day the old one was written. The struck line keeps the old date, so you can still see that it moved. Like a task, an event stays where you wrote it and isn't posted: a copy would come up twice.
 
 **An event that comes back**, such as a weekly lecture or a team's sync, is written once, in the note it belongs to, with the day of its first time and `(every …)`. `(until …)` ends it, and `(skip …)` takes out one time. Mia's football is in her note:
 
@@ -545,6 +545,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Show the vault's events in a calendar app | `pkm upcoming --ics > daybook.ics` | Write them in the calendar too |
 | Tick a task, or move a routine on | `pkm done invoice` | Write `x` in the box, or change a routine's due date |
 | Strike a line that is no longer true | `pkm strike <path:line>` | Wrap it in `~~` and add a link to today |
+| Move a task or an event to a new date | `pkm moved <path:line> friday` | Strike it, and write it again with the new date |
+| Do a routine early, and count on from then | `pkm done <words> --next 2027-11-19` | Change its due date by hand |
 | List the links to the outside | `pkm links --external apollo` | Read the note's Links section |
 | Post an entry | `pkm post daybook/2026/11/2026-11-10.md:10 apollo#Decisions` | Copy the line into the section, and add `([[2026-11-10]])` |
 | See the dates of each cycle's current period | `pkm cycle` | Count from the cycle's start in your calendar |

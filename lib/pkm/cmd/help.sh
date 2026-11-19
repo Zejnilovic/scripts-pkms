@@ -8,7 +8,8 @@ command_table() {
 day|Capture|the day's page, created when missing; prints its path
 add|Capture|an entry at the end of the day's Log, printed as path:line
 todo|Tasks|a task for today, under its Tasks section; prints path:line
-done|Tasks|marks the one open task that matches as done, or as dropped with --drop; moves a routine on
+done|Tasks|marks the one open task that matches as done, or as dropped with --drop; moves a routine on, or to the day --next gives
+moved|Tasks|strikes a task or an event whose date changed and writes it again with the new date; prints path:line: text
 tasks|Tasks|the open tasks of every note, in groups: overdue, due soon, waiting, the rest
 upcoming|Review|birthdays, due tasks, events and dates in the next days
 cycle|Review|the period of a cycle holding a date: its first and last day
@@ -69,7 +70,7 @@ command_options() {
     close) echo "--cycle --date --quarter --json" ;;
     add) echo "--day --file" ;;
     todo) echo "--due --high --low --waiting --someday --start --every --in" ;;
-    done) echo "--drop" ;;
+    done) echo "--drop --next" ;;
     new) echo "--name" ;;
     templates) echo "--user" ;;
     version) echo "--require" ;;

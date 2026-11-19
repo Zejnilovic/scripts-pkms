@@ -2,19 +2,25 @@
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
 # lib/pkm/cmd/done.sh: pkm done: marks the one open task that matches as done, or with --drop as dropped. A routine with
-# an interval, such as (every 1m), keeps its box open and moves its due date on by one interval. Sourced by bin/pkm.
-# Defines functions only.
+# an interval, such as (every 1m), keeps its box open and moves its due date on by one interval. With --next <day>, a
+# routine done early or late is next due on that day, and moves on from there. Sourced by bin/pkm. Defines functions only.
 
 cmd_done() {
-  local mark=x word="done" ref line file due rule new old US record text explicit
+  local mark=x word="done" ref line file due rule new old US record text explicit next=""
+  local usage="Usage: pkm done <words of the task | path:line> [--drop | --next <day>]"
   US=$(printf '\037')
   while [ $# -gt 0 ]; do
     case $1 in
       --drop) mark="-"; word="dropped"; shift ;;
+      --next)
+        { [ $# -ge 2 ] && next=$(parse_day "$2") && [ -n "$next" ]; } \
+          || die 2 "Not a day: ${2:-} (use YYYY-MM-DD, today, tomorrow, +3d, +2w or a weekday)"
+        shift 2 ;;
       *) ref="${ref:+$ref }$1"; shift ;;
     esac
   done
-  [ -n "$ref" ] || die 2 "Usage: pkm done <words of the task | path:line> [--drop]"
+  [ -n "$ref" ] || die 2 "$usage"
+  [ -z "$next" ] || [ "$mark" = x ] || die 2 "--next moves a routine that is done, so it doesn't go with --drop."
   task_records no > "$tmp/done-records"
   case $ref in
     *.md:[0-9]*) REF=$ref awk -F "$US" -v OFS="$US" '$3 == "open" && ($1 ":" $2) == ENVIRON["REF"]' "$tmp/done-records" > "$tmp/done-matches" ;;
@@ -37,9 +43,14 @@ EOF
   # which is not written on the line, so it is treated as undated.
   explicit=no
   case $text in *"(due "*|*"📅 "*) explicit=yes ;; esac
+  if [ -n "$next" ] && [ -z "$rule" ]; then
+    die 1 "$file:$line is not a routine, so it has no next time: to change its date, use pkm moved $file:$line <day>."
+  fi
   if [ "$mark" = x ] && [ -n "$rule" ]; then
     local unit n base
-    if printf '%s\n' "$rule" | grep -Eq '^[0-9]+[dwmy]$'; then
+    if [ -n "$next" ]; then
+      new=$next
+    elif printf '%s\n' "$rule" | grep -Eq '^[0-9]+[dwmy]$'; then
       # The due date moves on by one interval from the old due date (today, when there is none).
       base=$due; [ -n "$base" ] || base=$today
       unit=$(printf '%s' "$rule" | tail -c 1); n=${rule%?}
