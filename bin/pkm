@@ -135,6 +135,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/vault.sh"
 # shellcheck source=../lib/pkm/links.sh
 . "$pkm_home/lib/pkm/links.sh"
+# shellcheck source=../lib/pkm/lines.sh
+. "$pkm_home/lib/pkm/lines.sh"
 # shellcheck source=../lib/pkm/tasks.sh
 . "$pkm_home/lib/pkm/tasks.sh"
 # shellcheck source=../lib/pkm/index.sh

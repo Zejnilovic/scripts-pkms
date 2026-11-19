@@ -1,0 +1,15 @@
+exit 0
+== week 2026-11-09 to 2026-11-15: 18 entries (closes/2026/2026-11-09-week.md)
+== tasks
+daybook/2026/11/2026-11-09.md:5: overdue: - [ ] Send [[john-roe]] the Apollo invoice for October (due 2026-11-13) (high)
+notes/routines.md:7: overdue: - [ ] Send the sprint summary (due 2026-11-15) (every sprint)
+== open
+daybook/2026/11/2026-11-11.md:5: waiting 5 days: - [ ] Budget approval from [[john-roe]] for [[apollo]] (waiting 2026-11-11)
+daybook/2026/11/2026-11-12.md:9: question: - 17:40 Decide with the team: should we move the demo to a Tuesday?
+== due
+2026-11-19 birthday notes/jane-doe.md:4: birthday: 1990-11-19
+2026-11-20 due notes/routines.md:8: - [ ] Submit the timesheet (due 2026-11-20) (every 1w)
+== marked
+daybook/2026/11/2026-11-10.md:9: - ! They may cancel the contract if the demo slips again
+daybook/2026/11/2026-11-10.md:10: - Decided: we cut the mobile app from the first release
+daybook/2026/11/2026-11-12.md:10: - 17:55 Idea: a self-service export for [[acme]], maybe next year

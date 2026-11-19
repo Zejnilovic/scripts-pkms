@@ -1,0 +1,36 @@
+exit 0
+== log
+daybook/2026/11/2026-11-10.md:3: - 09:00 Met Jane Doe about [[apollo]].
+daybook/2026/11/2026-11-10.md:4: - [ ] Call Jane Doe (due friday)
+daybook/2026/11/2026-11-10.md:5: - [ ] Send the Apollo notes (due +2w) (high)
+daybook/2026/11/2026-11-10.md:6: - [ ] Book the room (due tomorrow) (low)
+daybook/2026/11/2026-11-10.md:7: - [ ] Order the parts (due +3)
+daybook/2026/11/2026-11-10.md:8: - [ ] Ask Acme for the quote (waiting since 2026-11-09)
+daybook/2026/11/2026-11-10.md:9: - [ ] Hear back from John Roe (waiting)
+daybook/2026/11/2026-11-10.md:10: - [ ] Learn the drums (someday)
+daybook/2026/11/2026-11-10.md:11: - [ ] Plan the offsite (start 2026-11-20) (due 2026-11-27)
+daybook/2026/11/2026-11-10.md:12: - [ ] Pay the invoice 📅 2026-11-12
+daybook/2026/11/2026-11-10.md:13: - [x] Draft the agenda (done 2026-11-10)
+daybook/2026/11/2026-11-10.md:14: - [-] Old idea (dropped 2026-11-10)
+daybook/2026/11/2026-11-10.md:15: - [ ] ~~Struck task (due today)~~ ([[2026-11-11]])
+daybook/2026/11/2026-11-10.md:17: - [ ] Bad date (due 2026-02-30)
+daybook/2026/11/2026-11-10.md:18: - [ ] Soon-ish (due soon-ish)
+daybook/2026/11/2026-11-10.md:19: - [ ] A routine on a day page (due 2026-11-30) (every 1w)
+daybook/2026/11/2026-11-10.md:20: 	- [ ] Indented with a tab (due today)
+daybook/2026/11/2026-11-10.md:21:   - [ ] Indented with spaces (due Monday)
+daybook/2026/11/2026-11-10.md:22: - [ ] Waiting on a bad date (waiting 2026-13-01)
+daybook/2026/11/2026-11-10.md:23: - [ ] Start on a bad date (start someday-ish)
+daybook/2026/11/2026-11-10.md:25: ```
+daybook/2026/11/2026-11-10.md:26: - [ ] In code (due today)
+daybook/2026/11/2026-11-10.md:27: ```
+daybook/2026/11/2026-11-10.md:29: ~~~
+daybook/2026/11/2026-11-10.md:30: - [ ] In tildes (due today)
+daybook/2026/11/2026-11-10.md:31: ~~~
+== tasks
+daybook/2026/11/2026-11-10.md:8: waiting 2 days: - [ ] Ask Acme for the quote (waiting since 2026-11-09)
+daybook/2026/11/2026-11-10.md:9: waiting: - [ ] Hear back from John Roe (waiting)
+daybook/2026/11/2026-11-10.md:20: overdue: - [ ] Indented with a tab (due today)
+notes/routines.md:8: overdue: - [ ] Pay rent (due 2026-11-01) (every 1m)
+== names
+2026-11-11  1 mention  last yesterday
+apollo      1 mention  last yesterday

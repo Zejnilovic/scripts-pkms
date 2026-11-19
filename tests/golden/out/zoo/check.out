@@ -1,0 +1,15 @@
+exit 1
+Checked 8 notes.
+
+Problems:
+- daybook/2026/11/2026-11-10.md:15: broken link [[2026-11-11]]
+- daybook/2026/11/2026-11-10.md:16: a recall mark belongs on a question, not in a task box: take the box out, or the mark
+- archive/old.md:4: cannot read the due date nope
+- daybook/2026/11/2026-11-10.md:17: cannot read the due date 2026-02-30
+- daybook/2026/11/2026-11-10.md:18: cannot read the due date soon-ish
+- daybook/2026/11/2026-11-10.md:22: cannot read the waiting date 2026-13-01
+- daybook/2026/11/2026-11-10.md:23: cannot read the start date someday-ish
+- notes/routines.md:13: relative date friday is outside a day page: write its date
+- daybook/2026/11/2026-11-10.md:19: a routine belongs in a note: a day page is a record, so move (every 1w) to a note
+- notes/routines.md:11: (every monday) is no longer a routine: write it as (every 1w) with a due date, or name a cycle
+- notes/routines.md:12: (every fortnight) names no cycle: set cycle_fortnight in .pkm/config, or use an interval such as (every 1m)

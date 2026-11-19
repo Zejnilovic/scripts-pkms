@@ -1,54 +1,29 @@
 # shellcheck shell=bash
 # shellcheck source=globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/tasks.sh: the tasks of the vault. A task is a "- [ ]" line in any note outside code. A box in a note of
-# type: list, and a struck line, is not a task. Its markers sit in the line: (due D) or 📅 D, (waiting D), (someday),
-# (high), (low), (every RULE), and (done D) or (dropped D) once closed. A relative date (friday, +3d, today, tomorrow)
-# is read against the date of the day page the task is on, in awk (dates.sh awk_dates), so no task starts a process.
+# lib/pkm/tasks.sh: the tasks of the vault, from the line scanner (lines.sh): its records of kind task. Their markers:
+# (due D) or 📅 D, (waiting D), (someday), (high), (low), (every RULE), (start D), and (done D) or (dropped D) once
+# closed. A relative date (friday, +3d, today, tomorrow) is read against the date of the day page the task is on, in awk
+# (dates.sh awk_dates), so no task starts a process.
 # Sourced by bin/pkm. Defines functions only.
 
-# awk_tasks: the task lines, one per line, in the fields of task_records. It needs awk_dates in front of it. A routine
-# goes to the file in RELOUT instead, for task_records to check its rule.
+# awk_tasks: reads the scanner's records (lines.sh) and prints the tasks in the fields of task_records. It needs
+# awk_dates and awk_markers in front of it. A routine goes to the file in RELOUT instead, for task_records to check its rule.
 awk_tasks() {
   cat <<'AWK'
-  function marker(s, key,   i, rest, v) {
-    i = index(s, "(" key " "); if (i == 0) return ""
-    rest = substr(s, i + length(key) + 2); v = index(rest, ")"); if (v == 0) return ""
-    return substr(rest, 1, v - 1)
-  }
-  function emoji_date(s,   i, m, rest, v) {
-    # Measured, not counted: gawk in a UTF-8 locale counts the emoji as one character, mawk as four bytes.
-    m = "\360\237\223\205 "; i = index(s, m); if (i == 0) return ""
-    rest = substr(s, i + length(m)); v = match(rest, /[ )]/)
-    return v ? substr(rest, 1, v - 1) : rest
-  }
-  FNR == 1 {
-    file = rel(FILENAME); fence = 0; b = base(file)
-    day = (b ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) ? substr(b, 1, 10) : ""
-    list = 0; front = ($0 == "---")
-  }
-  front && FNR > 1 { if ($0 == "---") front = 0; else if ($0 ~ /^type:[ \t]*list[ \t]*$/) list = 1; next }
-  /^[ \t]*(```|~~~)/ { fence = !fence; next }
-  fence || list || !/^[ \t]*- \[.\] / { next }
+  $3 != "task" { next }
   {
-    t = $0; sub(/^[ \t]+/, "", t); gsub(/\t/, " ", t)
-    c = substr(t, 4, 1)
-    if (c == " ") state = "open"
-    else if (c == "x" || c == "X") state = "done"
-    else if (c == "-") state = "dropped"
-    else next
-    if (substr(t, 7, 2) == "~~") next
-    if (index(t, "(recall ")) next
-    due = marker(t, "due"); if (due == "") due = emoji_date(t)
-    waiting = marker(t, "waiting"); sub(/^since /, "", waiting)
-    if (waiting == "" && index(t, "(waiting")) waiting = "?"
-    someday = index(t, "(someday)") ? 1 : 0
-    prio = index(t, "(high)") ? "high" : (index(t, "(low)") ? "low" : "")
+    m = $5; day = $6; t = $10; state = $4
+    due = mval(m, "due")
+    waiting = mval(m, "waiting"); sub(/^since /, "", waiting)
+    if (waiting == "" && (mflag(m, "waiting") || mhas(m, "waiting"))) waiting = "?"
+    someday = mflag(m, "someday")
+    prio = mflag(m, "high") ? "high" : (mflag(m, "low") ? "low" : "")
     closed = ""
-    if (state == "done") closed = marker(t, "done")
-    if (state == "dropped") closed = marker(t, "dropped")
-    rule = marker(t, "every")
-    start = marker(t, "start")
+    if (state == "done") closed = mval(m, "done")
+    if (state == "dropped") closed = mval(m, "dropped")
+    rule = mval(m, "every")
+    start = mval(m, "start")
     problem = ""; due_iso = ""
     if (due != "") {
       if (is_day(due)) due_iso = due
@@ -58,7 +33,7 @@ awk_tasks() {
     }
     if (problem == "" && waiting != "" && waiting != "?" && !is_day(waiting)) problem = "cannot read the waiting date " waiting
     if (problem == "" && start != "" && !is_day(start)) problem = "cannot read the start date " start
-    fields = file OFS FNR OFS state OFS due_iso OFS waiting OFS someday OFS prio OFS closed OFS rule OFS day OFS problem OFS start OFS t
+    fields = $1 OFS $2 OFS state OFS due_iso OFS waiting OFS someday OFS prio OFS closed OFS rule OFS day OFS problem OFS start OFS t
     if (rule != "") print fields > ENVIRON["RELOUT"]
     else print fields
   }
@@ -74,12 +49,12 @@ AWK
 # an interval (every 1w), a cycle name (every sprint), or an old rule that is no longer one: a routine lives in a note,
 # so one on a day page is a problem too.
 task_records() {
-  files "$1" '*.md' > "$tmp/task-files"
   local cyc
   cyc=$(cycle_names)
   # The dates are read in awk. A routine goes to task-raw, and its rule is checked below, one routine at a time.
   : > "$tmp/task-raw"
-  RELOUT="$tmp/task-raw" scan "$tmp/task-files" "$(awk_dates)$(awk_tasks)" -F '\037' -v OFS='\037' > "$tmp/task-plain"
+  line_records "$1" > "$tmp/task-lines"
+  RELOUT="$tmp/task-raw" awk -F '\037' -v OFS='\037' "$(awk_dates)$(awk_markers)$(awk_tasks)" "$tmp/task-lines" > "$tmp/task-plain"
   local US file line state due_iso waiting someday prio closed rule day start text problem
   US=$(printf '\037')
   : > "$tmp/task-records"

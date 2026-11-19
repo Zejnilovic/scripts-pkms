@@ -1,0 +1,24 @@
+exit 0
+== week 2026-11-09 to 2026-11-15: 30 entries (closes/2026/2026-11-09-week.md)
+== tasks
+daybook/2026/11/2026-11-10.md:20: overdue: - [ ] Indented with a tab (due today)
+notes/routines.md:8: overdue: - [ ] Pay rent (due 2026-11-01) (every 1m)
+== open
+daybook/2026/11/2026-11-10.md:8: waiting 2 days: - [ ] Ask Acme for the quote (waiting since 2026-11-09)
+daybook/2026/11/2026-11-10.md:9: waiting: - [ ] Hear back from John Roe (waiting)
+== due
+2026-11-11 due daybook/2026/11/2026-11-10.md:6: - [ ] Book the room (due tomorrow) (low)
+2026-11-12 due daybook/2026/11/2026-11-10.md:12: - [ ] Pay the invoice 📅 2026-11-12
+2026-11-13 due daybook/2026/11/2026-11-10.md:4: - [ ] Call Jane Doe (due friday)
+2026-11-13 due daybook/2026/11/2026-11-10.md:7: - [ ] Order the parts (due +3)
+2026-11-14 due daybook/2026/11/2026-11-13.md:3: - [ ] With a BOM and CRLF (due tomorrow)
+2026-11-15 due notes/routines.md:10: - [ ] Expenses report (every sprint)
+2026-11-15 due notes/routines.md:9: - [ ] Sprint summary (due 2026-11-15) (every sprint)
+2026-11-16 due daybook/2026/11/2026-11-10.md:21: - [ ] Indented with spaces (due Monday)
+2026-11-16 due notes/routines.md:14: - [ ] Weekly review (due 2026-11-16) (every 1w) (high)
+2026-11-18 due notes/apollo.md:10: - [ ] Review the plan with [[jane-doe]] (due 2026-11-18)
+2026-11-19 birthday notes/jane-doe.md:4: birthday: 1990-11-19
+2026-11-19 due daybook/2026/11/2026-11-12-sam.md:3: - [ ] Sam's call with Mia's school (due thu)
+2026-11-19 due daybook/2026/11/2026-11-12-sam.md:4: - [ ] Sam asks about football (due +1w)
+2026-11-20 due daybook/2026/11/2026-11-13.md:4: - [ ] Second CRLF line 📅 friday
+2026-11-20 start daybook/2026/11/2026-11-10.md:11: - [ ] Plan the offsite (start 2026-11-20) (due 2026-11-27)

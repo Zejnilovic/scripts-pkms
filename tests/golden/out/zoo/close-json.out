@@ -1,0 +1,20 @@
+exit 0
+{"kind":"tasks","path":"daybook/2026/11/2026-11-10.md","line":20,"text":"- [ ] Indented with a tab (due today)","state":"open","days":1,"name":null,"count":null,"last":null,"label":"overdue"}
+{"kind":"tasks","path":"notes/routines.md","line":8,"text":"- [ ] Pay rent (due 2026-11-01) (every 1m)","state":"open","days":10,"name":null,"count":null,"last":null,"label":"overdue"}
+{"kind":"open","path":"daybook/2026/11/2026-11-10.md","line":8,"text":"- [ ] Ask Acme for the quote (waiting since 2026-11-09)","state":"open","days":2,"name":null,"count":null,"last":null,"label":"waiting 2 days"}
+{"kind":"open","path":"daybook/2026/11/2026-11-10.md","line":9,"text":"- [ ] Hear back from John Roe (waiting)","state":"open","days":null,"name":null,"count":null,"last":null,"label":"waiting"}
+{"kind":"due","path":null,"line":null,"text":"2026-11-11 due daybook/2026/11/2026-11-10.md:6: - [ ] Book the room (due tomorrow) (low)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-12 due daybook/2026/11/2026-11-10.md:12: - [ ] Pay the invoice 📅 2026-11-12","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-13 due daybook/2026/11/2026-11-10.md:4: - [ ] Call Jane Doe (due friday)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-13 due daybook/2026/11/2026-11-10.md:7: - [ ] Order the parts (due +3)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-14 due daybook/2026/11/2026-11-13.md:3: - [ ] With a BOM and CRLF (due tomorrow)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-15 due notes/routines.md:10: - [ ] Expenses report (every sprint)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-15 due notes/routines.md:9: - [ ] Sprint summary (due 2026-11-15) (every sprint)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-16 due daybook/2026/11/2026-11-10.md:21: - [ ] Indented with spaces (due Monday)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-16 due notes/routines.md:14: - [ ] Weekly review (due 2026-11-16) (every 1w) (high)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-18 due notes/apollo.md:10: - [ ] Review the plan with [[jane-doe]] (due 2026-11-18)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-19 birthday notes/jane-doe.md:4: birthday: 1990-11-19","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-19 due daybook/2026/11/2026-11-12-sam.md:3: - [ ] Sam's call with Mia's school (due thu)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-19 due daybook/2026/11/2026-11-12-sam.md:4: - [ ] Sam asks about football (due +1w)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-20 due daybook/2026/11/2026-11-13.md:4: - [ ] Second CRLF line 📅 friday","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}
+{"kind":"due","path":null,"line":null,"text":"2026-11-20 start daybook/2026/11/2026-11-10.md:11: - [ ] Plan the offsite (start 2026-11-20) (due 2026-11-27)","state":null,"days":null,"name":null,"count":null,"last":null,"label":null}

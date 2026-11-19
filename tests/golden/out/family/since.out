@@ -1,0 +1,35 @@
+exit 0
+== log
+daybook/2026/11/2026-11-09-alex.md:5: - [ ] Return [[mia]]'s trip form to [[school]] (due 2026-11-13)
+daybook/2026/11/2026-11-09-alex.md:6: - [x] Quote from [[joe-bloggs-plumber]] for the [[bathroom]] (waiting 2026-11-09) (done 2026-11-11)
+daybook/2026/11/2026-11-09-alex.md:10: - 07:50 [[school]]: museum trip on 2026-11-26, the form goes back by Friday
+daybook/2026/11/2026-11-09-alex.md:11: - 18:30 [[joe-bloggs-plumber|Joe]] looked at the [[bathroom]]: the pipes behind the bath are older than we thought
+daybook/2026/11/2026-11-09-alex.md:12: - 18:45 He sends a quote by Wednesday and can start on 2026-12-01
+daybook/2026/11/2026-11-10-sam.md:5: - [ ] Ask [[nana]] which July dates suit her (due 2026-11-15)
+daybook/2026/11/2026-11-10-sam.md:9: ### 20:00 The [[summer-trip-2027|summer trip]], with Alex
+daybook/2026/11/2026-11-10-sam.md:11: - Decided: we go in the second half of July
+daybook/2026/11/2026-11-10-sam.md:12: - Nana wants to come for the first week
+daybook/2026/11/2026-11-10-sam.md:13: - Should we take the car or the train?
+daybook/2026/11/2026-11-11-alex.md:7: - 12:10 Paid the electricity bill
+daybook/2026/11/2026-11-11-alex.md:8: - 17:30 [[joe-bloggs-plumber|Joe]]'s quote came: 4,200 for new pipes and the bath: [pipes-quote.pdf](../../../files/2026/11/2026-11-11-pipes-quote.pdf)
+daybook/2026/11/2026-11-12-sam.md:7: - 08:15 [[joe-bloggs-plumber|Joe]] called: the December start is off, and he has no new date yet
+daybook/2026/11/2026-11-12-sam.md:8: - 12:40 Idea: a photo book of the summer for [[nana]]'s birthday
+daybook/2026/11/2026-11-12-sam.md:9: - 16:00 [[joe-bloggs-football|Joe]] from football: no training next Tuesday
+daybook/2026/11/2026-11-14-alex.md:7: - 10:30 Looked at tiles for the [[bathroom]] with [[mia]]: she wants blue
+daybook/2026/11/2026-11-14-alex.md:8: - 11:00 ! The car insurance renewal went up a lot: compare prices before 2026-11-20
+daybook/2026/11/2026-11-14-alex.md:9: - 11:40 [[school]]: parents' evening (at 2026-11-19 17:30-19:00)
+== tasks
+daybook/2026/11/2026-11-09-alex.md:5: overdue: - [ ] Return [[mia]]'s trip form to [[school]] (due 2026-11-13)
+== marked
+daybook/2026/11/2026-11-10-sam.md:11: - Decided: we go in the second half of July
+daybook/2026/11/2026-11-10-sam.md:13: - Should we take the car or the train?
+daybook/2026/11/2026-11-12-sam.md:8: - 12:40 Idea: a photo book of the summer for [[nana]]'s birthday
+daybook/2026/11/2026-11-14-alex.md:8: - 11:00 ! The car insurance renewal went up a lot: compare prices before 2026-11-20
+== names
+joe-bloggs-plumber   4 mentions  last 3 days ago
+bathroom             3 mentions  last yesterday
+school               3 mentions  last yesterday
+mia                  2 mentions  last yesterday
+nana                 2 mentions  last 3 days ago
+joe-bloggs-football  1 mention  last 3 days ago
+summer-trip-2027     1 mention  last 5 days ago

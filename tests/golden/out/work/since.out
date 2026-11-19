@@ -1,0 +1,36 @@
+exit 0
+== log
+daybook/2026/11/2026-11-09.md:5: - [ ] Send [[john-roe]] the Apollo invoice for October (due 2026-11-13) (high)
+daybook/2026/11/2026-11-09.md:6: - [x] Book the room for the demo (done 2026-11-09)
+daybook/2026/11/2026-11-09.md:10: - 09:10 Standup: [[apollo]] demo moved to 2026-11-20
+daybook/2026/11/2026-11-09.md:11: - 11:30 1:1 with [[jane-doe]]: she wants to lead the next release. We agreed she drafts a release plan by Friday
+daybook/2026/11/2026-11-09.md:12: - 16:05 Estimates are conversations, not commitments
+daybook/2026/11/2026-11-10.md:7: ### 10:00 Call with [[acme]] about [[apollo]]
+daybook/2026/11/2026-11-10.md:9: - ! They may cancel the contract if the demo slips again
+daybook/2026/11/2026-11-10.md:10: - Decided: we cut the mobile app from the first release
+daybook/2026/11/2026-11-10.md:11: - Their new contact is Marta Kovac
+daybook/2026/11/2026-11-10.md:12: - I'll send them the revised timeline by Thursday
+daybook/2026/11/2026-11-11.md:5: - [ ] Budget approval from [[john-roe]] for [[apollo]] (waiting 2026-11-11)
+daybook/2026/11/2026-11-11.md:9: - 08:45 [[statistics-101]] module 3, confidence intervals: a 95% interval comes from a method that catches the true value 95% of the time
+daybook/2026/11/2026-11-11.md:10: - 14:20 [[john-roe]] says the budget needs his manager's sign-off
+daybook/2026/11/2026-11-12.md:7: - 09:30 Sent [[acme]] the revised timeline
+daybook/2026/11/2026-11-12.md:8: - 13:00 [[jane-doe]] shared her release plan: solid on scope, thin on risks
+daybook/2026/11/2026-11-12.md:9: - 17:40 Decide with the team: should we move the demo to a Tuesday?
+daybook/2026/11/2026-11-12.md:10: - 17:55 Idea: a self-service export for [[acme]], maybe next year
+daybook/2026/11/2026-11-12.md:11: - [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)
+daybook/2026/11/2026-11-16.md:7: - 08:30 Still no answer from [[john-roe]] on the budget
+== tasks
+daybook/2026/11/2026-11-09.md:5: overdue: - [ ] Send [[john-roe]] the Apollo invoice for October (due 2026-11-13) (high)
+daybook/2026/11/2026-11-11.md:5: waiting 5 days: - [ ] Budget approval from [[john-roe]] for [[apollo]] (waiting 2026-11-11)
+notes/routines.md:7: overdue: - [ ] Send the sprint summary (due 2026-11-15) (every sprint)
+== marked
+daybook/2026/11/2026-11-10.md:9: - ! They may cancel the contract if the demo slips again
+daybook/2026/11/2026-11-10.md:10: - Decided: we cut the mobile app from the first release
+daybook/2026/11/2026-11-12.md:9: - 17:40 Decide with the team: should we move the demo to a Tuesday?
+daybook/2026/11/2026-11-12.md:10: - 17:55 Idea: a self-service export for [[acme]], maybe next year
+== names
+acme            4 mentions  last 4 days ago
+apollo          4 mentions  last 4 days ago
+john-roe        4 mentions  last today
+jane-doe        2 mentions  last 4 days ago
+statistics-101  1 mention  last 5 days ago
