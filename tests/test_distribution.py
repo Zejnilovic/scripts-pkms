@@ -149,9 +149,9 @@ class ReleaseWorkflow(unittest.TestCase):
     def step_named(self, name):
         return [step for step in self.steps() if step.startswith(name)]
 
-    def test_the_tarball_is_built_after_the_release_in_every_run(self):
+    def test_the_tarball_is_built_before_the_release_in_every_run(self):
         names = [step.split("\n")[0] for step in self.steps()]
-        self.assertLess(names.index("Create the GitHub release"), names.index("Build the tarball"))
+        self.assertLess(names.index("Build the tarball"), names.index("Create the GitHub release with the tarball"))
         build = self.step_named("Build the tarball")[0]
         self.assertIn("run: make dist", build)
         self.assertNotIn("if:", build)
@@ -166,7 +166,8 @@ class ReleaseWorkflow(unittest.TestCase):
         push = self.step_named("Update the formula in the tap")[0]
         self.assertIn("if: ${{ !inputs.dry_run }}", push)
         self.assertIn("secrets.HOMEBREW_TAP_TOKEN", push)
-        self.assertLess(names.index("Attach the tarball to the release"), names.index("Update the formula in the tap"))
+        self.assertLess(names.index("Create the GitHub release with the tarball"),
+                        names.index("Update the formula in the tap"))
 
     def test_a_job_installs_the_release_from_the_tap_and_tests_it(self):
         text = (REPO / ".github/workflows/release.yml").read_text()
@@ -176,11 +177,17 @@ class ReleaseWorkflow(unittest.TestCase):
         for line in ["brew install zejnilovic/tap/pkm", "brew test zejnilovic/tap/pkm", "brew audit --strict --online zejnilovic/tap/pkm"]:
             self.assertIn(line, verify)
 
-    def test_the_tarball_and_its_checksum_are_attached_only_on_a_real_release(self):
-        upload = self.step_named("Attach the tarball")[0]
-        self.assertIn("if: ${{ !inputs.dry_run }}", upload)
-        self.assertIn("gh release upload", upload)
-        self.assertIn(".sha256", upload)
+    def test_the_release_is_published_only_after_the_tarball_and_its_checksum_are_attached(self):
+        # An immutable release takes no files once it is published, so it starts as a draft with them.
+        names = [step.split("\n")[0] for step in self.steps()]
+        self.assertLess(names.index("Push the commit and tag"), names.index("Create the GitHub release with the tarball"))
+        release = self.step_named("Create the GitHub release with the tarball")[0]
+        self.assertIn("if: ${{ !inputs.dry_run }}", release)
+        create = release.index("gh release create")
+        self.assertIn("--draft", release[create:release.index("\n", release.index(".sha256"))])
+        self.assertIn('"dist/pkm-$VERSION.tar.gz" "dist/pkm-$VERSION.tar.gz.sha256"', release)
+        self.assertLess(create, release.index("--draft=false"))
+        self.assertNotIn("gh release upload", release)
 
 
 class Lint(unittest.TestCase):

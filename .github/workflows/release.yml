@@ -1,9 +1,10 @@
 name: Release
 
 # Releases the "(unreleased)" version in CHANGELOG.md: its notes become a GitHub release, CHANGELOG.md
-# keeps a link, and the release commit is tagged v<version>. It attaches the tarball, points the formula in
-# Zejnilovic/homebrew-tap at it, and then installs the release from the tap and tests it. Start it from the Actions
-# tab. A dry run does everything but push, and shows the notes and the formula.
+# keeps a link, and the release commit is tagged v<version>. The tarball is attached before the release is published,
+# so immutable releases work. It points the formula in Zejnilovic/homebrew-tap at the tarball, and then installs the
+# release from the tap and tests it. Start it from the Actions tab. A dry run does everything but push, and shows the
+# notes and the formula.
 on:
   workflow_dispatch:
     inputs:
@@ -45,7 +46,8 @@ jobs:
           { echo "VERSION=$version"; echo "NOTES=$NOTES"; } >> "$GITHUB_ENV"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           # The summary keeps the notes, so a failed last step can be finished by hand:
-          # gh release create v<version> --verify-tag --title <version> --notes-file notes.md
+          # make dist, then gh release create v<version> --verify-tag --title <version> --notes-file notes.md
+          # dist/pkm-<version>.tar.gz dist/pkm-<version>.tar.gz.sha256
           { echo "## Release notes for $version"; echo; cat "$NOTES"; echo; echo '## CHANGELOG.md'; echo
             echo '```diff'; git diff CHANGELOG.md; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Commit and tag
@@ -59,18 +61,18 @@ jobs:
       - name: Push the commit and tag
         if: ${{ !inputs.dry_run }}
         run: git push --atomic origin "HEAD:$GITHUB_REF_NAME" "v$VERSION"
-      - name: Create the GitHub release
-        if: ${{ !inputs.dry_run }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "v$VERSION" --verify-tag --title "$VERSION" --notes-file "$NOTES"
       - name: Build the tarball
         run: make dist
-      - name: Attach the tarball to the release
+      # The release starts as a draft with the tarball attached, and is published after: an immutable release takes
+      # no files once it is published.
+      - name: Create the GitHub release with the tarball
         if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "v$VERSION" "dist/pkm-$VERSION.tar.gz" "dist/pkm-$VERSION.tar.gz.sha256"
+        run: |
+          gh release create "v$VERSION" --verify-tag --draft --title "$VERSION" --notes-file "$NOTES" \
+            "dist/pkm-$VERSION.tar.gz" "dist/pkm-$VERSION.tar.gz.sha256"
+          gh release edit "v$VERSION" --draft=false
       - name: Write the formula
         run: |
           git clone -q --depth 1 https://github.com/Zejnilovic/homebrew-tap.git "$RUNNER_TEMP/tap"
