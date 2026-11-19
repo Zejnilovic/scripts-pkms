@@ -94,7 +94,8 @@ function event_skips(m,   n, a, i, out) {
 AWK
 }
 
-# event_lines <from> <to>: the events' days from one date to another, as "<sort key>US<date> event path:line: text".
+# event_lines <from> <to>: the events' days from one date to another, as "<sort key>US<date> event path:line: text"
+# US<start time>US<end time> (each HH:MM, or empty).
 # The key sorts a day's events by start time, the whole-day ones first, then by path and line.
 event_lines() {
   line_records no | awk -F '\037' -v from="$1" -v to="$2" "$(awk_dates)$(awk_markers)$(awk_events)"'
@@ -106,7 +107,8 @@ event_lines() {
       if (rule == "" || !is_day(until)) until = ""
       n = event_days(EV_FIRST, EV_LAST, rule, until, (rule == "") ? "" : event_skips($5), from, to, day)
       for (i = 1; i <= n; i++)
-        print day[i] " event " ((EV_START == "") ? "-" : EV_START) " " $1 ":" $2 "\037" day[i] " event " $1 ":" $2 ": " $10
+        print day[i] " event " ((EV_START == "") ? "-" : EV_START) " " $1 ":" $2 "\037" day[i] " event " $1 ":" $2 ": " $10 \
+          "\037" EV_START "\037" EV_END
     }'
 }
 

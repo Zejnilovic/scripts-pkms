@@ -61,7 +61,7 @@ class OutsideAVault(unittest.TestCase):
         self.assertEqual(sorted(result.stdout.split()), sorted(commands()))
 
     def test_a_dash_first_offers_the_global_options(self):
-        self.assertEqual(self.complete("-").stdout.split(), ["--vault", "-V", "--help", "--version"])
+        self.assertEqual(self.complete("-").stdout.split(), ["--vault", "-V", "--vaults", "--help", "--version"])
 
     def test_a_dash_after_a_command_offers_its_options(self):
         self.assertEqual(self.complete("find", "--").stdout.split(), ["--live", "--json", "--abs", "--limit"])
@@ -125,6 +125,17 @@ class InAVault(VaultCase):
             notes = run_pkm(["__complete", "-V", "work", "backlinks", ""], cwd=elsewhere, env=environment).stdout.split()
         self.assertEqual(names, ["work"])
         self.assertIn("apollo", notes)
+
+    def test_vaults_offers_the_named_vaults_and_its_commands(self):
+        self.write_user(f"vault_work={self.root}\n")
+        environment = pkm_env(XDG_CONFIG_HOME=self.config_home)
+        with tempfile.TemporaryDirectory() as elsewhere:
+            first = run_pkm(["__complete", "--vaults", ""], cwd=elsewhere, env=environment).stdout.split()
+            after = run_pkm(["__complete", "--vaults", "work", ""], cwd=elsewhere, env=environment).stdout.split()
+            opts = run_pkm(["__complete", "--vaults", "tasks", "--"], cwd=elsewhere, env=environment).stdout.split()
+        self.assertEqual(first, ["work", "tasks", "upcoming", "since"])
+        self.assertEqual(after, ["tasks", "upcoming", "since"])
+        self.assertIn("--under", opts)
 
 
 class BashTabPress(VaultCase):

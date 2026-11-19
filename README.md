@@ -35,7 +35,7 @@ pkm finds the vault from the current folder upward, or from `--vault <folder>`, 
 
 ## Several vaults
 
-Keep one vault for each part of your life, such as work and family. Name them in your user config, `~/.config/pkm/config`, with `vault_work=<folder>` lines, then choose one with `-V`: `pkm -V family add "Paid the rent"`. `pkm vaults` shows each one. Vaults never link to each other.
+Keep one vault for each part of your life, such as work and family. Name them in your user config, `~/.config/pkm/config`, with `vault_work=<folder>` lines, then choose one with `-V`: `pkm -V family add "Paid the rent"`. `pkm vaults` shows each one. Vaults never link to each other. To see several side by side, `pkm --vaults work,family tasks` runs `tasks`, `upcoming` or `since` in each, under `== vault <name>`, with each vault's own paths; with no names, it takes the `vaults=work,family` line of your config. It only reads, and copies nothing between them.
 
 ## Settings and ignored files
 
@@ -67,7 +67,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `done <words\|path:line> [--drop\|--next <day>]` | Marks the one open task that matches as done, or dropped with `--drop`. A routine with an interval, such as `(every 1m)`, keeps its box and moves its due date on; with `--next`, to that day |
 | `moved <path:line> <when>` | Strikes a task or an event whose date changed and writes it again with the new date: below the old line in a note, on today's page from another day, linking that day |
 | `tasks [open\|waiting\|someday\|done [<since>]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]` | Open tasks of every note, in groups: overdue, due soon, waiting, the rest. `--for` keeps someone's: the lines with a `(for …)` naming them, and a writer's own tasks. `--under` keeps those of a note's tree. `--all` includes `archive/` |
-| `upcoming [<days>] [--ics]` | Due tasks, routines included, events, and birthdays, target and warranty dates in the next days; `--ics` writes the events, tasks with a time and birthdays as a calendar file |
+| `upcoming [<days>] [--ics \| --json]` | Due tasks, routines included, events, and birthdays, target and warranty dates in the next days; `--ics` writes the events, tasks with a time and birthdays as a calendar file |
 | `new <type> <title> [--name <name>]` | A note in `notes/`, or the type's folder from its setting, made from its template; prints its path. `new close` writes the close page |
 | `names [--type <type>]` | Every note's name, type, path and aliases, from the cache. `--type person` lists the people |
 | `backlinks <name> [--since <date>] [--under <note>]` | Every line that links a note, by its file name, slug or alias, and the lines under a `###` heading that links it |
@@ -75,21 +75,21 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `find [--live] <word> [<word>...]` | Lines with every word, in any order, as `path:line: text`. Smart case. Searches `archive/` unless `--live` |
 | `list [<field>=<value> ...] [--show <fields>] [--quiet <days>] [--under <note>]` | Notes whose frontmatter matches, from the cache: path, type, title, then the fields asked for. `--quiet <days>` lists notes that no day page has linked in that many days; `--under` keeps the notes of a note's tree |
 | `overview [--json]` | The shape of the vault: each area with the notes that are `part_of` it, as a tree, then projects, resources (courses, topics, sources) and other notes with notes under them, then the archive's count. A line is `path:<title line>: <titles from the top> (<type>, <status>)` |
-| `tags` | Every tag with its count |
+| `tags [--json]` | Every tag with its count |
 | `index [--rebuild]` | Brings the cache in `.pkm/cache` up to date. The cache is a speed-up only |
 | `rename <old> <new> [--dry-run] [--no-alias]` | Renames a note and rewrites every link to it, keeping the shown text. The old name becomes an alias unless `--no-alias`. `--dry-run` writes nothing |
 | `mv <note> <folder>` | Moves a note into a folder, keeping its name and its links working |
 | `check [--urls]` | Broken links, duplicate names, alias clashes, secrets and merge conflicts; notices for links that work only by slug or alias. `--urls` also checks that web addresses answer (needs curl) |
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
 | `links --external [note]` | Each web address in the notes, outside code, as `path:line: address` |
-| `cycle [name] [--date D]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
+| `cycle [name] [--date D] [--json]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
 | `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--under <note>] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `since --seen` marks where the next `since last` starts |
 | `close [--cycle name] [--date D] [--quarter] [--json]` | The close of the period holding yesterday: tasks, open questions, what is due, marked entries, names with no note, quiet projects and people, and ideas |
 | `get <name>[#Section] [--lines a-b]` | A note, or one section of it, between `<<<note` and `>>>end` lines |
 | `post <path:line[-line]> <note>[#Section]` | Copies those lines verbatim into the section, with `([[day]])` after the last one |
 | `strike <path:line>` | Wraps the line in `~~` and adds `([[today's page]])`, for a line that is no longer true |
 | `init` | Sets up a vault in this folder: `.pkm/config`, `.pkm/.gitignore` and `.pkmignore`. Never overwrites them |
-| `vault`, `vaults` | The vault's folder; the named vaults in your config, each `ok` or `missing` |
+| `vault`, `vaults [--json]` | The vault's folder; the named vaults in your config, each `ok` or `missing` |
 | `config [<key>]` | Every setting with its value and where it comes from |
 | `recall [note]`, `recall <path:line> yes\|no`, `recall add <note> <question>` | The recall questions due today or earlier, as `path:line: text`, oldest first. `recall <path:line> yes` moves a question up the ladder (1, 3, 7, 14, 30, 60, 120 days) and `no` back to 1 day. `recall add` writes a question at the end of a note's `## Questions`, due tomorrow, with its answers indented below. A question ends with `(recall YYYY-MM-DD <N>d)` |
 | `templates`, `templates eject <type> [--user]` | Each template and where it comes from; `eject` copies a default so you can change it |

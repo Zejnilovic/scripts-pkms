@@ -164,6 +164,7 @@ cmd_since() {
     esac
   done
   TODAY=$today
+  [ "$json" = no ] || need_jq
   if [ "$seen" = yes ]; then
     [ -z "$arg" ] && [ -z "$about" ] && [ -z "$under" ] && [ "$json" = no ] && [ -z "$limit" ] || die 2 "pkm since --seen takes no other argument."
     local seen_time

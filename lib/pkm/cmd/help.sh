@@ -58,14 +58,14 @@ command_options() {
     evidence) echo "--verify" ;;
     get) echo "--lines" ;;
     list) echo "--all --show --quiet --under --json --abs --limit" ;;
-    overview) echo "--json" ;;
-    upcoming) echo "--ics" ;;
+    overview|tags|vaults) echo "--json" ;;
+    upcoming) echo "--ics --json" ;;
     names) echo "--type --json --abs --limit" ;;
     index) echo "--rebuild" ;;
     rename) echo "--dry-run --no-alias" ;;
     tasks) echo "--all --link --for --under --stale --json --abs --limit" ;;
     day) echo "--edit" ;;
-    cycle) echo "--date" ;;
+    cycle) echo "--date --json" ;;
     since) echo "--about --under --seen --json --limit" ;;
     close) echo "--cycle --date --quarter --json" ;;
     add) echo "--day --file" ;;

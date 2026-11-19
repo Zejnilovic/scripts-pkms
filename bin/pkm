@@ -4,6 +4,9 @@
 # (macOS) and Git Bash (Windows); it expects ripgrep (rg), jq and git: pkm doctor lists them.
 #
 # Usage: pkm [--vault <folder>] [-V <name>] <command> [arguments]
+#        pkm --vaults [<name>,<name>...] tasks|upcoming|since [arguments]
+#                                 the command in each named vault (or those of vaults= in the user config), each under
+#                                 == vault <name> with its own paths; --json adds vault to each record
 #   day [YYYY-MM-DD] [--edit]     the day's page, daybook/<year>/<month>/<date>.md, created when missing; prints its
 #                                 path. --edit opens it in $EDITOR. In a shared vault the page is <date>-<writer>.md
 #   add [--day <date>] [--file <path>] <text|->
@@ -26,7 +29,8 @@
 #   new <type> <title> [--name <name>]
 #                                 a note in notes/ (or folder_<type> from the settings), made from its template; a type with
 #                                 no template is made from the note template. An existing name fails (exit 1) and says so
-#   upcoming [<days>] [--ics]     due tasks (routines too), events, birthdays, target and warranty dates in the next <days> (14);
+#   upcoming [<days>] [--ics | --json]
+#                                 due tasks (routines too), events, birthdays, target and warranty dates in the next <days> (14);
 #                                 --ics prints the events, tasks with a time and birthdays as a calendar file
 #   backlinks <name> [--since YYYY-MM-DD] [--under <note>]
 #                                 every line that links a note, by its file name, slug or alias, archive included, and
@@ -48,7 +52,7 @@
 #   find [--live] <word> [<word>...]
 #                                 the lines with every word, in any order, as path:line: text. Smart case: a word
 #                                 with a capital letter matches exactly. The archive is searched too, unless --live
-#   tags                          every tag with its count
+#   tags [--json]                 every tag with its count
 #   check [--urls]                broken links, duplicate names, secrets and merge conflicts (exit 1), and notices;
 #                                 --urls also GETs each web address (curl, 5 s, 8 at once): no answer, 404 or 410 (exit 1)
 #   get <name>[#Section] [--lines a-b]
@@ -63,7 +67,8 @@
 #   strike <path:line>            wraps the line's text in ~~ and adds " ([[today's page]])", making today's page if it is
 #                                 missing; refuses a blank line, a heading or a struck line (exit 1)
 #   links --external [note]       each http(s) address outside code, as path:line: address (links to notes: backlinks)
-#   cycle [name] [--date D]       the period of a cycle holding a date (today): name, first and last day; cycles are set in
+#   cycle [name] [--date D] [--json]
+#                                 the period of a cycle holding a date (today): name, first and last day; cycles are set in
 #                                 .pkm/config as cycle_<name>=2w from <weekday|date> or cycle_<name>=1m from <day 1-28|date>
 #   since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]
 #                                 what happened since then, in sections: notes, log, tasks, marked, names; since --seen
@@ -85,7 +90,7 @@
 #   init                          sets up a vault in this folder, or in the one --vault names: .pkm/config, .pkm/.gitignore, .pkmignore; refuses
 #                                 to overwrite any of them
 #   vault                         the vault's folder
-#   vaults                        the named vaults of the user config, each with ok or missing
+#   vaults [--json]               the named vaults of the user config, each with ok or missing
 #   config [<key>]                every setting with its value and where it comes from (vault, user or default), or one
 #   templates                     each template type with where it comes from (vault, user or default)
 #   templates eject <type> [--user]
@@ -97,7 +102,7 @@
 #   completion bash|zsh           the shell's tab completion script, for example in ~/.zshrc: source <(pkm completion zsh)
 #
 # Listings: find, backlinks, path, list, tasks and check take --json (JSON Lines), --abs (absolute paths) and --limit n
-# (default 30). A listing with no results exits 1. docs/contract.md is the interface; pkm help --all lists the commands.
+# (default 30). A listing with no results exits 1. since, close, overview, upcoming, tags, cycle and vaults take --json. docs/contract.md is the interface; pkm help --all lists the commands.
 # Settings: docs/settings.md lists every key. .pkm/config is the vault's, the user's config is ~/.config/pkm/config.
 # .pkmignore in the vault hides files and folders from pkm, in gitignore syntax; .gitignore is not followed.
 # PKM_NOW=YYYYMMDDHHMMSS fixes the clock, for tests and for backfilling.
@@ -222,6 +227,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/find.sh"
 # shellcheck source=../lib/pkm/cmd/init.sh
 . "$pkm_home/lib/pkm/cmd/init.sh"
+# shellcheck source=../lib/pkm/cmd/across.sh
+. "$pkm_home/lib/pkm/cmd/across.sh"
 # shellcheck source=../lib/pkm/cmd/backlinks.sh
 . "$pkm_home/lib/pkm/cmd/backlinks.sh"
 # shellcheck source=../lib/pkm/cmd/overview.sh
@@ -252,9 +259,13 @@ trap 'rm -rf "$tmp"' EXIT
 
 # Options before the command say which vault to use. help, version, init, vaults, doctor and completion work outside a
 # vault.
-vault_option="" vault_name=""
+vault_option="" vault_name="" across=no across_names=""
 while [ $# -gt 0 ]; do
   case $1 in
+    --vaults)
+      across=yes; shift
+      # The names are optional: a word that is a command, or an option, isn't a list of names.
+      case ${1:-} in tasks|upcoming|since|-*|"") ;; *) across_names=$1; shift ;; esac ;;
     --vault) [ $# -ge 2 ] || die 2 "--vault needs a folder"; vault_option=$2; shift 2 ;;
     -V) [ $# -ge 2 ] || die 2 "-V needs a vault name"; vault_name=$2; shift 2 ;;
     *) break ;;
@@ -266,6 +277,7 @@ command=${1:-help}
 # Tab completion reads the words as typed, vault options included, and never fails a Tab press.
 if [ "$command" = __complete ]; then cmd_complete "$@"; exit 0; fi
 if is_builtin "$command"; then check_options "$command" "$@"; fi
+if [ "$across" = yes ]; then cmd_across "$across_names" "$command" "$@"; exit $?; fi
 case "$command" in
   help|-h|--help|version|--version|init|vaults|doctor|completion) ;;
   *) { find_vault && cd "$vault"; } || exit 2 ;;
@@ -288,7 +300,7 @@ case $command in
   rename) cmd_rename "$@" ;;
   mv) cmd_mv "$@" ;;
   find) output_command find "$@" ;;
-  tags) cmd_tags ;;
+  tags) cmd_tags "$@" ;;
   check) output_command check "$@" ;;
   evidence) cmd_evidence "$@" ;;
   cycle) cmd_cycle "$@" ;;
@@ -307,7 +319,7 @@ case $command in
   doctor) cmd_doctor ;;
   init) cmd_init ;;
   vault) cmd_vault ;;
-  vaults) cmd_vaults ;;
+  vaults) cmd_vaults "$@" ;;
   config) cmd_config "$@" ;;
   templates) cmd_templates "$@" ;;
   version|--version) cmd_version "$@" ;;

@@ -1,15 +1,28 @@
 # shellcheck shell=bash
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/cmd/cycle.sh: pkm cycle [name] [--date D]: the period holding the date (today by default), as
-# name<TAB>first<TAB>last, and a fourth field "close" on the close cycle. With no name, every cycle. Sourced by bin/pkm.
+# lib/pkm/cmd/cycle.sh: pkm cycle [name] [--date D] [--json]: the period holding the date (today by default), as
+# name<TAB>first<TAB>last, and a fourth field "close" on the close cycle. With no name, every cycle. --json gives name,
+# first, last and close (true or false). Sourced by bin/pkm.
 
 cmd_cycle() {
+  local json=no arg args=()
+  for arg in "$@"; do
+    if [ "$arg" = --json ]; then json=yes; else args+=("$arg"); fi
+  done
+  if [ "$json" = no ]; then cycle_rows ${args[@]+"${args[@]}"}; return; fi
+  need_jq
+  cycle_rows ${args[@]+"${args[@]}"} > "$tmp/cycles" || exit $?
+  jq -R -c 'split("\t") as $f | {name: $f[0], first: $f[1], last: $f[2], close: ($f[3] == "close")}' "$tmp/cycles"
+}
+
+# cycle_rows [name] [--date D]: the lines of pkm cycle.
+cycle_rows() {
   local name="" date=$today close line n
   while [ $# -gt 0 ]; do
     case $1 in
       --date) [ $# -ge 2 ] || die 2 "--date needs a day, YYYY-MM-DD"; is_date "$2" || die 2 "--date needs a day, YYYY-MM-DD, got: $2"; date=$2; shift 2 ;;
-      *) [ -z "$name" ] || die 2 "Usage: pkm cycle [name] [--date YYYY-MM-DD]"; name=$1; shift ;;
+      *) [ -z "$name" ] || die 2 "Usage: pkm cycle [name] [--date YYYY-MM-DD] [--json]"; name=$1; shift ;;
     esac
   done
   close=$(config close week)

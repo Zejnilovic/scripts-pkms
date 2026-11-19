@@ -235,6 +235,7 @@ cmd_close() {
       *) die 2 "Usage: pkm close [--cycle name] [--date YYYY-MM-DD] [--quarter] [--json]" ;;
     esac
   done
+  [ "$json" = no ] || need_jq
   index_ensure
   [ -n "$cycle" ] || cycle=$(config close week)
   [ -n "$date" ] || date=$(day_add "$today" -1)

@@ -75,14 +75,18 @@ complete_days() { printf '%s\n' today tomorrow monday tuesday wednesday thursday
 
 # cmd_complete <word>... <word at the cursor>: the candidates for the word at the cursor.
 cmd_complete() {
-  local c_vault="" c_name="" want="" cmd="" n=0 first="" cur
+  local c_vault="" c_name="" want="" cmd="" n=0 first="" cur across=no
   while [ $# -gt 1 ]; do
     if [ -n "$want" ]; then
-      case $want in --vault) c_vault=$1 ;; -V) c_name=$1 ;; esac
+      case $want in
+        --vault) c_vault=$1 ;;
+        -V) c_name=$1 ;;
+        --vaults) case $1 in tasks|upcoming|since) cmd=$1 ;; *) across=yes ;; esac ;;
+      esac
       want=""
     else
       case $1 in
-        --vault|-V) [ -n "$cmd" ] || want=$1 ;;
+        --vault|-V|--vaults) [ -n "$cmd" ] || want=$1 ;;
         -*) if [ -n "$cmd" ] && complete_value_option "$1"; then want=$1; fi ;;
         *) if [ -z "$cmd" ]; then cmd=$1; else n=$((n + 1)); [ "$n" != 1 ] || first=$1; fi ;;
       esac
@@ -95,6 +99,7 @@ cmd_complete() {
   case $want in
     --vault) echo :dirs; return ;;
     -V) complete_pkm vaults | cut -f 1; return ;;
+    --vaults) complete_pkm vaults | cut -f 1; printf '%s\n' tasks upcoming since; return ;;
     --type) complete_types; return ;;
     --link|--about|--under) complete_notes; return ;;
     --cycle) complete_cycles; return ;;
@@ -105,12 +110,13 @@ cmd_complete() {
 
   case $cur in
     -*)
-      if [ -z "$cmd" ]; then echo --vault -V --help --version
+      if [ -z "$cmd" ]; then echo --vault -V --vaults --help --version
       elif [ "$cmd" = new ] && [ "$first" = close ]; then command_options close
       else command_options "$cmd"; fi | tr ' ' '\n' | grep -v '^$'
       return ;;
   esac
 
+  if [ -z "$cmd" ] && [ "$across" = yes ]; then printf '%s\n' tasks upcoming since; return; fi
   case $cmd:$n in
     :0) { command_table | cut -d '|' -f 1; extension_table | cut -f 1; } ;;
     tasks:0) printf '%s\n' open waiting someday 'done' ;;

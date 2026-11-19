@@ -16,9 +16,7 @@ cmd_overview() {
       *) die 2 "Usage: pkm overview [--json]" ;;
     esac
   done
-  if [ "$json" = yes ] && ! command -v jq >/dev/null 2>&1; then
-    die 2 "--json needs jq: brew install jq, or your system's package manager. pkm doctor lists the tools."
-  fi
+  [ "$json" = no ] || need_jq
   US=$(printf '\037')
   tab=$(printf '\t')
   index_ensure

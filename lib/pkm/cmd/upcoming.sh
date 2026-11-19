@@ -1,23 +1,37 @@
 # shellcheck shell=bash
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/cmd/upcoming.sh: pkm upcoming: the tasks due in the next days (routines included), overdue ones, the
+# lib/pkm/cmd/upcoming.sh: pkm upcoming [<days>] [--ics | --json]: the tasks due in the next days (routines included), overdue ones, the
 # birthday:, target:, deadline: and warranty: dates in that window, and the events on each of their days (events.sh). Prints DATE KIND path:line: text, by date.
 # Sourced by bin/pkm. Defines functions only.
 
 cmd_upcoming() {
-  local days=14 ics=no arg
+  local days=14 ics=no json=no arg
   for arg in "$@"; do
     case $arg in
       --ics) ics=yes ;;
+      --json) json=yes ;;
       *) days=$arg ;;
     esac
   done
   number "$days" "The number of days"
-  if [ "$ics" = yes ]; then upcoming_ics; else upcoming_lines "$days"; fi
+  [ "$ics" = no ] || [ "$json" = no ] || die 2 "Use one of --ics and --json, not both."
+  if [ "$ics" = yes ]; then upcoming_ics; return; fi
+  if [ "$json" = no ]; then upcoming_lines "$days"; return; fi
+  need_jq
+  upcoming_lines "$days" yes > "$tmp/upcoming-json"
+  # date, kind, path, line, text, time, end: from "DATE KIND path:line: text", and an event's US<start>US<end>.
+  awk -F '\037' -v OFS='\037' '{
+    s = $1; date = substr(s, 1, 10); s = substr(s, 12); kind = substr(s, 1, index(s, " ") - 1); s = substr(s, length(kind) + 2)
+    match(s, /:[0-9]+: /); path = substr(s, 1, RSTART - 1); line = substr(s, RSTART + 1, RLENGTH - 3)
+    print date, kind, path, line, substr(s, RSTART + RLENGTH), $2, $3
+  }' "$tmp/upcoming-json" | jq -R -c 'split("\u001f") as $f
+    | {date: $f[0], kind: $f[1], path: $f[2], line: ($f[3] | tonumber), text: $f[4],
+       time: (if ($f[5] // "") == "" then null else $f[5] end), end: (if ($f[6] // "") == "" then null else $f[6] end)}'
 }
 
-# upcoming_lines <days>: the dated lines of the next <days> days, as DATE KIND path:line: text, sorted by date.
+# upcoming_lines <days> [yes]: the dated lines of the next <days> days, as DATE KIND path:line: text, sorted by date.
+# With yes, an event's line also has US<start time>US<end time> (event_lines), for --json.
 upcoming_lines() {
   local days=$1 end window i d US
   US=$(printf '\037')
@@ -58,7 +72,8 @@ upcoming_lines() {
   ' | LC_ALL=C sort > "$tmp/upcoming-tasks"
   # Each line gets a sort key: itself, or for an event, its date and start time, so a day's events come by time.
   { awk '{ print $0 "\037" $0 }' "$tmp/upcoming-dates" "$tmp/upcoming-tasks"; event_lines "$today" "$end"; } \
-    | LC_ALL=C sort | cut -d "$US" -f 2-
+    | LC_ALL=C sort | cut -d "$US" -f 2- > "$tmp/upcoming-all"
+  if [ "${2:-no}" = yes ]; then cat "$tmp/upcoming-all"; else cut -d "$US" -f 1 "$tmp/upcoming-all"; fi
 }
 
 # upcoming_ics: the vault's events, its open tasks with an (at …) and its birthdays as an iCalendar file (RFC 5545), from

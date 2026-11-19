@@ -366,7 +366,7 @@ Keep a vault for each part of life that has its own people and its own rules: on
 
 A vault is a plain folder, and often also a git repository. To keep something in the folder but out of pkm's sight, such as exports or a folder of PDFs, list it in `.pkmignore`, which reads like `.gitignore`. A folder you keep out of git is still part of the vault, so pkm doesn't follow `.gitignore`.
 
-Vaults never link to each other, and nothing is copied between them. Write where you are: in the work vault at work, in the family vault at home. If a home task lands on your work page, nothing breaks; write it in the family vault too if you want it closed there. Each vault has its own close and its own cycles.
+Vaults never link to each other, and nothing is copied between them. To look at them side by side, as in a morning brief, `pkm --vaults work,family upcoming` lists each vault's days in a section of its own; it only reads. Write where you are: in the work vault at work, in the family vault at home. If a home task lands on your work page, nothing breaks; write it in the family vault too if you want it closed there. Each vault has its own close and its own cycles.
 
 ### The archive
 

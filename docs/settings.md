@@ -23,6 +23,7 @@ Keys with a `<type>`, `<name>` pattern stand for each key of that shape, for exa
 | `writer` | user | - | The name of the person who writes on this machine, for a shared vault. |
 | `vault` | user | - | The vault to use when none is given and none is above the current folder. |
 | `vault_<name>` | user | - | A named vault, chosen with -V <name>. |
+| `vaults` | user | - | The named vaults that --vaults lists when it names none, such as work,family. |
 
 ## Other files that shape a vault
 

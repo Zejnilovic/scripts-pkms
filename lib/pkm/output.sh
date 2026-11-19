@@ -19,6 +19,11 @@ output_shape() {
   esac
 }
 
+# need_jq: exits 2, saying how to get it, when jq (for --json) is missing.
+need_jq() {
+  command -v jq >/dev/null 2>&1 || die 2 "--json needs jq: brew install jq, or your system's package manager. pkm doctor lists the tools."
+}
+
 # output_command <command> <args...>: runs a listing command and prints its output in the form asked for.
 output_command() {
   local command=$1 shape json=no abs=no limit="" rc records vault_path
@@ -35,9 +40,7 @@ output_command() {
     shift
   done
   if [ -z "$limit" ]; then limit=$(config limit 30); fi
-  if [ "$json" = yes ] && ! command -v jq >/dev/null 2>&1; then
-    die 2 "--json needs jq: brew install jq, or your system's package manager. pkm doctor lists the tools."
-  fi
+  [ "$json" = no ] || need_jq
   "cmd_$command" ${args[@]+"${args[@]}"} > "$tmp/listing"
   rc=$?
   vault_path=$(pwd)
