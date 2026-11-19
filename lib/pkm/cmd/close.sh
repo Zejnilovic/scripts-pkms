@@ -45,7 +45,7 @@ close_sections() {
 
   # The period's questions, and its ! Decided: Idea: entries.
   # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
-  awk -F "$US" -v US="$US" "$(cycle_awk_lib)$(rec_awk)"'
+  awk -F "$US" -v US="$US" "$(awk_dates)$(rec_awk)"'
     function marked(t,  s) {
       if (t !~ /^[ \t]*- /) return 0
       s = t; sub(/^[ \t]*- /, "", s)
@@ -60,7 +60,7 @@ close_sections() {
   ' "$tmp/dg-pages" >> "$tmp/close-records"
 
   # Overdue tasks, tasks open 21 days or more on their day page, and waiting tasks. Someday tasks go to ideas.
-  awk -F "$US" -v US="$US" -v today="$today" "$(cycle_awk_lib)$(rec_awk)"'
+  awk -F "$US" -v US="$US" -v today="$today" "$(awk_dates)$(rec_awk)"'
     $3 != "open" { next }
     $12 != "" && $12 > today { next }                    # hidden until its start date
     $6 == 1 && !($12 != "" && $12 <= today) { next }     # someday: only in ideas
@@ -76,13 +76,13 @@ close_sections() {
       rec("2open", $1, pad($2), "", $1, $2, $13, "open", d, "", "", "", "waiting " d " days")
     }
   ' "$tmp/close-tasks" >> "$tmp/close-records"
-  awk -F "$US" -v US="$US" "$(cycle_awk_lib)$(rec_awk)"'
+  awk -F "$US" -v US="$US" "$(awk_dates)$(rec_awk)"'
     $3 != "open" || $6 != 1 || ($12 != "" && $12 <= today) { next }
     { rec("7ideas", $1, pad($2), "", $1, $2, $13, "open", "", "", "", "", "someday") }
   ' "$tmp/close-tasks" > "$tmp/close-someday"
 
   # Due: the lines upcoming prints from today to the end of the next period.
-  awk -v US="$US" "$(cycle_awk_lib)$(rec_awk)"'
+  awk -v US="$US" "$(awk_dates)$(rec_awk)"'
     { rec("3due", substr($0, 1, 10), $0, "", "", "", $0, "", "", "", "", "", "") }
   ' "$tmp/close-due" >> "$tmp/close-records"
 
@@ -159,7 +159,7 @@ close_sections() {
 
 # quarter_start <first> <last>: yes when a day in the range is the first day of January, April, July or October.
 quarter_start() {
-  awk -v a="$1" -v b="$2" "$(cycle_awk_lib)"' BEGIN {
+  awk -v a="$1" -v b="$2" "$(awk_dates)"' BEGIN {
     for (z = ymd(a); z <= ymd(b); z++) { civil(z); if (CD == 1 && (CM - 1) % 3 == 0) { print "yes"; exit } }
     print "no"
   }'

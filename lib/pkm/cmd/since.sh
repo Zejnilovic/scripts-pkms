@@ -12,7 +12,7 @@
 # since_build <start>: the records of the sections, US-separated: section, sort keys, path, line, text, state, days, name,
 # count, last, label. Reads $tmp/dg-names, $tmp/dg-pages and $tmp/since-tasks; the environment has ABOUT, TODAY and US.
 since_build() {
-  awk -F "$US" -v OFS="$US" -v US="$US" -v ABOUT="$ABOUT" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(cycle_awk_lib)"'
+  awk -F "$US" -v OFS="$US" -v US="$US" -v ABOUT="$ABOUT" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(awk_dates)"'
     function ago(d,  k) { k = ymd(TODAY) - ymd(d); if (k == 0) return "today"; if (k == 1) return "yesterday"; return k " days ago" }
     function pad(n) { return sprintf("%06d", n) }
     function marked_text(t,  s) {

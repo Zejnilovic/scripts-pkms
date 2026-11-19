@@ -4,25 +4,17 @@
 # lib/pkm/tasks.sh: the tasks of the vault. A task is a "- [ ]" line in any note outside code. A box in a note of
 # type: list, and a struck line, is not a task. Its markers sit in the line: (due D) or 📅 D, (waiting D), (someday),
 # (high), (low), (every RULE), and (done D) or (dropped D) once closed. A relative date (friday, +3d, today, tomorrow)
-# is read against the date of the day page the task is on. Sourced by bin/pkm. Defines functions only.
+# is read against the date of the day page the task is on, in awk (dates.sh awk_dates), so no task starts a process.
+# Sourced by bin/pkm. Defines functions only.
 
-# awk_tasks: the raw task lines, one per line, fields separated by the unit separator: file, line, state, due as written,
-# waiting ("?" when marked without a date), someday (1 or 0), priority, done date, rule, day page date, text.
+# awk_tasks: the task lines, one per line, in the fields of task_records. It needs awk_dates in front of it. A routine
+# goes to the file in RELOUT instead, for task_records to check its rule.
 awk_tasks() {
   cat <<'AWK'
   function marker(s, key,   i, rest, v) {
     i = index(s, "(" key " "); if (i == 0) return ""
     rest = substr(s, i + length(key) + 2); v = index(rest, ")"); if (v == 0) return ""
     return substr(rest, 1, v - 1)
-  }
-  # A calendar date written YYYY-MM-DD. Checked here, in awk, so the common case never starts a process.
-  function iso(s,   y, m, d, dim) {
-    if (s !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) return 0
-    y = substr(s, 1, 4) + 0; m = substr(s, 6, 2) + 0; d = substr(s, 9, 2) + 0
-    if (m < 1 || m > 12 || d < 1) return 0
-    split("31 28 31 30 31 30 31 31 30 31 30 31", dim, " ")
-    dim[2] = (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) ? 29 : 28
-    return d <= dim[m] + 0
   }
   function emoji_date(s,   i, m, rest, v) {
     # Measured, not counted: gawk in a UTF-8 locale counts the emoji as one character, mawk as four bytes.
@@ -57,9 +49,17 @@ awk_tasks() {
     if (state == "dropped") closed = marker(t, "dropped")
     rule = marker(t, "every")
     start = marker(t, "start")
-    fields = file OFS FNR OFS state OFS due OFS waiting OFS someday OFS prio OFS closed OFS rule OFS day OFS "" OFS start OFS t
-    # A task with a routine, or a date that isn't a calendar date, is resolved in bash (task_records).
-    if ((due != "" && !iso(due)) || (waiting != "" && waiting != "?" && !iso(waiting)) || (start != "" && !iso(start)) || rule != "") print fields > ENVIRON["RELOUT"]
+    problem = ""; due_iso = ""
+    if (due != "") {
+      if (is_day(due)) due_iso = due
+      else if (!relative_word(due)) problem = "cannot read the due date " due
+      else if (day == "") problem = "relative date " due " is outside a day page: write its date"
+      else if ((due_iso = day_word(due, day)) == "") problem = "cannot read the due date " due
+    }
+    if (problem == "" && waiting != "" && waiting != "?" && !is_day(waiting)) problem = "cannot read the waiting date " waiting
+    if (problem == "" && start != "" && !is_day(start)) problem = "cannot read the start date " start
+    fields = file OFS FNR OFS state OFS due_iso OFS waiting OFS someday OFS prio OFS closed OFS rule OFS day OFS problem OFS start OFS t
+    if (rule != "") print fields > ENVIRON["RELOUT"]
     else print fields
   }
 AWK
@@ -77,28 +77,13 @@ task_records() {
   files "$1" '*.md' > "$tmp/task-files"
   local cyc
   cyc=$(cycle_names)
-  # Dates written as calendar dates pass straight through; a relative date, or one that can't be read as it stands,
-  # goes to task-raw and is resolved below, one task at a time.
+  # The dates are read in awk. A routine goes to task-raw, and its rule is checked below, one routine at a time.
   : > "$tmp/task-raw"
-  RELOUT="$tmp/task-raw" scan "$tmp/task-files" "$(awk_tasks)" -F '\037' -v OFS='\037' > "$tmp/task-plain"
-  local US file line state due waiting someday prio closed rule day start text problem due_iso
+  RELOUT="$tmp/task-raw" scan "$tmp/task-files" "$(awk_dates)$(awk_tasks)" -F '\037' -v OFS='\037' > "$tmp/task-plain"
+  local US file line state due_iso waiting someday prio closed rule day start text problem
   US=$(printf '\037')
   : > "$tmp/task-records"
-  while IFS=$US read -r file line state due waiting someday prio closed rule day _ start text; do
-    problem="" due_iso=""
-    if [ -n "$due" ]; then
-      if is_date "$due"; then due_iso=$due
-      elif ! (today=2000-01-01; parse_day "$due") >/dev/null 2>&1; then problem="cannot read the due date $due"
-      elif [ -z "$day" ]; then problem="relative date $due is outside a day page: write its date"
-      elif due_iso=$(today=$day; parse_day "$due"); then :
-      else problem="cannot read the due date $due"; fi
-    fi
-    if [ -n "$waiting" ] && [ "$waiting" != "?" ] && ! is_date "$waiting"; then
-      [ -n "$problem" ] || problem="cannot read the waiting date $waiting"
-    fi
-    if [ -n "$start" ] && ! is_date "$start"; then
-      [ -n "$problem" ] || problem="cannot read the start date $start"
-    fi
+  while IFS=$US read -r file line state due_iso waiting someday prio closed rule day problem start text; do
     # A routine is an interval (every 1m) or a cycle (every sprint). An undated cycle routine is due on the last day of
     # the period holding today. An old rule (every monday) is no longer a routine, and a name that is neither is a problem.
     if [ -n "$rule" ]; then

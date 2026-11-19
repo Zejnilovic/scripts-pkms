@@ -4,38 +4,8 @@
 # lib/pkm/cycles.sh: the cycles of a vault and their periods. The week is built in: 1w from monday. A cycle of your own is
 # set in .pkm/config as cycle_<name>=<N>w from <weekday|date> (a weekday only for 1w), or cycle_<name>=<N>m from <day 1-28
 # or date>. A period runs from its first day to the day before the next period starts, and periods run both ways from
-# the anchor. Day arithmetic is done in awk on civil dates, so it does not depend on the time zone. Sourced by bin/pkm.
+# the anchor. Day arithmetic is done in awk on civil dates (dates.sh awk_dates), so it does not depend on the time zone. Sourced by bin/pkm.
 # Defines functions only.
-
-# cycle_awk_lib: the awk functions for days. dnum(y, m, d) is the day number (0 on 1970-01-01), civil(z) sets CY, CM and CD,
-# iso(z) is the date of a day number, ymd(s) the day number of a YYYY-MM-DD string, fdiv(a, b) the floor of a / b.
-cycle_awk_lib() {
-  cat <<'AWK'
-function fdiv(a, b) { return a >= 0 ? int(a / b) : -int((-a + b - 1) / b) }
-function dnum(y, m, d,   yy, era, yoe, doy, doe) {
-  yy = (m <= 2) ? y - 1 : y
-  era = fdiv(yy, 400)
-  yoe = yy - era * 400
-  doy = int((153 * (m > 2 ? m - 3 : m + 9) + 2) / 5) + d - 1
-  doe = yoe * 365 + int(yoe / 4) - int(yoe / 100) + doy
-  return era * 146097 + doe - 719468
-}
-function civil(z,   era, doe, yoe, y, doy, mp) {
-  z += 719468
-  era = fdiv(z, 146097)
-  doe = z - era * 146097
-  yoe = int((doe - int(doe / 1460) + int(doe / 36524) - int(doe / 146096)) / 365)
-  y = yoe + era * 400
-  doy = doe - (365 * yoe + int(yoe / 4) - int(yoe / 100))
-  mp = int((5 * doy + 2) / 153)
-  CD = doy - int((153 * mp + 2) / 5) + 1
-  CM = (mp < 10) ? mp + 3 : mp - 9
-  CY = y + (CM <= 2)
-}
-function iso(z) { civil(z); return sprintf("%04d-%02d-%02d", CY, CM, CD) }
-function ymd(s) { return dnum(substr(s, 1, 4) + 0, substr(s, 6, 2) + 0, substr(s, 9, 2) + 0) }
-AWK
-}
 
 # cycle_value_parse <value>: "unit n kind anchor" for a cycle's value, or nothing and a failure when the value is not one.
 # kind is wday (a weekday, Monday 0), date (a day number's date, as written) or dom (a day of the month).
@@ -100,7 +70,7 @@ cycle_period() {
   read -r unit n kind val <<EOF
 $spec
 EOF
-  awk -v unit="$unit" -v n="$n" -v kind="$kind" -v val="$val" -v d="$2" "$(cycle_awk_lib)"'
+  awk -v unit="$unit" -v n="$n" -v kind="$kind" -v val="$val" -v d="$2" "$(awk_dates)"'
     BEGIN {
       z = ymd(d)
       if (unit == "w") {
@@ -134,21 +104,13 @@ cycle_period_last() {
 
 # day_diff <from> <to>: the days from one date to another (negative when earlier).
 day_diff() {
-  awk -v a="$1" -v b="$2" "$(cycle_awk_lib)"' BEGIN { print ymd(b) - ymd(a) }'
+  awk -v a="$1" -v b="$2" "$(awk_dates)"' BEGIN { print ymd(b) - ymd(a) }'
 }
 
 # month_add <date> <months>: the date that many months later, on the same day of the month, or the last day of that month
 # when it is shorter (January 31 plus one month is February 28).
 month_add() {
-  awk -v d="$1" -v n="$2" "$(cycle_awk_lib)"'
-    BEGIN {
-      y = substr(d, 1, 4) + 0; m = substr(d, 6, 2) + 0; dd = substr(d, 9, 2) + 0
-      mi = y * 12 + m - 1 + n; ny = int(mi / 12); nm = mi % 12 + 1
-      first = dnum(ny, nm, 1)
-      nxt = (nm == 12) ? dnum(ny + 1, 1, 1) : dnum(ny, nm + 1, 1)
-      dim = nxt - first
-      print iso(first + ((dd < dim) ? dd : dim) - 1)
-    }'
+  awk -v d="$1" -v n="$2" "$(awk_dates)"' BEGIN { print add_months(d, n) }'
 }
 
 # cycle_routine_due <name>: the due date of an undated cycle routine: the last day of the period holding today.
