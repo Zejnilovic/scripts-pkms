@@ -112,7 +112,9 @@ A mark says what an entry is. There are few, on purpose, and all are optional: m
 | `~~Joe can start on 2026-12-01~~` | No longer true: struck through, still readable |
 | `(recall 2026-11-16 7d)` | A question to recall, with its next day and current interval |
 
-A task can say more at the end of its line: `(due 2026-11-20)`, `(high)`, `(waiting 2026-11-11)` for a task that waits for someone since that day, `(start 2026-12-01)` to hide it until then, `(someday)`, or `(every 1m)` for a routine. A tag, `#estimation`, marks a theme that cuts across notes. The [reference](#reference) at the end has the exact forms.
+A task can say more at the end of its line: `(due 2026-11-20)`, `(high)`, `(waiting 2026-11-11)` for a task that waits for someone since that day, `(start 2026-12-01)` to hide it until then, `(someday)`, `(every 1m)` for a routine, or `(for [[jane-doe]])` when it is someone else's move. A tag, `#estimation`, marks a theme that cuts across notes. The [reference](#reference) at the end has the exact forms.
+
+**Whose move it is.** A task is yours, and in a shared vault it is the writer's whose page it is on. When someone else does it, or a question is someone else's to decide, end the line with `(for <who>)`: a link to their note, `- [ ] Draft the release plan (for [[jane-doe]]) (due 2026-11-25)`, or a writer's name in a shared vault, `- Should we put a stair rail in before [[nana]]'s visit? (for sam)`. `pkm tasks --for sam` lists Sam's moves, and the close gathers everything that is someone's under their name, so a promise made to you is chased like a wait.
 
 A task stays where you wrote it; nothing copies it forward. Because a page is a record, an entry you forgot to mark stays as it is. At the close, you write the task on today's page instead, quoting the entry and linking its day: `- [ ] I'll send them the revised timeline by Thursday ([[2026-11-10]])`.
 
@@ -541,6 +543,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Move a finished note to the archive | `pkm mv apollo archive` | Move the file into `archive/`; its links keep working |
 | See what happened since a cycle began | `pkm since sprint --about apollo` | Read the pages since the sprint began, or search for `[[apollo` and keep the recent ones |
 | List open tasks | `pkm tasks` | Search for `- [ ]` |
+| See someone's moves | `pkm tasks --for sam` | Search for `(for sam)` and Sam's pages |
 | See what comes next: dated tasks, events, birthdays | `pkm upcoming` | Search for `(due `, `(at ` and `birthday:` |
 | Show the vault's events in a calendar app | `pkm upcoming --ics > daybook.ics` | Write them in the calendar too |
 | Tick a task, or move a routine on | `pkm done invoice` | Write `x` in the box, or change a routine's due date |
@@ -578,7 +581,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | A routine | A task with `(every <number><unit>)`, the unit `d`, `w`, `m` or `y`, and a due date, or with `(every <cycle>)`, kept in a note; when done, its due date moves on by one interval or one period; a cycle routine with no due date is due on the last day of the current period | `- [ ] Pay the rent (due 2026-12-01) (every 1m)`, `- [ ] Send the sprint summary (every sprint)` |
 | An event | An entry ending in `(at <when>)` or `(@ <when>)`; `<when>` is a date, a date and `HH:MM`, a date and `HH:MM-HH:MM`, or `<date> to <date>`; on a page the date can also be a weekday, `today`, `tomorrow`, `+3d` or `+2w`, counted from that page's date; with a task box it is a task, due on that date | `- Parents' evening (at 2026-11-19 17:30-19:00)` |
 | An event that comes back | An event in a note with `(every <number><unit>)`, the unit `d`, `w`, `m` or `y`, counted from the date in its `(at …)`; `(until <date>)` ends it, and `(skip <date>)` takes out one time; never in a task box | `(at 2026-11-03 17:00-18:00) (every 1w) (skip 2026-11-17)` |
-| A question | An entry ending in `?` | `- Should we take the car or the train?` |
+| A question | An entry ending in `?`, before its markers | `- Should we take the car or the train?` |
+| Whose move it is | `(for [[<name>]])` on a task or a question, or `(for <writer>)` in a shared vault | `- [ ] Book the boiler service (for sam)` |
 | A decision | An entry starting `Decided:` | `- Decided: we cut the mobile app` |
 | Important | An entry starting `!` after the time | `- 09:12 ! Acme may cancel` |
 | An idea | An entry starting `Idea:` after the time | `- 12:40 Idea: a photo book of the summer` |

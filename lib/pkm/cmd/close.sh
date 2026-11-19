@@ -4,6 +4,7 @@
 # lib/pkm/cmd/close.sh: pkm close [--cycle name] [--date D] [--quarter] [--json]: the close of a period, by default the close
 # cycle's period holding yesterday. The first line names the period, its entry count and its close page. Then only the
 # sections with lines: == tasks (overdue, and open for 21 days or more), == open (questions, and every waiting task),
+# == for (the open tasks and the period's questions with a (for …), by person, which the two before leave out),
 # == due (from today to the end of the next period, as upcoming prints them), == marked (the period's ! Decided: Idea:
 # entries), == names (names linked on three lines or more of day pages, with no note), == quiet (projects and people linked
 # 15 to 42 days ago and not in the last 14 days) and == ideas (every Idea: entry and someday task, in a period that holds the
@@ -38,14 +39,19 @@ close_sections() {
   link_build ""
   digest_pages "$first" "$last"
   task_records no > "$tmp/close-tasks"
+  # Whose move it is: the open tasks and the period's questions with a (for …) go to == for, by person, and only there.
+  for_records | awk -F "$US" -v first="$first" -v last="$last" \
+    '$7 == 1 && ($3 == "task" || ($3 == "question" && $8 >= first && $8 <= last))' > "$tmp/close-for"
+  awk -F "$US" '{ print $1 ":" $2 }' "$tmp/close-for" > "$tmp/close-for-lines"
   upcoming_lines "$(day_diff "$today" "$next")" | awk '$2 != "overdue"' > "$tmp/close-due"
   w1s=$(day_add "$today" -41); w1e=$(day_add "$today" -14); w2s=$(day_add "$today" -13)
   PENTRIES=$(awk -F "$US" '$4 == "l"' "$tmp/dg-pages" | wc -l | tr -d ' ')
   : > "$tmp/close-records"
 
   # The period's questions, and its ! Decided: Idea: entries.
-  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
-  awk -F "$US" -v US="$US" "$(awk_dates)$(rec_awk)"'
+  # shellcheck disable=SC2016,SC2129 # awk program: the $ in it is awk's; each section below is its own program
+  awk -F "$US" -v US="$US" "$(awk_dates)$(awk_markers)$(awk_plain)$(rec_awk)"'
+    FILENAME == ARGV[1] { theirs[$0] = 1; next }
     function marked(t,  s) {
       if (t !~ /^[ \t]*- /) return 0
       s = t; sub(/^[ \t]*- /, "", s)
@@ -54,14 +60,17 @@ close_sections() {
       return (s ~ /^! / || s ~ /^Decided:/ || s ~ /^Idea:/)
     }
     $4 == "l" {
-      if ($5 ~ /\?[ \t]*$/) rec("2open", $1, pad($3), "", $1, $3, $5, "", "", "", "", "", "question")
+      # A question ends with "?" before its markers; one that is someone'"'"'s is in == for.
+      q = plain_unmark($5)
+      if (q ~ /\?[ \t]*$/ && !(($1 ":" $3) in theirs)) rec("2open", $1, pad($3), "", $1, $3, $5, "", "", "", "", "", "question")
       if (marked($5)) rec("4marked", $1, pad($3), "", $1, $3, $5, "", "", "", "", "", "")
     }
-  ' "$tmp/dg-pages" >> "$tmp/close-records"
+  ' "$tmp/close-for-lines" "$tmp/dg-pages" >> "$tmp/close-records"
 
   # Overdue tasks, tasks open 21 days or more on their day page, and waiting tasks. Someday tasks go to ideas.
   awk -F "$US" -v US="$US" -v today="$today" "$(awk_dates)$(rec_awk)"'
-    $3 != "open" { next }
+    FILENAME == ARGV[1] { theirs[$0] = 1; next }
+    $3 != "open" || (($1 ":" $2) in theirs) { next }
     $12 != "" && $12 > today { next }                    # hidden until its start date
     $6 == 1 && !($12 != "" && $12 <= today) { next }     # someday: only in ideas
     $4 != "" && $4 < today { rec("1tasks", $1, pad($2), "", $1, $2, $13, "open", ymd(today) - ymd($4), "", "", "", "overdue"); next }
@@ -75,7 +84,29 @@ close_sections() {
       d = ymd(today) - ymd($5)
       rec("2open", $1, pad($2), "", $1, $2, $13, "open", d, "", "", "", "waiting " d " days")
     }
-  ' "$tmp/close-tasks" >> "$tmp/close-records"
+  ' "$tmp/close-for-lines" "$tmp/close-tasks" >> "$tmp/close-records"
+
+  # For: by person, then path and line. A task shows what it waits on: overdue, waiting, or its due date.
+  awk -F "$US" -v US="$US" -v today="$today" "$(awk_dates)$(rec_awk)"'
+    FILENAME == ARGV[1] { who[$1 ":" $2] = $6; kind[$1 ":" $2] = $3; if ($3 == "question") q[$1 ":" $2] = $0; next }
+    FILENAME == ARGV[2] {
+      k = $1 ":" $2
+      if (!(k in who) || $3 != "open") next
+      if ($12 != "" && $12 > today) next                   # hidden until its start date
+      if ($6 == 1 && !($12 != "" && $12 <= today)) next    # someday: only in ideas
+      l = "for " who[k]
+      if ($4 != "" && $4 < today) { l = l ", overdue"; d = ymd(today) - ymd($4) }
+      else if ($5 == "?") { l = l ", waiting"; d = "" }
+      else if ($5 != "" && $5 <= today) { d = ymd(today) - ymd($5); l = l ", waiting " d " days" }
+      else if ($4 != "") { l = l ", due " $4; d = "" }
+      else d = ""
+      rec("2pfor", tolower(who[k]), $1, pad($2), $1, $2, $13, "open", d, who[k], "", "", l)
+      next
+    }
+    END {
+      for (k in q) { split(q[k], f, US); rec("2pfor", tolower(f[6]), f[1], pad(f[2]), f[1], f[2], f[9], "", "", f[6], "", "", "for " f[6] ", question") }
+    }
+  ' "$tmp/close-for" "$tmp/close-tasks" >> "$tmp/close-records"
   awk -F "$US" -v US="$US" "$(awk_dates)$(rec_awk)"'
     $3 != "open" || $6 != 1 || ($12 != "" && $12 <= today) { next }
     { rec("7ideas", $1, pad($2), "", $1, $2, $13, "open", "", "", "", "", "someday") }
@@ -176,7 +207,7 @@ close_render() {
   fi
   awk -F "$US" -v OFS="$US" -v json="$1" '
     BEGIN {
-      label["1tasks"] = "tasks"; label["2open"] = "open"; label["3due"] = "due"; label["4marked"] = "marked"
+      label["1tasks"] = "tasks"; label["2open"] = "open"; label["2pfor"] = "for"; label["3due"] = "due"; label["4marked"] = "marked"
       label["5names"] = "names"; label["6quiet"] = "quiet"; label["7ideas"] = "ideas"
       json = (json == "yes")
     }

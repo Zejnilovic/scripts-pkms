@@ -20,7 +20,7 @@
 #                                 marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
 #                                 A routine with an interval, such as (every 1m), keeps its box and moves its due date on
 #                                 (--next <day>: to that day, for a routine done early or late)
-#   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--stale <days>] [--all]
+#   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--stale <days>] [--all]
 #                                 the open tasks of every note, in groups: overdue, due soon, waiting, the rest
 #                                 (docs/contract.md gives the order). A task is a "- [ ]" line outside code
 #   new <type> <title> [--name <name>]
@@ -145,6 +145,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/events.sh"
 # shellcheck source=../lib/pkm/plain.sh
 . "$pkm_home/lib/pkm/plain.sh"
+# shellcheck source=../lib/pkm/people.sh
+. "$pkm_home/lib/pkm/people.sh"
 # shellcheck source=../lib/pkm/tasks.sh
 . "$pkm_home/lib/pkm/tasks.sh"
 # shellcheck source=../lib/pkm/index.sh

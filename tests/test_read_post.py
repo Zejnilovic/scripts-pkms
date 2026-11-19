@@ -298,8 +298,8 @@ class ExampleVault(unittest.TestCase):
         (vault / "notes/bathroom.md").write_text("\n".join(lines) + "\n")
         out = self.ok(vault, "strike", "notes/bathroom.md:13", now="20261112090000").strip()
         self.assertEqual(out, "notes/bathroom.md:13")
-        method_line = (REPO / "docs/method.md").read_text().splitlines()[121]
-        self.assertEqual(method_line, "- ~~[[joe-bloggs-plumber|Joe]] can start on 2026-12-01 ([[2026-11-09-alex]])~~ ([[2026-11-12-sam]])")
+        method_line = "- ~~[[joe-bloggs-plumber|Joe]] can start on 2026-12-01 ([[2026-11-09-alex]])~~ ([[2026-11-12-sam]])"
+        self.assertIn(method_line, (REPO / "docs/method.md").read_text().splitlines())
         self.assertEqual((vault / "notes/bathroom.md").read_text().splitlines()[12], method_line)
 
 

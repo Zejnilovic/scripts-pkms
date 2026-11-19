@@ -9,7 +9,7 @@
 # first word is a marker key, in the order written, separated by tabs). mval(m, key) is the value of the first
 # "(key …)" ("" when there is none), mhas(m, key) is 1 when one is written with a value or a space, and mflag(m, key) is 1
 # when "(key)" is written alone. line_markers(s) is the markers field of a line's text: (at …) and (@ …) count only with a
-# value after them (at_value), and (@ …) is recorded as (at …).
+# value after them (at_value), and (@ …) is recorded as (at …); (for …) only with a link or a writer's name (for_value).
 awk_markers() {
   cat <<'AWK'
 function mval(m, key,   n, a, i) {
@@ -35,9 +35,17 @@ function line_markers(s,   out, i, rest, j, c, key, sp) {
     key = sp ? substr(c, 1, sp - 1) : c
     if (key == "@") { c = "at" substr(c, 2); key = "at" }
     if (key == "at" && !at_value(substr(c, 4))) continue
-    if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip)$/) out = out (out == "" ? "" : "\t") c
+    if (key == "for" && !for_value(substr(c, 5))) continue
+    if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip|for)$/) out = out (out == "" ? "" : "\t") c
   }
   return out
+}
+# for_value(v): 1 for a link, or the name of a writer of the vault's day pages (PKM_WRITERS, set by vault_writers).
+function for_value(v,   w) {
+  sub(/[ \t]+$/, "", v)
+  if (v ~ /^\[\[[^]]+\]\]$/) return 1
+  w = tolower(v)
+  return w ~ /^[a-z0-9-]+$/ && index(" " ENVIRON["PKM_WRITERS"] " ", " " w " ") > 0
 }
 function at_value(v,   w) {
   w = tolower(v); sub(/ .*/, "", w)
@@ -108,6 +116,7 @@ AWK
 # calls line_records_forget in between.
 line_records() {
   local out="$tmp/lines-$1"
+  vault_writers
   if [ ! -f "$out" ]; then
     files "$1" '*.md' > "$tmp/lines-files-$1"
     scan "$tmp/lines-files-$1" "$(awk_markers)$(awk_lines)" -v OFS='\037' > "$out"
@@ -118,4 +127,14 @@ line_records() {
 # line_records_forget: the next line_records call scans the vault again.
 line_records_forget() {
   rm -f "$tmp"/lines-yes "$tmp"/lines-no
+}
+
+# vault_writers: exports PKM_WRITERS, the writers of a shared vault's day pages (daybook/…/2026-11-14-alex.md: alex),
+# separated by spaces, for for_value. A command that reads (for …) calls it first; it lists the files once.
+vault_writers() {
+  [ "$writers_listed" = yes ] && return 0
+  writers_listed=yes
+  PKM_WRITERS=$(files no '*.md' | sed -n 's|^daybook/\(.*/\)\{0,1\}[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-\([a-z0-9-]*\)\.md$|\2|p' \
+    | LC_ALL=C sort -u | tr '\n' ' ')
+  export PKM_WRITERS
 }

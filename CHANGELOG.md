@@ -7,6 +7,7 @@ Version numbers: **major** when a command, option, output format, note name, lin
 ## 0.4.0 (unreleased)
 
 - `pkm moved <path:line> <when>` moves a task or an event to a new date: it strikes the line and writes it again with the new date, below the old line in a note, or on today's page from another day's page, linking that day. A date alone keeps an event's time.
+- `(for <who>)` says whose move it is: on a task they do it, on a question they decide. It takes a link, `(for [[jane-doe]])`, or the name of a writer of a shared vault, `(for sam)`; `(for now)` stays text. `pkm tasks --for <who>` lists their tasks and questions, a writer's own unassigned tasks included, and the close gathers them by person in a new `== for` section. `check` reports a `(for …)` on a line that is neither a task nor a question. A question is now found by its `?` before its markers. The family example has Sam's boiler service and a question for Sam.
 - `pkm done … --next <day>` marks a routine done and makes it next due on that day, for a routine done early or late, such as a car service a few months early.
 
 ## Released

@@ -63,7 +63,7 @@ command_options() {
     names) echo "--type --json --abs --limit" ;;
     index) echo "--rebuild" ;;
     rename) echo "--dry-run --no-alias" ;;
-    tasks) echo "--all --link --stale --json --abs --limit" ;;
+    tasks) echo "--all --link --for --stale --json --abs --limit" ;;
     day) echo "--edit" ;;
     cycle) echo "--date" ;;
     since) echo "--about --seen --json --limit" ;;
