@@ -106,6 +106,12 @@ class Formula(unittest.TestCase):
             self.assertIn(f'url "https://github.com/Zejnilovic/scripts-pkms/releases/download/v{VERSION}/pkm-{VERSION}.tar.gz"', text)
             self.assertIn(f'sha256 "{hashlib.sha256(tarball.read_bytes()).hexdigest()}"', text)
             self.assertNotIn("PLACEHOLDER", text)
+            self.assertEqual([n for n, line in enumerate(text.splitlines(), 1) if len(line) > 118], [])
+
+    def test_the_formula_lines_fit_brew_audit(self):
+        # brew audit --strict, in the Release workflow's last job, fails a line longer than 118 characters.
+        lines = (REPO / "packaging/pkm.rb").read_text().splitlines()
+        self.assertEqual([f"{n}: {len(line)}" for n, line in enumerate(lines, 1) if len(line) > 118], [])
 
     def test_the_formula_has_the_dependencies_and_a_test(self):
         text = (REPO / "packaging/pkm.rb").read_text()

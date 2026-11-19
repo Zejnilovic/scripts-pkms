@@ -1,5 +1,6 @@
 # Homebrew formula for pkm, in Zejnilovic/homebrew-tap. The Release workflow fills the url and the sha256 with
-# scripts/formula.sh from the tarball that make dist built, and pushes it to the tap. Here the sha256 stays a placeholder.
+# scripts/formula.sh from the tarball that make dist built, and pushes it to the tap. Here the sha256 stays a
+# placeholder. brew audit allows lines of 118 characters at most.
 class Pkm < Formula
   desc "Command-line tool for Markdown vaults: day pages, tasks, links and the close"
   homepage "https://zejnilovic.github.io/scripts-pkms/"
