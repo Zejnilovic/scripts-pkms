@@ -148,13 +148,15 @@ aliases: [Apollo]
 
 | Kind | For | Sections |
 |---|---|---|
-| Project | Anything with an end: a release, a trip, a renovation, a degree | **Now** (a few lines on where things stand), Goals, People, Links, Risks, Decisions, Later |
-| Area | Something you look after that never ends: a home, a car, money, your health, a team you lead, your learning | **Now**, Routines, People, Links, Ideas |
-| Person | A colleague, a child, a plumber | How to reach them at the top, then the entries posted to them; Ideas, for gifts |
+| Project | Anything with an end: a release, a trip, a renovation, a degree | **Now** (a few lines on where things stand), Next time, Goals, People, Links, Risks, Decisions, Later |
+| Area | Something you look after that never ends: a home, a car, money, your health, a team you lead, your learning | **Now**, Next time, Routines, People, Links, Ideas |
+| Person | A colleague, a child, a plumber | How to reach them at the top, Next time, then Notes, the entries posted to them; Ideas, for gifts |
 | Organization | A customer, an employer, a school | As for a person |
 | List | Shopping, packing, things to take | The list itself |
 | Course | Something you study | Modules, Questions |
 | Topic, source | A subject, a book, an article | What you think, and the entries posted to them |
+
+**Next time** holds what to raise the next time you meet: in a 1:1, the weekly call with a customer, a parents' evening. Between two meetings, post the entries you want to bring up there. In the work vault, Jane's release plan was "solid on scope, thin on risks", which belongs in her next 1:1. Her note is older than the section, so first add `## Next time` and `## Notes` below her contact lines, as a new person note has them: an entry posted without a section goes to the end of the note, into Notes. Then `pkm post daybook/2026/11/2026-11-12.md:8 "jane-doe#Next time"` copies it under Next time, as line 15. You can also write a line straight into the section. Once you have raised one, strike it, `pkm strike notes/jane-doe.md:15`: it stays as a record of what you raised and when, and the open lines are the agenda.
 
 Make a note when a name keeps coming back, about three times, or when you have something about it worth keeping, such as the role of a new contact. A name mentioned once, with nothing to keep, stays text. When a topic grows to about ten notes, a hub note that lists them helps you browse.
 
@@ -370,6 +372,15 @@ A vault is a plain folder, and often also a git repository. To keep something in
 
 Vaults never link to each other, and nothing is copied between them. To look at them side by side, as in a morning brief, `pkm --vaults work,family upcoming` lists each vault's days in a section of its own; it only reads. Write where you are: in the work vault at work, in the family vault at home. If a home task lands on your work page, nothing breaks; write it in the family vault too if you want it closed there. Each vault has its own close and its own cycles.
 
+### Other people's private matters
+
+A vault holds other people too: a report's sick leave, a child's trouble at school, a parent's medication. Some of it you need, since a care vault without the dose that changed is no use. Health comes first among these, and four habits keep it, and the rest, in proportion:
+
+- **Write what you need to act on, as you heard it, and who said it.** "The pharmacy: the new dose is 5 mg, from today" is a fact with its source. "He's getting worse" is a verdict, and it outlives the day it was true. What someone else noticed is theirs: "Eva noticed he is unsteady on the stairs".
+- **Keep it where only the people it concerns read it.** Health, money trouble, family conflict and the like go in the vault of the part of life they belong to: a care vault shared with your sister, not your work vault. Within a vault, a folder of their own, such as `care/`, can stay out of a sync, out of git, and out of an agent's reach.
+- **Decide before you write.** Nothing in the method is deleted, and a struck line stays readable, so the moment to leave something out is before it is written. Ask whether the person would be at ease reading the line.
+- **Count an agent as someone reading.** What an agent reads goes to the service that runs it. Name the folders it must not read; the agentic setup asks the first time such a note appears. pkm's secrets check finds passwords and keys, not health facts: those are yours to place.
+
 ### The archive
 
 Finished notes, such as a project that is done, move to `archive/`. They keep their names, so every link to them still works, and search still finds them. What is no longer true is struck through, not erased. Nothing in the Daybook Method is ever deleted.
@@ -544,6 +555,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | Find by words | `pkm find mobile app` | Your editor's search across the folder |
 | See a note's history | `pkm backlinks apollo` | Search for `[[apollo`, and read the lines under a heading that has it |
 | Add up the time spent on something | `pkm since sprint --about apollo --sum` | Search the sprint's pages for `[[apollo`, and add up the ranges and durations |
+| Collect what to raise at the next meeting | `pkm post <path:line> "jane-doe#Next time"`, then `pkm strike` once raised | Copy the entry under `## Next time` in her note, and strike it through once raised |
 | Share a section with someone outside the vault | `pkm get apollo#Now --plain` | Copy the section, and take out the links to day pages and the markers |
 | See the work of an area | `pkm tasks --under home` | Open each note of the area, and search the day pages for links to them |
 | Rename a note, fixing every link to it | `pkm rename joe-bloggs joe-bloggs-plumber` | Rename the file, add the old name to `aliases:`, and fix each `[[joe-bloggs` you find |

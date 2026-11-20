@@ -93,7 +93,7 @@ class NewTest(VaultCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "notes/marta-kovac.md")
         self.assertEqual(self.read("notes/marta-kovac.md"),
-                         "---\ntype: person\nsummary:\naliases: [Marta Kovac]\ncreated: 2026-11-16\n---\n\n# Marta Kovac\n")
+                         "---\ntype: person\nsummary:\naliases: [Marta Kovac]\ncreated: 2026-11-16\n---\n\n# Marta Kovac\n\n## Next time\n\n## Notes\n")
 
     def test_a_taken_name_fails_with_the_path_and_a_suggestion_and_writes_nothing(self):
         self.write("archive/projects/apollo.md", "# Apollo\n")
@@ -114,17 +114,20 @@ class NewTest(VaultCase):
         self.assertIn("status: active\n", text)
         self.assertIn("target:\n", text)
         headings = [line for line in text.split("\n") if line.startswith("## ")]
-        self.assertEqual(headings, ["## Now", "## Goals", "## People", "## Links", "## Risks", "## Decisions", "## Later"])
+        self.assertEqual(headings, ["## Now", "## Next time", "## Goals", "## People", "## Links", "## Risks", "## Decisions", "## Later"])
         self.assertNotIn("health", text)
         self.assertNotIn("board", text)
 
     def test_a_list_has_type_list(self):
         self.assertIn("type: list\n", self.read(self.ok("new", "list", "Packing").strip()))
 
-    def test_person_topic_and_source_end_after_the_heading(self):
-        for kind in ["person", "topic", "source"]:
+    def test_topic_and_source_end_after_the_heading_and_a_person_with_notes(self):
+        # A post without a section goes to the end of a note: for a person that is ## Notes, after ## Next time.
+        for kind in ["topic", "source"]:
             text = self.read(self.ok("new", kind, f"Note {kind}").strip())
             self.assertTrue(text.endswith(f"# Note {kind}\n"), kind)
+        text = self.read(self.ok("new", "person", "Note person").strip())
+        self.assertTrue(text.endswith("# Note person\n\n## Next time\n\n## Notes\n"), text)
 
     def test_notes_go_to_notes_and_a_folder_setting_moves_a_type(self):
         self.assertEqual(self.ok("new", "source", "A source").strip(), "notes/a-source.md")

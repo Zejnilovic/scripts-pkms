@@ -12,6 +12,8 @@ created: {{date}}
 
 ## Now
 
+## Next time
+
 ## Goals
 
 ## People

@@ -113,7 +113,23 @@ To run pkm from Obsidian, use a terminal in the vault folder, or the community "
 
 ## On a phone
 
-Any app that writes Markdown into the vault can capture: an entry is `- HH:MM text` at the end of the day's Log. From a shell, `pkm add "text"` or `pkm add -` (text on stdin) does that for you and prints `path:line`.
+A phone needs one thing from the vault: today's page, to add an entry at its end. pkm isn't needed for that, only the page's path and the form of an entry. The vault reaches the phone the way your other files do, through a synced folder or a git app.
+
+**The path of today's page.** `daybook/<year>/<month>/<date>.md`, such as `daybook/2026/11/2026-11-18.md`. In a shared vault each writer has their own page, `daybook/2026/11/2026-11-18-alex.md`, so two phones never write into the same file. An entry is `- HH:MM text` on a line of its own, and it may simply go at the end of the page: pkm reads the lines of a day page whether or not they sit under `## Log`.
+
+**An editor with daily notes.** Set its daily note to that path, with no template needed. In Obsidian's app, as on the desktop: folder `daybook`, date format `YYYY/MM/YYYY-MM-DD`; in a shared vault, add the writer in brackets, which Obsidian keeps as text: `YYYY/MM/YYYY-MM-DD-[alex]`. The editor then opens today's page, or creates it, with one tap.
+
+**A shortcut that appends.** A phone's shortcut or automation app can capture in one step, without opening an editor. Build it from these actions:
+
+1. Ask for the text.
+2. Take today's date as `yyyy/MM/yyyy-MM-dd` (add `-alex` in a shared vault) and the time as `HH:mm`; most shortcut apps use these Unicode date patterns.
+3. Append `- <time> <text>` and a line break to `daybook/<that path>.md` in the vault's folder. When the file doesn't exist yet, write `# <date>` and a blank line first, so the page starts with its title.
+
+The entry lands on the right page whatever the day, and nothing else in the vault changes.
+
+**pkm over SSH.** If a computer that keeps the vault is reachable, an SSH app can save a command such as `pkm -V family add "<text>"`, which writes the entry under `## Log` and prints `path:line`. With text on several lines, `pkm add -` reads it from the input. In a shared vault, set `writer=alex` in that computer's pkm settings, or run it as the user whose settings say so.
+
+From any shell, `pkm add "text"` or `pkm add -` (text on stdin) does the same and prints `path:line`.
 
 ## Planned
 

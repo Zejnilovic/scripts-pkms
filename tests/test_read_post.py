@@ -268,11 +268,12 @@ class ExampleVault(unittest.TestCase):
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-10.md:10", "apollo#Decisions").strip(),
                          "notes/apollo.md:35")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-10.md:11", "marta-kovac").strip(),
-                         "notes/marta-kovac.md:10")
+                         "notes/marta-kovac.md:14")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-16.md:8", "marta-kovac").strip(),
-                         "notes/marta-kovac.md:11")
+                         "notes/marta-kovac.md:15")
         self.assertEqual((vault / "notes/marta-kovac.md").read_text(), (
             "---\ntype: person\nsummary:\naliases: [Marta Kovac]\ncreated: 2026-11-16\n---\n\n# Marta Kovac\n\n"
+            "## Next time\n\n## Notes\n\n"
             "- Their new contact is Marta Kovac ([[2026-11-10]])\n"
             "- 09:05 [[marta-kovac|Marta Kovac]] is [[acme|Acme]]'s project lead ([[2026-11-16]])\n"))
 

@@ -10,6 +10,8 @@ created: {{date}}
 
 ## Now
 
+## Next time
+
 ## Routines
 
 ## People
