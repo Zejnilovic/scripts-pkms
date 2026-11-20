@@ -166,6 +166,17 @@ class FrontmatterOutsideSections(VaultCase):
         self.assertNotIn("mood: fine", out)
 
 
+class QuestionsWithMarkers(VaultCase):
+    """A question is an entry whose text ends with "?" before its markers, in since's == marked as in the close."""
+
+    def test_since_marks_a_question_with_markers_after_it(self):
+        self.write("daybook/2026/10/2026-10-25.md", "# 2026-10-25\n\n## Log\n\n"
+                   "- 07:42 Should we take the train? (for [[sam]])\n- 07:50 Is the form due? (due 2026-10-30)\n"
+                   "- 08:00 Sam asked (why?) about it\n- 08:10 Plain question?\n")
+        marked = sections(self.ok("since", "2026-10-25"))["marked"]
+        self.assertEqual([line.split(":")[1] for line in marked], ["5", "6", "8"])
+
+
 class SinceState(ExampleCopy):
     def setUp(self):
         super().setUp()

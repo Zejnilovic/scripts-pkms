@@ -16,15 +16,17 @@
 # and for --under, UNDER with the files UNDER_PATHS and UNDER_LINES.
 since_build() {
   awk -F "$US" -v OFS="$US" -v US="$US" -v ABOUT="$ABOUT" -v UNDER="${UNDER:-}" -v UNDER_PATHS="${UNDER_PATHS:-}" \
-    -v UNDER_LINES="${UNDER_LINES:-}" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(awk_dates)"'
+    -v UNDER_LINES="${UNDER_LINES:-}" -v TODAY="$TODAY" -v START="$1" -v SEEN="${SEEN_TIME:-}" "$(awk_dates)$(awk_markers)$(awk_plain)"'
     function ago(d,  k) { k = ymd(TODAY) - ymd(d); if (k == 0) return "today"; if (k == 1) return "yesterday"; return k " days ago" }
     function pad(n) { return sprintf("%06d", n) }
-    function marked_text(t,  s) {
+    function marked_text(t,  s, q) {
       if (t !~ /^[ \t]*- /) return 0
       s = t; sub(/^[ \t]*- /, "", s)
       if (s ~ /^~~/) return 0
       sub(/^[0-9][0-9]:[0-9][0-9] /, "", s)
-      return (s ~ /^! / || s ~ /^Decided:/ || s ~ /^Idea:/ || s ~ /\?[ \t]*$/)
+      # A question ends with "?" before its markers, as in the close (plain.sh).
+      q = plain_unmark(s); sub(/[ \t]+$/, "", q)
+      return (s ~ /^! / || s ~ /^Decided:/ || s ~ /^Idea:/ || q ~ /\?$/)
     }
     # under(path, line): 1 without --under, else 1 for a line of a note in the tree or a day page line about one.
     function under(path, line) { return UNDER == "" || (path in tree) || ((path ":" line) in near) }
