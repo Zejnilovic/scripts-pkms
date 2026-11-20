@@ -239,6 +239,8 @@ Ideas wait. They are not part of the weekly close, and nothing reminds you of th
 
 **A list** is a note with `type: list`: shopping, packing, things to take to the beach. Its boxes are ticked and unticked as you go, so they are a checklist, not tasks, and the close and the task list leave them out. A packing list you use every year can be copied for each trip.
 
+**Every day** is a checklist, not a routine. A parent's pills, a child's reading, the plants in summer: as a routine with `(every 1d)`, each would be a task every day, and each day missed would be overdue at every close. Keep a list of what each day needs instead, such as `notes/dad-every-day.md` with `- [ ] Morning pills` and `- [ ] Evening pills`, tick its boxes as the day goes, and untick them for the next. The list says what to do; the day page says what happened, and only when it matters: `- 08:10 Dad skipped his morning pills, he felt sick`. When the list changes, such as a new dose, strike the old line and write the new one below it, so the list keeps its history.
+
 **A routine** is a task that comes back: the rent, a timesheet, a service, a summary at the end of every sprint. You define it once, as a task with `(every ...)` in a note rather than on a day page, and it comes up again every time without being written again. It comes back on an interval, such as `(every 1m)`, or with one of your [cycles](#your-cycle), such as `(every sprint)` or `(every pay)`:
 
 ```markdown
