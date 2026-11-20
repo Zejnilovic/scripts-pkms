@@ -96,7 +96,25 @@ section_add() {
   cat "$tmp/log-first"
 }
 
-# log_add <page> <lines file> <yes|no>: section_add for the Log section, with the lines from a file.
+# log_add <page> <lines file> <yes|no>: section_add for the Log section, with the lines from a file. An entry that
+# follows a ### block gets a blank line before it, so the block ends there (log_in_block).
 log_add() {
-  section_add "$1" Log "$(cat "$2")" "$3"
+  local sep=$3
+  [ "$sep" = yes ] || sep=$(log_in_block "$1")
+  section_add "$1" Log "$(cat "$2")" "$sep"
+}
+
+# log_in_block <page>: yes when the page's Log ends inside a ### block: after a ### heading, with no later heading and
+# no blank line after the block's lines followed by an entry (- HH:MM …). Else no.
+log_in_block() {
+  awk '
+    { sub(/\r$/, "") }
+    /^## / { inlog = ($0 ~ /^## Log[ \t]*$/); block = 0; next }
+    !inlog { next }
+    /^##? / { block = 0; next }
+    /^### / { block = 1; seen = 0; blank = 0; next }
+    /^[ \t]*$/ { blank = 1; next }
+    { if (block && seen && blank && $0 ~ /^- [0-2][0-9]:[0-5][0-9] /) block = 0; else if (block) seen = 1; blank = 0 }
+    END { print (block ? "yes" : "no") }
+  ' "$1"
 }

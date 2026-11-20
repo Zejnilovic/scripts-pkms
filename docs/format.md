@@ -36,7 +36,7 @@ Dot files and folders, and `node_modules/`, are always skipped. Files named `AGE
 A day page has the sections `## Tasks` and `## Log`. A `## ` section runs to the next `## ` heading or the end of the file.
 
 1. An entry is a list line in the Log: `- HH:MM text`, with a 24-hour time.
-2. A block of several lines is an `### HH:MM` heading, then the lines as written.
+2. A block of several lines is an `### HH:MM` heading, then the lines as written. It ends at the next heading, or at a blank line after its lines that is followed by an entry (`- HH:MM …`); a blank line, then an untimed line such as `- Decided: …`, stays in it. Its lines are about what its heading links. `add` writes a blank line before an entry that follows a block.
 3. A mark follows the time: `- 09:12 ! text` (important), `Decided:` (a decision), `Idea:` (an idea). An entry ending in `?` is an open question.
 4. A struck line is `~~text~~`, with the day it was learned in a link after it: `([[2026-11-12]])`.
 5. A posted line ends with the day it came from: `text ([[2026-11-10]])`.

@@ -112,7 +112,7 @@ cmd_moved() {
   if [ "$status" = away ]; then
     page=$(day_ensure "$today") || exit $?
     if [ "$kind" = task ]; then loc=$(section_add "$page" Tasks "$new" no) || exit $?
-    else loc=$(section_add "$page" Log "$new" no) || exit $?; fi
+    else printf '%s\n' "$new" > "$tmp/moved-line"; loc=$(log_add "$page" "$tmp/moved-line" no) || exit $?; fi
     echo "$page:$loc: $new"
     return 0
   fi

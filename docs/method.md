@@ -95,7 +95,7 @@ In a vault several people share, such as a family's, each person keeps their own
 
 ### Entries
 
-An entry is one line, usually starting with the time. Short entries are easier to post, find and close, so write the way you would speak a note to yourself: "John says the budget needs sign-off", not a paragraph about the budget. At home it is no different: `- 07:50 [[school]]: museum trip on 2026-11-26, the form goes back by Friday`. Longer material, such as meeting notes, goes under a heading with its time.
+An entry is one line, usually starting with the time. Short entries are easier to post, find and close, so write the way you would speak a note to yourself: "John says the budget needs sign-off", not a paragraph about the budget. At home it is no different: `- 07:50 [[school]]: museum trip on 2026-11-26, the form goes back by Friday`. Longer material, such as meeting notes, goes under a heading with its time, and it ends where a blank line is followed by the next timed entry; `pkm add` leaves that blank line for you.
 
 ### Marks
 

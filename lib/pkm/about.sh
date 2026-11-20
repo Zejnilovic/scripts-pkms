@@ -1,8 +1,9 @@
 # shellcheck shell=bash
 # shellcheck source=globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/about.sh: the lines about a name. A line is about a name when it links the name, or sits under a ### heading
-# that links it (until the next heading of level 1, 2 or 3). Used by since --about and the digest, and by --under and
+# lib/pkm/about.sh: the lines about a name. A line is about a name when it links the name, or sits in the block of a ###
+# heading that links it. The block ends at the next heading of level 1, 2 or 3, or at a blank line after its lines that
+# is followed by an entry (- HH:MM …). Used by since --about and the digest, and by --under and
 # backlinks. Files are US-separated, with \037 between the fields. Sourced by bin/pkm. Defines functions only.
 
 # about_pages <files list> <out>: one row per non-blank line of the files listed, outside the frontmatter: path, date,
@@ -59,8 +60,8 @@ about_names() {
       print $1 US $2 US n US 1 US ""
     }
   ' "$tmp/lb-links" > "$tmp/an-own"
-  # Each line of the pages gets its own names, and those of the ### heading above it (until the next heading of level 1,
-  # 2 or 3).
+  # Each line of the pages gets its own names, and those of the ### heading whose block it is in. The pages have no blank
+  # lines, so a blank line shows as a gap in the line numbers.
   awk -F "$US" -v OFS="$US" -v US="$US" '
     FILENAME == ARGV[1] { own[$1 SUBSEP $2] = own[$1 SUBSEP $2] "|" $3; next }
     function emit(s, o,   arr, n, i) {
@@ -70,12 +71,14 @@ about_names() {
     }
     {
       path = $1; line = $3; text = $5; date = $2
-      if (path != lastpath) { lastpath = path; cur = "" }
+      if (path != lastpath) { lastpath = path; cur = ""; prev = 0 }
       mine = own[path SUBSEP line]
       if (text ~ /^##? /) cur = ""
-      if (text ~ /^### /) { cur = mine; emit(mine, 1); next }
+      if (text ~ /^### /) { cur = mine; seen = 0; prev = line; emit(mine, 1); next }
+      if (seen && line > prev + 1 && text ~ /^- [0-2][0-9]:[0-5][0-9] /) cur = ""
       emit(mine, 1)
       emit(cur, 0)
+      seen = 1; prev = line
     }
   ' "$tmp/an-own" "$1" > "$tmp/an-page-names"
   LC_ALL=C sort -u "$tmp/an-own" "$tmp/an-page-names" > "$2"
