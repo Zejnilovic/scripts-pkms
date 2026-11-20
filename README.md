@@ -83,7 +83,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
 | `links --external [note]` | Each web address in the notes, outside code, as `path:line: address` |
 | `cycle [name] [--date D] [--json]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
-| `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--under <note>] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `since --seen` marks where the next `since last` starts |
+| `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `--sum` adds up the time spent: entries timed as a range, such as `09:00-11:30`, and durations such as `(1h30)`. `since --seen` marks where the next `since last` starts |
 | `close [--cycle name] [--date D] [--quarter] [--json]` | The close of the period holding yesterday: tasks, open questions, what is due, marked entries, names with no note, quiet projects and people, and ideas |
 | `get <name>[#Section] [--lines a-b] [--plain]` | A note, or one section of it, between `<<<note` and `>>>end` lines. `--plain` prints it to paste for someone outside the vault: links as their text or the note's title, without the source links, the markers or struck lines |
 | `post <path:line[-line]> <note>[#Section]` | Copies those lines verbatim into the section, with `([[day]])` after the last one |

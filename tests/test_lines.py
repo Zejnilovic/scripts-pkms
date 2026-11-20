@@ -81,6 +81,18 @@ class LineRecords(VaultCase):
         self.assertEqual(rows["notes/x.md:3"][2], "due 2026-11-12")
         self.assertEqual(rows["notes/x.md:4"][2], "due 2026-11-13")
 
+    def test_time_spent_is_a_duration_marker_or_a_range_at_the_start(self):
+        self.write("daybook/2026/11/2026-11-16.md", "# 2026-11-16\n\n- 09:00-11:30 Workshop\n- 11:45 Call (40m)\n"
+                   "- 13:00 Lunch\n- 25:00-26:00 Not a time\n- 10:00-10:00 Nothing\n- Talk (1h5) (2 h)\n"
+                   "- 14:00–15:00 With an en dash (1h)\n")
+        rows = self.records()
+        p = "daybook/2026/11/2026-11-16.md"
+        self.assertEqual(rows[f"{p}:3"][:3], ["entry", "", ""])
+        self.assertEqual(rows[f"{p}:4"][:3], ["entry", "", "40m"])
+        self.assertEqual(rows[f"{p}:9"][:3], ["entry", "", "1h"])
+        for n in (5, 6, 7, 8):
+            self.assertNotIn(f"{p}:{n}", rows)
+
 
 if __name__ == "__main__":
     unittest.main()

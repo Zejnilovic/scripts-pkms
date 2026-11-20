@@ -66,7 +66,7 @@ command_options() {
     tasks) echo "--all --link --for --under --stale --json --abs --limit" ;;
     day) echo "--edit" ;;
     cycle) echo "--date --json" ;;
-    since) echo "--about --under --seen --json --limit" ;;
+    since) echo "--about --under --seen --sum --json --limit" ;;
     close) echo "--cycle --date --quarter --json" ;;
     add) echo "--day --file" ;;
     todo) echo "--due --high --low --waiting --someday --start --every --in" ;;

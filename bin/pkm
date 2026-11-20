@@ -71,7 +71,7 @@
 #   cycle [name] [--date D] [--json]
 #                                 the period of a cycle holding a date (today): name, first and last day; cycles are set in
 #                                 .pkm/config as cycle_<name>=2w from <weekday|date> or cycle_<name>=1m from <day 1-28|date>
-#   since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]
+#   since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]
 #                                 what happened since then, in sections: notes, log, tasks, marked, names; since --seen
 #                                 marks where the next since last starts (.pkm/state)
 #   recall [note] [--json] [--limit n]

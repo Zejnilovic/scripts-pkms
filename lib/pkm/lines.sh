@@ -1,15 +1,17 @@
 # shellcheck shell=bash
 # shellcheck source=globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/lines.sh: the line scanner. One awk pass over the vault yields every line that carries a marker, and every
-# task, as a record that tasks, upcoming, close and check filter. A line in code or frontmatter, a struck line, a heading,
+# lib/pkm/lines.sh: the line scanner. One awk pass over the vault yields every line that carries a marker, every entry
+# whose time is a range, and every task, as a record that tasks, upcoming, close and check filter. A line in code or frontmatter, a struck line, a heading,
 # and a box in a note of type: list are never records. Sourced by bin/pkm. Defines functions only.
 
 # awk_markers: the awk functions that read a record's markers (field 5: the text inside each pair of parentheses whose
 # first word is a marker key, in the order written, separated by tabs). mval(m, key) is the value of the first
 # "(key …)" ("" when there is none), mhas(m, key) is 1 when one is written with a value or a space, and mflag(m, key) is 1
 # when "(key)" is written alone. line_markers(s) is the markers field of a line's text: (at …) and (@ …) count only with a
-# value after them (at_value), and (@ …) is recorded as (at …); (for …) only with a link or a writer's name (for_value).
+# value after them (at_value), and (@ …) is recorded as (at …); (for …) only with a link or a writer's name (for_value);
+# a duration, (1h30), (1h) or (40m), is recorded as written (duration_value). spent(kind, m, t) is the time a record
+# says was spent, in minutes: its first duration, else the range its text starts with (range_minutes), and 0 for an event.
 awk_markers() {
   cat <<'AWK'
 function mval(m, key,   n, a, i) {
@@ -36,9 +38,39 @@ function line_markers(s,   out, i, rest, j, c, key, sp) {
     if (key == "@") { c = "at" substr(c, 2); key = "at" }
     if (key == "at" && !at_value(substr(c, 4))) continue
     if (key == "for" && !for_value(substr(c, 5))) continue
-    if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip|for)$/) out = out (out == "" ? "" : "\t") c
+    if (key ~ /^(due|start|waiting|someday|high|low|done|dropped|recall|at|every|until|skip|for)$/ || \
+        (key == c && duration_value(c) != "")) out = out (out == "" ? "" : "\t") c
   }
   return out
+}
+# duration_value(c): the minutes of a duration, <h>h, <h>h<mm> (mm two digits, below 60) or <m>m, or "" for anything else.
+function duration_value(c) {
+  if (c ~ /^[0-9]+m$/) return substr(c, 1, length(c) - 1) + 0
+  if (c ~ /^[0-9]+h$/) return substr(c, 1, length(c) - 1) * 60
+  if (c ~ /^[0-9]+h[0-5][0-9]$/) return substr(c, 1, index(c, "h") - 1) * 60 + substr(c, index(c, "h") + 1)
+  return ""
+}
+# range_minutes(t): the minutes of the range a line's text starts with, after its list mark and box, as in
+# "- 09:00-11:30 Workshop" (the dash may be an en dash); a range that ends before it starts ends the next day. 0 when
+# the line starts with none, or its start and end are the same.
+function range_minutes(t,   b, s, r, dash, e, d) {
+  b = t; sub(/^[-*+] (\[.\] )?/, "", b)
+  if (b !~ /^([01][0-9]|2[0-3]):[0-5][0-9]/) return 0
+  s = substr(b, 1, 5); r = substr(b, 6); dash = "\342\200\223"
+  if (substr(r, 1, 1) == "-") r = substr(r, 2)
+  else if (index(r, dash) == 1) r = substr(r, length(dash) + 1)
+  else return 0
+  e = substr(r, 1, 5)
+  if (e !~ /^([01][0-9]|2[0-3]):[0-5][0-9]$/ || (length(r) > 5 && substr(r, 6, 1) != " ")) return 0
+  d = (substr(e, 1, 2) * 60 + substr(e, 4, 2)) - (substr(s, 1, 2) * 60 + substr(s, 4, 2))
+  if (d < 0) d += 1440
+  return d
+}
+function spent(kind, m, t,   n, a, i, v) {
+  if (kind == "event") return 0
+  n = split(m, a, "\t")
+  for (i = 1; i <= n; i++) if ((v = duration_value(a[i])) != "") return v
+  return range_minutes(t)
 }
 # for_value(v): 1 for a link, or the name of a writer of the vault's day pages (PKM_WRITERS, set by vault_writers).
 function for_value(v,   w) {
@@ -62,7 +94,8 @@ AWK
 # its frontmatter, or empty), 10 the text: the line without its indent, tabs as spaces.
 # A line with (recall …) is a question, box or not (check reports the box). Another box line is a task. Without a box,
 # a line with (at …) or (@ …) followed by a value (a date, a weekday, today, tomorrow or +…) is an event, and any other
-# line with a marker is an entry. The keys are those of docs/format.md 7.5.
+# line with a marker, or whose time is a range (time spent: - 09:00-11:30 …), is an entry. The keys are those of
+# docs/format.md 7.5.
 awk_lines() {
   cat <<'AWK'
   function emoji_date(s,   i, m, rest, v) {
@@ -99,9 +132,10 @@ awk_lines() {
       if (state != "") body = substr(t, 7)
     } else if (t ~ /^[-*+] /) body = substr(t, 3)
     if (substr(body, 1, 2) == "~~") next
-    if (state == "" && index(t, "(") == 0) next
+    ranged = (state == "" && t ~ /^[-*+] [0-2][0-9]:[0-5][0-9]/ && range_minutes(t) > 0)
+    if (state == "" && index(t, "(") == 0 && !ranged) next
     m = line_markers(t)
-    if (state == "" && m == "") next
+    if (state == "" && m == "" && !ranged) next
     if (mval(m, "due") == "") { e = emoji_date(t); if (e != "") m = m (m == "" ? "" : "\t") "due " e }
     if (mhas(m, "recall")) kind = "question"
     else if (state != "") kind = "task"

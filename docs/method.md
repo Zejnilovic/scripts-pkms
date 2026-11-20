@@ -116,6 +116,8 @@ A task can say more at the end of its line: `(due 2026-11-20)`, `(high)`, `(wait
 
 **Whose move it is.** A task is yours, and in a shared vault it is the writer's whose page it is on. When someone else does it, or a question is someone else's to decide, end the line with `(for <who>)`: a link to their note, `- [ ] Draft the release plan (for [[jane-doe]]) (due 2026-11-25)`, or a writer's name in a shared vault, `- Should we put a stair rail in before [[nana]]'s visit? (for sam)`. `pkm tasks --for sam` lists Sam's moves, and the close gathers everything that is someone's under their name, so a promise made to you is chased like a wait.
 
+**Time spent.** When you want to know how long something took, write the entry's time as a range, or end the line with how long it took: `(1h30)`, `(1h)` or `(40m)`. Had Jane's review of the release plan taken the afternoon, the work vault's entry would read `- 13:00-15:30 [[jane-doe]] shared her release plan: solid on scope, thin on risks`. A range at the start of an entry is time spent; `(at …)` is a time something will happen. `pkm since sprint --about apollo --sum` adds up the time spent on Apollo since the sprint began.
+
 A task stays where you wrote it; nothing copies it forward. Because a page is a record, an entry you forgot to mark stays as it is. At the close, you write the task on today's page instead, quoting the entry and linking its day: `- [ ] I'll send them the revised timeline by Thursday ([[2026-11-10]])`.
 
 **When something stops being true**, strike it through and link the day you learned it. In the family vault, the bathroom's note said the plumber could start in December, until he called to say he couldn't:
@@ -541,6 +543,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | See the shape of the vault | `pkm overview` | Search for `type: area` and for `part_of: home` |
 | Find by words | `pkm find mobile app` | Your editor's search across the folder |
 | See a note's history | `pkm backlinks apollo` | Search for `[[apollo`, and read the lines under a heading that has it |
+| Add up the time spent on something | `pkm since sprint --about apollo --sum` | Search the sprint's pages for `[[apollo`, and add up the ranges and durations |
 | Share a section with someone outside the vault | `pkm get apollo#Now --plain` | Copy the section, and take out the links to day pages and the markers |
 | See the work of an area | `pkm tasks --under home` | Open each note of the area, and search the day pages for links to them |
 | Rename a note, fixing every link to it | `pkm rename joe-bloggs joe-bloggs-plumber` | Rename the file, add the old name to `aliases:`, and fix each `[[joe-bloggs` you find |
@@ -587,6 +590,7 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | An event that comes back | An event in a note with `(every <number><unit>)`, the unit `d`, `w`, `m` or `y`, counted from the date in its `(at …)`; `(until <date>)` ends it, and `(skip <date>)` takes out one time; never in a task box | `(at 2026-11-03 17:00-18:00) (every 1w) (skip 2026-11-17)` |
 | A question | An entry ending in `?`, before its markers | `- Should we take the car or the train?` |
 | Whose move it is | `(for [[<name>]])` on a task or a question, or `(for <writer>)` in a shared vault | `- [ ] Book the boiler service (for sam)` |
+| Time spent | An entry whose time is a range, `- HH:MM-HH:MM <text>`, or a duration at its end, `(<h>h<mm>)`, `(<h>h)` or `(<m>m)`; the duration counts when a line has both | `- 13:00-15:30 [[jane-doe]] shared her release plan`, `(40m)` |
 | A decision | An entry starting `Decided:` | `- Decided: we cut the mobile app` |
 | Important | An entry starting `!` after the time | `- 09:12 ! Acme may cancel` |
 | An idea | An entry starting `Idea:` after the time | `- 12:40 Idea: a photo book of the summer` |

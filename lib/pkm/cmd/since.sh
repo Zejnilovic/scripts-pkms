@@ -1,15 +1,15 @@
 # shellcheck shell=bash
 # shellcheck source=../globals.sh
 . "$pkm_home/lib/pkm/globals.sh"
-# lib/pkm/cmd/since.sh: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]: what happened from
+# lib/pkm/cmd/since.sh: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]: what happened from
 # a date to today, in the day pages of every writer, as sections: == notes (created in the range), == log (every line),
 # == tasks (overdue, and waiting, each with its days), == marked (! Decided: Idea: entries and questions) and == names (the
 # names linked, with their count and last day). Only sections with lines are printed; with none, "Nothing since <date>."
 # and exit 1. last starts on the date in .pkm/state (set by since --seen, with its time), or the last 7 days; on that date it
 # leaves out the entries timed at or before the stored time, and keeps untimed lines. N is today and the N-1 days
 # before. --about NAME keeps the lines about NAME (about.sh): those that link it, a ### heading's links included.
-# --under <note> keeps the lines of the notes in its tree, and the day page lines about one of them (tree.sh). Sourced by
-# bin/pkm.
+# --under <note> keeps the lines of the notes in its tree, and the day page lines about one of them (tree.sh). --sum
+# keeps the lines that say how long something took, and adds their total (since_sum). Sourced by bin/pkm.
 
 # since_build <start>: the records of the sections, US-separated: section, sort keys, path, line, text, state, days, name,
 # count, last, label. Reads $tmp/dg-names, $tmp/dg-pages and $tmp/since-tasks; the environment has ABOUT, TODAY and US,
@@ -143,6 +143,39 @@ since_notes() {
   ' -v US="$US"
 }
 
+# since_sum <start> <json yes|no> <limit>: the == log lines of $tmp/since-records that say how long something took
+# (spent, lines.sh), as path:line: <duration>: text, then "Total: <duration> in N lines"; or as JSON Lines with minutes,
+# and a last {kind: total}. --limit applies to the lines, with the footer on stderr; the total counts them all. With
+# none, "Nothing timed since <start>." and exit 1.
+since_sum() {
+  local US
+  US=$(printf '\037')
+  line_records no | awk -F "$US" "$(awk_markers)"'{ v = spent($3, $5, $10); if (v > 0) print $1 ":" $2 "\t" v }' \
+    > "$tmp/since-spent"
+  awk -F "$US" -v OFS="$US" '
+    FILENAME == ARGV[1] { split($0, f, "\t"); mins[f[1]] = f[2]; next }
+    $1 == "2log" && (($5 ":" $6) in mins) { print $5, $6, mins[$5 ":" $6], $7 }
+  ' "$tmp/since-spent" "$tmp/since-records" > "$tmp/since-timed"
+  if [ ! -s "$tmp/since-timed" ]; then
+    [ "$2" = yes ] || echo "Nothing timed since $1."
+    return 1
+  fi
+  if [ "$2" = yes ]; then
+    awk -F "$US" -v OFS="$US" -v limit="$3" '{ n++; total += $3; if (n <= limit) print "time", $1, $2, $4, $3 }
+      END { print "total", "", "", "", total }' "$tmp/since-timed" | jq -R -c 'split("\u001f") as $f
+      | {kind: $f[0], path: (if $f[1] == "" then null else $f[1] end), line: (if $f[2] == "" then null else ($f[2] | tonumber) end),
+         text: (if $f[3] == "" then null else $f[3] end), minutes: ($f[4] | tonumber)}'
+    return 0
+  fi
+  awk -F "$US" -v limit="$3" '
+    function dur(m) { return (m < 60) ? m "m" : (m % 60 == 0) ? int(m / 60) "h" : int(m / 60) "h" sprintf("%02d", m % 60) }
+    { n++; total += $3; if (n <= limit) print $1 ":" $2 ": " dur($3) ": " $4 }
+    END {
+      if (n > limit) printf "... %d more (use --limit)\n", n - limit > "/dev/stderr"
+      print "Total: " dur(total) " in " n " " (n == 1 ? "line" : "lines")
+    }' "$tmp/since-timed"
+}
+
 # under_keep_notes: the notes section records (from since_notes, on stdin) of the notes in $tmp/under-paths.
 under_keep_notes() {
   local US
@@ -151,22 +184,23 @@ under_keep_notes() {
 }
 
 cmd_since() {
-  local arg="" about="" under="" seen=no limit="" json=no start US ABOUT TODAY
+  local arg="" about="" under="" seen=no sum=no limit="" json=no start US ABOUT TODAY
   US=$(printf '\037')
   while [ $# -gt 0 ]; do
     case $1 in
       --seen) seen=yes; shift ;;
       --json) json=yes; shift ;;
+      --sum) sum=yes; shift ;;
       --about) [ $# -ge 2 ] || die 2 "--about needs a name"; about=$2; shift 2 ;;
       --under) [ $# -ge 2 ] && [ -n "$2" ] || die 2 "--under needs a note, such as apollo"; under=$2; shift 2 ;;
       --limit) [ $# -ge 2 ] || die 2 "--limit needs a whole number"; number "$2" "--limit"; limit=$2; shift 2 ;;
-      *) [ -z "$arg" ] || die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]"; arg=$1; shift ;;
+      *) [ -z "$arg" ] || die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]"; arg=$1; shift ;;
     esac
   done
   TODAY=$today
   [ "$json" = no ] || need_jq
   if [ "$seen" = yes ]; then
-    [ -z "$arg" ] && [ -z "$about" ] && [ -z "$under" ] && [ "$json" = no ] && [ -z "$limit" ] || die 2 "pkm since --seen takes no other argument."
+    [ -z "$arg" ] && [ -z "$about" ] && [ -z "$under" ] && [ "$sum" = no ] && [ "$json" = no ] && [ -z "$limit" ] || die 2 "pkm since --seen takes no other argument."
     local seen_time
     seen_time="${now:8:2}:${now:10:2}"
     state_write_since "$today" "$seen_time" || exit $?
@@ -188,7 +222,7 @@ cmd_since() {
   elif cycle_known "$arg"; then
     start=$(cycle_period "$arg" "$(day_add "$today" -1)" | cut -d ' ' -f 1)
   else
-    die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--limit n] [--json]: $arg is none of them"
+    die 2 "Usage: pkm since [last | YYYY-MM-DD | N | cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]: $arg is none of them"
   fi
   ABOUT=""
   [ -z "$about" ] || ABOUT=$(about_key "$about")
@@ -204,6 +238,7 @@ cmd_since() {
     UNDER=$under UNDER_PATHS="$tmp/under-paths" UNDER_LINES="$tmp/under-lines" ABOUT=$ABOUT TODAY=$today US=$US \
       SEEN_TIME=$SEEN_TIME since_build "$start"
   } | LC_ALL=C sort -t "$US" -k1,1 -k2,2 -k3,3 -k4,4 > "$tmp/since-records"
+  if [ "$sum" = yes ]; then since_sum "$start" "$json" "$limit"; return; fi
   if [ ! -s "$tmp/since-records" ]; then
     [ "$json" = yes ] || echo "Nothing since $start."
     return 1
