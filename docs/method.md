@@ -25,6 +25,8 @@ flowchart LR
 
 You **log** on today's page and **mark** what needs something as you write. Later you **post** the entries that matter into the notes they are about. Once a week, or once a cycle of your own, you **close**: you decide on everything still open. At any time you **find** things by name, by link or by words, never by remembering where you put them.
 
+[The method in five minutes](five-minutes.md) is the same on one sheet, to print.
+
 Eight words carry the method:
 
 | Term | Meaning |

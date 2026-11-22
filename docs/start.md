@@ -1,6 +1,6 @@
 # First steps
 
-Six commands get you going, and the rest can wait until you need it. This page goes from installing pkm to your first close, in the order you will need each step. [The method](method.md) explains why each step works this way.
+Six commands get you going, and the rest can wait until you need it. This page goes from installing pkm to your first close, in the order you will need each step. [The method](method.md) explains why each step works this way, and [the method in five minutes](five-minutes.md) puts it on one sheet.
 
 ## 1. Install pkm and check it
 

@@ -31,7 +31,7 @@ pkm tasks                                  # open tasks: overdue, due soon, wait
 pkm close                                  # what the week leaves open; pkm new close writes the page
 ```
 
-pkm finds the vault from the current folder upward, or from `--vault <folder>`, `PKM_VAULT`, or a named vault. The [Daybook Method](docs/method.md#the-practice) explains the pages. [First steps](docs/start.md) goes from installing to your first close, and `pkm example` copies an example vault to try the commands on.
+pkm finds the vault from the current folder upward, or from `--vault <folder>`, `PKM_VAULT`, or a named vault. The [Daybook Method](docs/method.md#the-practice) explains the pages, and [the method in five minutes](docs/five-minutes.md) fits it on one sheet. [First steps](docs/start.md) goes from installing to your first close, and `pkm example` copies an example vault to try the commands on.
 
 ## Several vaults
 

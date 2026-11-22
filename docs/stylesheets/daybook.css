@@ -421,3 +421,36 @@ body::before {
   .db-glossary > div:nth-child(2n) { padding-left: 0; border-left: 0; }
   .db-wrap { padding: 0 .8rem; }
 }
+
+/* ---------- Print: ink on white paper, compact, so a short page fits on one sheet ---------- */
+@media print {
+  @page { margin: 14mm 16mm; }
+  [data-md-color-scheme] {
+    --db-paper: #fff;
+    --db-paper-2: #fff;
+    --db-paper-3: #eee;
+    --db-ink: #000;
+    --db-ink-2: #333;
+    --db-ink-3: #666;
+    --db-blue: #000;
+    --db-red: #000;
+    --db-rule: #bbb;
+    --db-grain-opacity: 0;
+  }
+  body::before { display: none; }
+  html, body, .md-container { height: auto; min-height: 0; }
+  .md-main__inner, .md-content__inner { margin: 0; padding: 0; }
+  .md-content__inner > :first-child { margin-top: 0; }
+  .md-typeset { font-size: 9.5pt; line-height: 1.4; }
+  .md-typeset h1 { font-size: 20pt; margin: 0 0 .3em; }
+  .md-typeset h2 { font-size: 13pt; margin: 1em 0 .4em; padding-top: .35em; break-after: avoid; }
+  .md-typeset h3 { font-size: 11pt; margin: .9em 0 .3em; break-after: avoid; }
+  .md-typeset :is(p, ul, ol, table, pre, blockquote) { margin-top: .4em; margin-bottom: .4em; }
+  .md-typeset :is(ul, ol) li { margin-bottom: .15em; }
+  .md-typeset :is(li, tr, pre) { break-inside: avoid; }
+  .md-typeset table:not([class]) { font-size: 8.5pt; }
+  .md-typeset table:not([class]) :is(th, td) { padding: .3em .6em; }
+  .md-typeset code { padding: 0 .15em; font-size: .9em; }
+  .md-typeset a { color: inherit; text-decoration: none; }
+  .md-typeset .headerlink, .db-screen-only, .db-sibling { display: none; }
+}
