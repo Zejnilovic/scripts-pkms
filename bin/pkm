@@ -90,6 +90,9 @@
 #                                 a day page, a source note, or path:line; --verify checks the links and lines exist
 #   init                          sets up a vault in this folder, or in the one --vault names: .pkm/config, .pkm/.gitignore, .pkmignore; refuses
 #                                 to overwrite any of them
+#   example [<name>] [<folder>]   copies an example vault that ships with pkm, work (the default) or family, into a new
+#                                 folder (pkm-example-<name>), to try the commands on a vault with weeks in it; its
+#                                 .pkm/config sets now, so it opens on its own day. Refuses a folder that exists (exit 1)
 #   vault                         the vault's folder
 #   vaults [--json]               the named vaults of the user config, each with ok or missing
 #   config [<key>]                every setting with its value and where it comes from (vault, user or default), or one
@@ -225,6 +228,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/completion.sh"
 # shellcheck source=../lib/pkm/cmd/help.sh
 . "$pkm_home/lib/pkm/cmd/help.sh"
+# shellcheck source=../lib/pkm/cmd/example.sh
+. "$pkm_home/lib/pkm/cmd/example.sh"
 # shellcheck source=../lib/pkm/cmd/find.sh
 . "$pkm_home/lib/pkm/cmd/find.sh"
 # shellcheck source=../lib/pkm/cmd/init.sh
@@ -259,8 +264,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/pkm.XXXXXX") || exit 2
 trap 'rm -rf "$tmp"' EXIT
 
-# Options before the command say which vault to use. help, version, init, vaults, doctor and completion work outside a
-# vault.
+# Options before the command say which vault to use. help, version, init, vaults, doctor, completion and example work
+# outside a vault.
 vault_option="" vault_name="" across=no across_names=""
 while [ $# -gt 0 ]; do
   case $1 in
@@ -285,8 +290,8 @@ fi
 if is_builtin "$command"; then check_options "$command" "$@"; fi
 if [ "$across" = yes ]; then cmd_across "$across_names" "$command" "$@"; exit $?; fi
 case "$command" in
-  help|-h|--help|version|--version|init|vaults|doctor|completion) ;;
-  *) { find_vault && cd "$vault"; } || exit 2 ;;
+  help|-h|--help|version|--version|init|vaults|doctor|completion|example) ;;
+  *) { find_vault && cd "$vault"; } || exit 2; vault_clock ;;
 esac
 
 case $command in
@@ -324,6 +329,7 @@ case $command in
   links) output_command links "$@" ;;
   doctor) cmd_doctor ;;
   init) cmd_init ;;
+  example) cmd_example "$@" ;;
   vault) cmd_vault ;;
   vaults) cmd_vaults "$@" ;;
   config) cmd_config "$@" ;;

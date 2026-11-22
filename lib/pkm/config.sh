@@ -17,6 +17,7 @@ cycle_<name>|vault|-|A cycle of your own: <N>w from a weekday (1w only) or a dat
 cross_vault|vault|no|yes lets an agent working in another of your vaults read this one, for a brief across vaults.
 templates|vault|templates|The folder of this vault's own templates, relative to the vault.
 folder_<type>|vault|notes|The folder that new notes of this type go in.
+now|vault|-|Fixes the clock of this vault at YYYY-MM-DD HH:MM, so pkm works as if it were then. The example vaults set it; PKM_NOW wins over it.
 due_soon_days|both|7|The tasks due within this many days, after the overdue ones, come first in pkm tasks.
 waiting_days|both|7|A task waiting for longer than this many days comes after the due soon ones in pkm tasks.
 limit|both|30|The most listed lines a command prints before the footer; --limit sets it for one run.
@@ -111,6 +112,21 @@ config() {
   config_with_source "$1" "$2" | cut -f1
 }
 
+# vault_clock: in the vault's folder, its now setting fixes the clock (now, today and clock), unless PKM_NOW is set.
+vault_clock() {
+  local value
+  [ -z "${PKM_NOW:-}" ] || return 0
+  value=$(file_value .pkm/config now)
+  [ -n "$value" ] || return 0
+  case $value in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' '[0-9][0-9]:[0-9][0-9]) ;;
+    *) die 2 "now in .pkm/config must look like YYYY-MM-DD HH:MM, got: $value" ;;
+  esac
+  now="${value:0:4}${value:5:2}${value:8:2}${value:11:2}${value:14:2}00"
+  today=${value:0:10}
+  clock=${value:11:5}
+}
+
 # config_problems <file> <vault|user>: one line per problem in a settings file, as path:line: text. Checks each line
 # is key=value, the key is a setting of this file's kind, and the value is one that setting accepts.
 config_problems() {
@@ -144,6 +160,11 @@ config_problems() {
         case $value in
           ''|*[!0-9]*) echo "$file:$n: $key is a whole number of 1 or more, got: $value" ;;
           *) [ "$value" -ge 1 ] || echo "$file:$n: $key is a whole number of 1 or more, got: $value" ;;
+        esac ;;
+      now)
+        case $value in
+          [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' '[0-9][0-9]:[0-9][0-9]) ;;
+          *) echo "$file:$n: now is YYYY-MM-DD HH:MM, got: $value" ;;
         esac ;;
       close)
         if [ "$value" != week ] && ! printf '%s\n' "$cycles" | grep -qx "cycle_${value}"; then

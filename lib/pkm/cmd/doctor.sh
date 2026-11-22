@@ -35,6 +35,9 @@ cmd_doctor() {
   else
     echo "settings  .pkm/config and the user config are fine (pkm config shows them)"
   fi
+  if [ -n "$found" ] && [ -n "$(file_value "$found/.pkm/config" now)" ]; then
+    echo "clock     now=$(file_value "$found/.pkm/config" now) in .pkm/config fixes the clock: pkm works as if it were then"
+  fi
   if [ -n "$doctor_missing" ]; then echo "Install what's missing, for example: brew install$doctor_missing"; fi
   [ "$doctor_failed" = 0 ] || return 1
 }

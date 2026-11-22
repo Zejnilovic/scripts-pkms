@@ -31,7 +31,7 @@ pkm tasks                                  # open tasks: overdue, due soon, wait
 pkm close                                  # what the week leaves open; pkm new close writes the page
 ```
 
-pkm finds the vault from the current folder upward, or from `--vault <folder>`, `PKM_VAULT`, or a named vault. The [Daybook Method](docs/method.md#the-practice) explains the pages.
+pkm finds the vault from the current folder upward, or from `--vault <folder>`, `PKM_VAULT`, or a named vault. The [Daybook Method](docs/method.md#the-practice) explains the pages. [First steps](docs/start.md) goes from installing to your first close, and `pkm example` copies an example vault to try the commands on.
 
 ## Several vaults
 
@@ -89,6 +89,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `post <path:line[-line]> <note>[#Section]` | Copies those lines verbatim into the section, with `([[day]])` after the last one |
 | `strike <path:line>` | Wraps the line in `~~` and adds `([[today's page]])`, for a line that is no longer true |
 | `init` | Sets up a vault in this folder: `.pkm/config`, `.pkm/.gitignore` and `.pkmignore`. Never overwrites them |
+| `example [<name>] [<folder>]` | Copies an example vault that ships with pkm, `work` (the default) or `family`, into a new folder, `pkm-example-<name>`. Its `.pkm/config` sets `now`, so it opens on its own day. Never writes into a folder that exists |
 | `vault`, `vaults [--json]` | The vault's folder; the named vaults in your config, each `ok` or `missing` |
 | `config [<key>]` | Every setting with its value and where it comes from |
 | `recall [note]`, `recall <path:line> yes\|no`, `recall add <note> <question>` | The recall questions due today or earlier, as `path:line: text`, oldest first. `recall <path:line> yes` moves a question up the ladder (1, 3, 7, 14, 30, 60, 120 days) and `no` back to 1 day. `recall add` writes a question at the end of a note's `## Questions`, due tomorrow, with its answers indented below. A question ends with `(recall YYYY-MM-DD <N>d)` |

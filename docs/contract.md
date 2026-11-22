@@ -38,6 +38,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `strike` | Notes | strikes a line through when it is no longer true, linking today's page | no |
 | `doctor` | Setup | the tools pkm uses, and the settings | no |
 | `init` | Setup | sets up a vault: .pkm/config, .pkm/.gitignore and .pkmignore | no |
+| `example` | Setup | copies an example vault that ships with pkm into a new folder; prints the folder, then what to try; exit 1 when the folder exists | no |
 | `vault` | Setup | the vault's folder | no |
 | `vaults` | Setup | the named vaults of the user config | no; `--json` gives `name`, `path` and `state` |
 | `config` | Setup | every setting, its value and where it comes from | no |

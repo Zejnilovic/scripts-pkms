@@ -134,6 +134,8 @@ cmd_complete() {
     templates:0) echo eject ;;
     templates:1) [ "$first" != eject ] || complete_types ;;
     completion:0) printf '%s\n' bash zsh ;;
+    example:0) example_names ;;
+    example:1) echo :dirs ;;
   esac
   return 0
 }

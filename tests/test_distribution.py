@@ -65,6 +65,9 @@ class Makefile(unittest.TestCase):
             for name in PACKED:
                 self.assertIn(f"pkm-{VERSION}/{name}", names)
             self.assertIn(f"pkm-{VERSION}/bin/pkm", names)
+            self.assertIn(f"pkm-{VERSION}/share/pkm/examples/work/.pkm/config", names)
+            self.assertIn(f"pkm-{VERSION}/share/pkm/examples/family/.pkm/config", names)
+            self.assertFalse([n for n in names if "/.pkm/cache" in n or n.endswith("/.pkm/state")], names)
             self.assertFalse([n for n in names if "/tests/" in n or "/packaging/" in n], names)
 
     def test_make_check_runs_the_checks_and_the_tests(self):

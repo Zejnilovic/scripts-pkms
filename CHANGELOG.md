@@ -8,6 +8,9 @@ Version numbers: **major** when a command, option, output format, note name, lin
 
 - `pkm help <command>` and `pkm <command> --help` print one command: its summary, its usage and its options. They work outside a vault, and `pkm help <Tab>` completes the command names. An unknown option now points to `pkm help <command>`.
 - The site has a command reference, [docs/commands.md](docs/commands.md), made from `pkm help` by `scripts/commands.py`; `scripts/check.py` fails when it is out of date.
+- `pkm example [<name>] [<folder>]` copies an example vault, work or family, into a new folder to try the commands on. The examples ship with pkm in `share/pkm/examples`: `make install` and `make dist` copy them there, and nothing is downloaded.
+- The `now` vault setting fixes a vault's clock at `YYYY-MM-DD HH:MM`; `PKM_NOW` wins over it. The example vaults set it, so they open on their own day, and `pkm doctor` says when it is set.
+- The site has a First steps page, [docs/start.md](docs/start.md): from installing to an example vault, your own vault and your first close, and the tools that go well with pkm.
 - Fix: `pkm help --all` cut a summary at its first `|`, so recall's summary ended at `yes`.
 
 ## Released

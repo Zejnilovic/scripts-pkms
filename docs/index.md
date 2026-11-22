@@ -45,4 +45,6 @@ The first five minutes are the whole start. Leave notes, links and the close unt
     pkm close                                  # what the week leaves open
     ```
 
-[Read the method](method.md){ .md-button .md-button--primary } [Browse the example vaults](examples/README.md){ .md-button }
+    [First steps](start.md) goes on from there: an example vault to try the commands on, your own vault, and your first close.
+
+[Read the method](method.md){ .md-button .md-button--primary } [First steps with pkm](start.md){ .md-button } [Browse the example vaults](examples/README.md){ .md-button }

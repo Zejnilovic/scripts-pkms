@@ -374,6 +374,16 @@ init                          sets up a vault in this folder, or in the one --va
                               to overwrite any of them
 ```
 
+### example
+
+Copies an example vault that ships with pkm into a new folder, to try the commands on.
+
+```text
+example [<name>] [<folder>]   copies an example vault that ships with pkm, work (the default) or family, into a new
+                              folder (pkm-example-<name>), to try the commands on a vault with weeks in it; its
+                              .pkm/config sets now, so it opens on its own day. Refuses a folder that exists (exit 1)
+```
+
 ### vault
 
 The vault's folder.

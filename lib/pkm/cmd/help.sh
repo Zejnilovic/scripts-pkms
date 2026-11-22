@@ -36,6 +36,7 @@ post|Notes|copies lines of a page into a note's section, with the page as their 
 strike|Notes|strikes a line through when it is no longer true, and links today's page
 doctor|Setup|the tools pkm uses, and the settings
 init|Setup|sets up a vault: .pkm/config, .pkm/.gitignore and .pkmignore
+example|Setup|copies an example vault that ships with pkm into a new folder, to try the commands on
 vault|Setup|the vault's folder
 vaults|Setup|the named vaults of the user config
 config|Setup|every setting, its value and where it comes from
