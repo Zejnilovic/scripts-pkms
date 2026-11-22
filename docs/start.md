@@ -42,6 +42,14 @@ pkm find Apollo                                         # every line with that w
 
 You can also write in the day's page with any editor: pkm reads what you write, the same as what it writes. Commands work from any folder inside the vault.
 
+To use the vault from anywhere else too, say from a project you are working in, name it in your user config once:
+
+```bash
+mkdir -p ~/.config/pkm && echo 'vault=~/notes' >> ~/.config/pkm/config
+```
+
+Then `pkm add "…"` writes to `~/notes` from any folder, and prints where it wrote. A vault above the current folder still comes first. With more than one vault, name each one, as in `vault_work=~/work-notes`, and choose with `pkm -V work add "…"`; [the README](../README.md#several-vaults) has more.
+
 ## 4. Let notes come when they are needed
 
 Don't plan folders or notes up front. When a person, a project or a topic keeps coming up, give it a note and link to it:
