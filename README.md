@@ -57,7 +57,7 @@ The files pkm reads are described in [docs/format.md](docs/format.md) (Format 1)
 
 ## Commands
 
-Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work from any folder in the vault.
+Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) for one command and its options, or `pkm help --all` for the list. [docs/commands.md](docs/commands.md) has each command's usage and options, as `pkm help` prints them. Commands work from any folder in the vault.
 
 | Command | Does |
 |---|---|
@@ -95,7 +95,7 @@ Run `pkm help` for the usage, or `pkm help --all` for the list. Commands work fr
 | `templates`, `templates eject <type> [--user]` | Each template and where it comes from; `eject` copies a default so you can change it |
 | `doctor` | The tools pkm uses, and the settings: what is missing or wrong |
 | `version [--require <x.y>]` | The pkm release; with `--require`, exit 0 when it is at least `x.y` |
-| `help [--all]` | The usage text, or every command with its group |
+| `help [--all \| <command>]` | The usage text, every command with its group, or one command's usage and options; `pkm <command> --help` is the same |
 | `completion bash\|zsh` | The shell's tab completion script; Homebrew installs it for you |
 
 ## Templates

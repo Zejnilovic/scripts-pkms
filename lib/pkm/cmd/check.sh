@@ -9,7 +9,7 @@ cmd_check() {
   for arg in "$@"; do
     case $arg in
       --urls) urls=yes ;;
-      *) die 2 "pkm check has no option $arg: pkm help lists the commands and their options." ;;
+      *) die 2 "pkm check has no option $arg: pkm help check lists its options." ;;
     esac
   done
   files yes '*.md' > "$tmp/notes"

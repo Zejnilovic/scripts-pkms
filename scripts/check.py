@@ -48,6 +48,10 @@ for command in commands:
     if not re.search(rf"`{command}[ `]", readme):
         problems.append(f"README.md: the command table doesn't list '{command}'")
 
+# docs/commands.md, the site's command reference, is made from pkm help by scripts/commands.py.
+if subprocess.run([sys.executable, str(REPO / "scripts/commands.py"), "--check"], capture_output=True).returncode != 0:
+    problems.append("docs/commands.md is out of date: run python3 scripts/commands.py")
+
 for path in TEMPLATES_DIR.glob("*.md"):
     if rel(path) not in readme:
         problems.append(f"README.md doesn't list {rel(path)}")

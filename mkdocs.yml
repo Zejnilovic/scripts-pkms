@@ -110,6 +110,7 @@ nav:
       - examples/work/index.md
       - examples/family/index.md
   - pkm:
+      - Commands: commands.md
       - The file format: format.md
       - The output contract: contract.md
       - Settings: settings.md

@@ -30,7 +30,7 @@ This repo is pkm, the command line for plain Markdown vaults: `bin/pkm`, its mod
 
 1. A new command or option is a minor version. Renaming or removing one, or changing what it prints, is major.
 2. Results print one per line as `path:line: text`, with paths relative to the vault. Exit 0 when it worked, 1 when a check finds problems or nothing matches, 2 for a wrong call (errors go to stderr).
-3. Every command in `pkm help --all` has a row in `docs/contract.md` (`tests/test_contract.py` checks it) and in the README's command table (`scripts/check.py` checks it). Update the usage text at the top of `bin/pkm` as well.
+3. Every command in `pkm help --all` has a row in `docs/contract.md` (`tests/test_contract.py` checks it) and in the README's command table (`scripts/check.py` checks it). Update the usage text at the top of `bin/pkm` as well, then run `python3 scripts/commands.py`: it makes `docs/commands.md`, the site's command reference, from `pkm help`, and `scripts/check.py` fails when that page is out of date.
 4. Settings: change the list in `lib/pkm/config.sh` and the table in `docs/settings.md` together. A test keeps them equal.
 5. The file format is `docs/format.md` (Format 1). A change to any of its rules is a new format number and a major version.
 
@@ -61,6 +61,6 @@ This repo is pkm, the command line for plain Markdown vaults: `bin/pkm`, its mod
 
 - **The vault is the owner's.** The script never deletes a note, never rewrites the owner's words, and only reads and writes local files. Anything that files text in bulk works like `pkm post`: the owner or an agent picks the lines, the script copies them verbatim with their source, and nothing is lost.
 - **Generic only.** No real names, places, employers or other personal facts in pkm, its tests or its docs: use made-up examples such as Jane Doe, Apollo and Acme.
-- **Docs for people** are `README.md` and `docs/` (`docs/method.md` is the why). Keep `docs/format.md`, `docs/contract.md`, `docs/settings.md` and `docs/editors.md` in step with the code.
+- **Docs for people** are `README.md` and `docs/` (`docs/method.md` is the why). Keep `docs/format.md`, `docs/contract.md`, `docs/settings.md` and `docs/editors.md` in step with the code; `docs/commands.md` is made by `scripts/commands.py`, never by hand.
 - **The site** is built from `docs/` by `mkdocs.yml` and the Docs workflow, and published to GitHub Pages. Write the docs for GitHub; `scripts/site_hooks.py` adapts their links and the example vaults for the site, and is the same file as in agentic-pkms. The home page is `docs/overrides/home.html`: when the method changes, check that its story still quotes the method and the example vaults. Preview with `pip install -r docs/requirements.txt` and `mkdocs serve`.
 - When adding, renaming or removing a command or template, update the tables in `README.md` and the usage text at the top of `bin/pkm`.

@@ -1,5 +1,6 @@
 # shellcheck shell=bash
-# lib/pkm/cmd/help.sh: pkm help: the usage text, and help --all: one line per command, name<TAB>group<TAB>summary.
+# lib/pkm/cmd/help.sh: pkm help: the usage text; help --all: one line per command, name<TAB>group<TAB>summary; help
+# <command>: that command's summary, its entries in the usage text and its options.
 # command_table is the one list of commands; docs/contract.md must describe each of them (a test checks it).
 # Sourced by bin/pkm. Defines functions only.
 
@@ -89,7 +90,7 @@ check_options() {
   allowed=" $(command_options "$key") "
   for arg in "$@"; do
     case $arg in
-      --*) case $allowed in *" $arg "*) ;; *) die 2 "pkm $command has no option $arg: pkm help lists the commands and their options." ;; esac ;;
+      --*) case $allowed in *" $arg "*) ;; *) die 2 "pkm $command has no option $arg: pkm help $command lists its options." ;; esac ;;
     esac
   done
 }
@@ -103,7 +104,31 @@ is_builtin() {
 cmd_help() {
   case ${1:-} in
     '') usage ;;
-    --all) command_table | awk -F '|' -v OFS='\t' '{ print $1, $2, $3 }'; extension_table ;;
-    *) die 2 "Usage: pkm help [--all]" ;;
+    --all) command_table | awk -F '|' -v OFS='\t' '{ name = $1; group = $2; sub(/^[^|]*[|][^|]*[|]/, ""); print name, group, $0 }'
+           extension_table ;;
+    -*) die 2 "Usage: pkm help [--all | <command>]" ;;
+    *) [ $# -eq 1 ] || die 2 "Usage: pkm help [--all | <command>]"; command_help "$1" ;;
   esac
+}
+
+# command_help <name>: "pkm <name> (<group>): <summary>", the command's entries in the usage text, and its options.
+command_help() {
+  local head options
+  head=$(command_table | NAME=$1 awk -F '|' '$1 == ENVIRON["NAME"] {
+    name = $1; group = $2; sub(/^[^|]*[|][^|]*[|]/, ""); print "pkm " name " (" group "): " $0 }')
+  if [ -z "$head" ]; then
+    head=$(extension_table | NAME=$1 awk -F '\t' '$1 == ENVIRON["NAME"] { print "pkm " $1 " (" $2 "): " $3 }')
+    [ -n "$head" ] || die 2 "pkm help: there is no command $1; pkm help --all lists them."
+    echo "$head"
+    return 0
+  fi
+  echo "$head"
+  echo
+  # An entry is a line indented by two spaces whose first word is the name, and the lines indented further below it.
+  usage | NAME=$1 awk '
+    /^  [^ ]/ { split(substr($0, 3), word, " "); on = (word[1] == ENVIRON["NAME"]); if (on) print; next }
+    /^   / { if (on) print; next }
+    { on = 0 }'
+  options=$(command_options "$1")
+  if [ -n "$options" ]; then echo; echo "Options: $options"; fi
 }

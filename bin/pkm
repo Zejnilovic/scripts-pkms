@@ -99,11 +99,12 @@
 #                                 never overwrites one (exit 1)
 #   doctor                        the tools pkm uses and the settings: what is missing or wrong (exit 1)
 #   version [--require <x.y>]     the pkm release; with --require, exit 0 when it is at least x.y, else 1 and no output
-#   help                          this text
+#   help [--all | <command>]      this text; --all lists every command as name<TAB>group<TAB>summary; <command> gives
+#                                 its summary, usage and options, the same as pkm <command> --help
 #   completion bash|zsh           the shell's tab completion script, for example in ~/.zshrc: source <(pkm completion zsh)
 #
 # Listings: find, backlinks, path, list, tasks and check take --json (JSON Lines), --abs (absolute paths) and --limit n
-# (default 30). A listing with no results exits 1. since, close, overview, upcoming, tags, cycle and vaults take --json. docs/contract.md is the interface; pkm help --all lists the commands.
+# (default 30). A listing with no results exits 1. since, close, overview, upcoming, tags, cycle and vaults take --json. docs/contract.md is the interface; pkm help --all lists the commands, docs/commands.md describes each.
 # Settings: docs/settings.md lists every key. .pkm/config is the vault's, the user's config is ~/.config/pkm/config.
 # .pkmignore in the vault hides files and folders from pkm, in gitignore syntax; .gitignore is not followed.
 # PKM_NOW=YYYYMMDDHHMMSS fixes the clock, for tests and for backfilling.
@@ -277,6 +278,10 @@ command=${1:-help}
 [ $# -gt 0 ] && shift
 # Tab completion reads the words as typed, vault options included, and never fails a Tab press.
 if [ "$command" = __complete ]; then cmd_complete "$@"; exit 0; fi
+# pkm <command> --help is pkm help <command>, outside a vault too.
+if [ "${command#-}" = "$command" ] && is_builtin "$command"; then
+  for arg in "$@"; do [ "$arg" != --help ] || { cmd_help "$command"; exit $?; }; done
+fi
 if is_builtin "$command"; then check_options "$command" "$@"; fi
 if [ "$across" = yes ]; then cmd_across "$across_names" "$command" "$@"; exit $?; fi
 case "$command" in

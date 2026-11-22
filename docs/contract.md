@@ -4,7 +4,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 
 ## Commands
 
-`pkm help --all` prints one line per command, `name<TAB>group<TAB>summary`. Each command below is in that list.
+`pkm help --all` prints one line per command, `name<TAB>group<TAB>summary`. Each command below is in that list. `pkm help <command>`, or `pkm <command> --help`, prints one command: the line `pkm <name> (<group>): <summary>`, a blank line, its entries in the usage text, and `Options: ...` when it has any; a name pkm doesn't have is a usage error (exit 2). [commands.md](commands.md) is the same for every command, on one page.
 
 | Command | Group | Does | Listing (`--json`, `--abs`, `--limit`) |
 |---|---|---|---|
@@ -43,7 +43,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `config` | Setup | every setting, its value and where it comes from | no |
 | `templates` | Setup | each template type and where it comes from | no |
 | `version` | Setup | the pkm release; --require checks a minimum | no |
-| `help` | Setup | the usage text; --all lists every command | no |
+| `help` | Setup | the usage text; --all lists every command; `help <command>` gives one command's usage and options | no |
 | `completion` | Setup | the shell's tab completion script, for `bash` or `zsh`; it calls `pkm __complete`, which is not part of the contract | no |
 
 ## Listings

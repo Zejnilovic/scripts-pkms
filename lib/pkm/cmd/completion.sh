@@ -118,7 +118,7 @@ cmd_complete() {
 
   if [ -z "$cmd" ] && [ "$across" = yes ]; then printf '%s\n' tasks upcoming since; return; fi
   case $cmd:$n in
-    :0) { command_table | cut -d '|' -f 1; extension_table | cut -f 1; } ;;
+    :0|help:0) { command_table | cut -d '|' -f 1; extension_table | cut -f 1; } ;;
     tasks:0) printf '%s\n' open waiting someday 'done' ;;
     new:0) { complete_types; echo close; } | LC_ALL=C sort -u ;;
     backlinks:0|path:0|get:0|rename:0|mv:0|links:0) complete_notes ;;
