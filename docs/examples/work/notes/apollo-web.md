@@ -1,9 +1,9 @@
 ---
 type: repo
-part_of: apollo
+part_of: acme-portal
 url: https://github.com/acme-example/apollo-web
 items: https://github.com/acme-example/apollo-web/issues/
-summary: The web app of the [[apollo]] portal
+summary: The web app of the [[acme-portal]]
 ---
 
 # apollo-web

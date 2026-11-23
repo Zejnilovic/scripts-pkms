@@ -154,7 +154,9 @@ aliases: [Apollo]
 | Area | Something you look after that never ends: a home, a car, money, your health, a team you lead, your learning | **Now**, Next time, Routines, People, Links, Ideas |
 | Person | A colleague, a child, a plumber | How to reach them at the top, Next time, then Notes, the entries posted to them; Ideas, for gifts |
 | Organization | A customer, an employer, a school | As for a person |
+| Application | Software you build or run, which outlasts its projects | **Now**, Links, Decisions, Notes; its repositories and projects are `part_of` it (see [Where a note belongs](#where-a-note-belongs)) |
 | Repository | Code you work on, on GitHub or anywhere else | **Now**, Decisions, Notes; its address in `url` and its numbered items in `items` (see [Links](#links)) |
+| Team | A team you work in or with | **Now**, Next time, People, Links, Notes |
 | List | Shopping, packing, things to take | The list itself |
 | Course | Something you study | Modules, Questions |
 | Topic, source | A subject, a book, an article | What you think, and the entries posted to them |
@@ -188,6 +190,18 @@ home           area
 
 The tree can go deeper. Going back to study for an MBA, you would make `learning` an area, the MBA a project that is `part_of: learning` and ends with the degree, and each of its courses `part_of: mba`. Everything else a note touches is a link: a strategy course can link `[[team]]` as often as it likes, and the team's backlinks find it. One parent keeps the tree something you can read, and the links carry the rest.
 
+At work, an application you build or run plays the part of the home: it lasts while its projects come and go. A note with `type: app` holds what stays true of it, such as where it runs, who owns it and the links to reach the rest, and its repositories and the projects that work on it are `part_of` it. In the work vault:
+
+```text
+acme-portal    app
+├── apollo     project
+└── apollo-web repo
+```
+
+`pkm tasks --under acme-portal` then finds the tasks of the project and of the repository, and `pkm backlinks acme-portal` lists what belongs to it. A repository or project that serves two applications belongs to its main one and links the other. An application often has numbers in other systems, such as its IDs in an asset register: put each one in `aliases`, `aliases: [Acme Portal, APP-1001, CI-2002]`, and `[[APP-1001]]` links the note as its name does. A key of your own works too: pkm keeps any frontmatter key, and `pkm list <key>=<value>` finds the notes that carry the value, also when the key holds a list.
+
+A team you work in or with gets a note with `type: team`: who is in it under **People**, where it works under **Links**, such as its team on GitHub, its board and its wiki, and **Next time** for what to raise when you meet. A team you lead, with its routines, is an area.
+
 `part_of` is optional, and it is not a folder: the note stays in `notes/` under its own name, so moving it under another parent changes one line and breaks nothing. Add it when you make the note, or at the close, or never. A note without one is simply not part of anything. pkm counts it as a link, so `pkm backlinks home` lists what belongs to the home, and `pkm rename` keeps it right. Write the name; pkm also reads `"[[home]]"`, the form some editors show as a link.
 
 A tree is also a way to look at work. `pkm tasks --under home` lists the tasks of the home and of every note in it, and the tasks on day pages that are about one of them: a line that links it, or a line under a `###` heading that does. `since`, `list` and `backlinks` take `--under` too.
@@ -207,17 +221,17 @@ Because a link names the note rather than its folder, moving a note never breaks
 ```markdown
 ---
 type: repo
-part_of: apollo
+part_of: acme-portal
 url: https://github.com/acme-example/apollo-web
 items: https://github.com/acme-example/apollo-web/issues/
-summary: The web app of the [[apollo]] portal
+summary: The web app of the [[acme-portal]]
 aliases: [acme-example/apollo-web]
 ---
 ```
 
 An item's address is the `items` line with the number added at the end, so `[[apollo-web]]#42` is `https://github.com/acme-example/apollo-web/issues/42`. GitHub sends that address on to the pull request when 42 is one, so one line covers both. Any tool that numbers its items works the same way: `items: https://acme.atlassian.net/browse/APOLLO-` on a project's note for its Jira board, or `items: https://dev.azure.com/acme/apollo/_workitems/edit/` for Azure Boards. pkm knows no tool and needs no plugin for one: it adds the number to the line. `pkm new repo apollo-web` makes the note with both lines empty; an agent that makes it can fill them in from the repository's name, so you never type them.
 
-The link part is an ordinary link. The line is in the repository's backlinks, `pkm rename` keeps it right, and because the repository is `part_of: apollo`, `pkm tasks --under apollo` finds `- [ ] Review [[apollo-web]]#51` with the project's other tasks. In an editor, going to the link opens the note and going to the number opens the item in your browser: `pkm url "[[apollo-web]]#42"` prints the address, and the editor opens it. pkm only prints addresses; it never goes online. In an editor that knows none of this, or on paper, the line still says what it is about.
+The link part is an ordinary link. The line is in the repository's backlinks, `pkm rename` keeps it right, and because the repository is `part_of: acme-portal`, `pkm tasks --under acme-portal` finds `- [ ] Review [[apollo-web]]#51` with the tasks of the Apollo project. In an editor, going to the link opens the note and going to the number opens the item in your browser: `pkm url "[[apollo-web]]#42"` prints the address, and the editor opens it. pkm only prints addresses; it never goes online. In an editor that knows none of this, or on paper, the line still says what it is about.
 
 A repository's note holds what the repository can't: **Now**, what you are doing there and what waits on you; **Decisions**, posted from their days; and **Notes**, the entries posted to it. The issues, pull requests and their comments stay in the tool, and the note links them.
 
@@ -619,6 +633,8 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | A link to the outside | A plain address, or a Markdown link | `https://ferries.example.com/booking/X7K2` |
 | An item in a tool | `[[<name>]]#<number>`: the note's `items` line with the number added at the end | `[[apollo-web]]#42` |
 | A repository | A note with `type: repo`, its address in `url` and the start of its items' addresses in `items` | `notes/apollo-web.md` |
+| An application | A note with `type: app`; its repositories and projects are `part_of` it, and its IDs in other systems are `aliases` | `notes/acme-portal.md` |
+| A team | A note with `type: team`: People, Links, Next time | `notes/web-team.md` |
 | An entry | `- <time> <text>` | `- 14:20 John says the budget needs sign-off` |
 | A task | `- [ ] <text>`; done `- [x]`; dropped `- [-]` | `- [ ] Send the invoice (due friday)` |
 | A due date | `(due <date>)`; on a page also a weekday, `today`, `tomorrow`, `+3d`, `+2w`, counted from that page's date | `(due 2026-11-20)` |

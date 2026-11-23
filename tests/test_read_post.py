@@ -264,9 +264,9 @@ class ExampleVault(unittest.TestCase):
         self.assertEqual(self.ok(vault, "add", "[[marta-kovac|Marta Kovac]] is [[acme|Acme]]'s project lead").strip(),
                          "daybook/2026/11/2026-11-16.md:8")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-10.md:9", "apollo#Risks").strip(),
-                         "notes/apollo.md:31")
+                         "notes/apollo.md:32")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-10.md:10", "apollo#Decisions").strip(),
-                         "notes/apollo.md:35")
+                         "notes/apollo.md:36")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-10.md:11", "marta-kovac").strip(),
                          "notes/marta-kovac.md:14")
         self.assertEqual(self.ok(vault, "post", "daybook/2026/11/2026-11-16.md:8", "marta-kovac").strip(),

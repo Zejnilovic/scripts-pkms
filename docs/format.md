@@ -47,7 +47,7 @@ A note may start with frontmatter: a line `---`, the keys, and a closing line `-
 
 | Key | Use |
 |---|---|
-| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks. `overview` groups notes by the type of their top note: `area`; `project`, `writing` and `repo`; `course`, `topic` and `source` |
+| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks. `overview` groups notes by the type of their top note: `area`; `project`, `writing`, `repo` and `app`; `course`, `topic` and `source` |
 | `part_of` | The one note this note belongs to, as a name (`part_of: home`) or a link (`part_of: "[[home]]"`). It is a link (see 6). A list (`[home, car]`), a note that names itself and a circle are `check` problems |
 | `aliases` | Other names for the note: `[Jane, J. Doe]`, or indented `  - Jane` lines below the key |
 | `status` | `upcoming` skips a note whose status is `done`, `dropped`, `published`, `sold`, `gone` or `archived`, and so does `overview` for a top note other than an area. `idea` marks a note for something not started |

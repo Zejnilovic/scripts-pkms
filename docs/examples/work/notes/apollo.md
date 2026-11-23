@@ -1,5 +1,6 @@
 ---
 type: project
+part_of: acme-portal
 status: active
 target: 2026-12-15
 summary: Customer portal for [[acme]]; demo on 2026-11-20
