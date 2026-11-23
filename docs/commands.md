@@ -276,6 +276,15 @@ path <name>                   the path of the note, attachment or alias a [[name
 
 Options: `--json` `--abs` `--limit`
 
+### url
+
+The address outside the vault an item ([[name]]#42) or a note's url line points to.
+
+```text
+url <[[name]]#number | name>  the address outside the vault: an item's (the note's items line and the number), or the
+                              note's url line; prints only http(s) addresses and never goes online
+```
+
 ### find
 
 The lines with every word, in any order.

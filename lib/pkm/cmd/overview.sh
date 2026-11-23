@@ -3,7 +3,7 @@
 . "$pkm_home/lib/pkm/globals.sh"
 # lib/pkm/cmd/overview.sh: pkm overview [--json]: the shape of the vault, from the cache. Each note names the one it
 # belongs to with part_of, so the notes make trees. The trees are shown in sections, by the kind of their top note:
-# areas (type area), projects (project or writing, not done or dropped), resources (course, topic, source, not done or
+# areas (type area), projects (project, writing or repo, not done or dropped), resources (course, topic, source, not done or
 # dropped) and other (a note of another kind with notes under it), then the number of notes in archive/. In a tree, the
 # notes come by name, each under its parent. A line is path:<title line>: <the titles from the top> (<type>, <status>).
 # Day and close pages, and notes in the archive, are not in the trees (tree.sh). Sourced by bin/pkm. Defines functions only.
@@ -58,7 +58,7 @@ cmd_overview() {
           if (p in parent) continue
           if (t == "area") sec = 1
           else if (closed(status[p])) continue
-          else if (t == "project" || t == "writing") sec = 2
+          else if (t == "project" || t == "writing" || t == "repo") sec = 2
           else if (t == "course" || t == "topic" || t == "source") sec = 3
           else if (p in haskids) sec = 4
           else continue

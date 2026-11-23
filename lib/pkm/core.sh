@@ -166,6 +166,34 @@ awk_links_in() {
 AWK
 }
 
+# awk_items_in: the awk functions for items (docs/format.md, Links 6). items(s, tgt, num) fills tgt[i] and num[i] with
+# each item on the line: a link followed at once by # and digits, [[apollo-web]]#42, its target without shown text or
+# folder. A link with a section or a block is not an item, and neither is #42 followed by a letter or digit.
+# web_value(v) is v without quotes when it is one http(s) address, else "": only such a value becomes an address.
+awk_items_in() {
+  cat <<'AWK'
+
+  function items(s, tgt, num,   n, m, p, t, d) {
+    n = 0
+    while (match(s, /\[\[[^]]*\]\]#[0-9]+/)) {
+      m = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+      if (substr(s, 1, 1) ~ /[A-Za-z0-9_]/) continue
+      p = index(m, "]]#"); t = substr(m, 3, p - 3); d = substr(m, p + 3)
+      sub(/\|.*/, "", t); sub(/\\$/, "", t)
+      if (t ~ /[#^]/) continue
+      gsub(/^[ \t]+|[ \t]+$/, "", t); sub(/.*\//, "", t)
+      if (t != "") { n++; tgt[n] = t; num[n] = d }
+    }
+    return n
+  }
+  function web_value(v) {
+    gsub(/^[ \t]+|[ \t]+$/, "", v)
+    if (v ~ /^".*"$/ || v ~ /^'.*'$/) v = substr(v, 2, length(v) - 2)
+    return (v ~ /^https?:\/\/[^] \t"'<>()`[]+$/) ? v : ""
+  }
+AWK
+}
+
 # awk_part_of: the awk functions for part_of, the frontmatter key that names the one note a note belongs to.
 # part_of_value(line) is the value of a "part_of:" line, trimmed, or "" for any other line. part_of_target(value) is the
 # name it gives, without quotes, brackets, shown text, heading or folder: "home", "[[home]]" and "[[notes/home|Home]]"

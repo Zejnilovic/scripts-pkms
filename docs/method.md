@@ -154,6 +154,7 @@ aliases: [Apollo]
 | Area | Something you look after that never ends: a home, a car, money, your health, a team you lead, your learning | **Now**, Next time, Routines, People, Links, Ideas |
 | Person | A colleague, a child, a plumber | How to reach them at the top, Next time, then Notes, the entries posted to them; Ideas, for gifts |
 | Organization | A customer, an employer, a school | As for a person |
+| Repository | Code you work on, on GitHub or anywhere else | **Now**, Decisions, Notes; its address in `url` and its numbered items in `items` (see [Links](#links)) |
 | List | Shopping, packing, things to take | The list itself |
 | Course | Something you study | Modules, Questions |
 | Topic, source | A subject, a book, an article | What you think, and the entries posted to them |
@@ -199,7 +200,26 @@ A link is a note's name in double brackets: `[[jane-doe]]`, or `[[jane-doe|Jane]
 
 Because a link names the note rather than its folder, moving a note never breaks a link. And every link is a path back. A note's **backlinks**, the lines that link to it, are its history as you wrote it, day by day. They include the lines under a `###` heading that links it, so the notes of a call under `### Call with [[jane-doe]]` are part of Jane's history.
 
-**Links to the outside.** Tickets, boards, pull requests, bookings and quotes stay where they are. The vault links to them and doesn't copy them: an entry carries the link, `- Reviewed [pull request 42](https://github.com/acme-example/apollo/pull/42)`, and a project's **Links** section says where its work lives, such as the board, the code or the booking. The tool keeps the details and the latest state; your vault keeps what you think, decided and owe, and the way back to the rest.
+**Links to the outside.** Tickets, boards, pull requests, bookings and quotes stay where they are. The vault links to them and doesn't copy them: an entry carries the address, `- Booked the ferry https://ferries.example.com/booking/X7K2`, and a project's **Links** section says where its work lives, such as the board, the code or the booking. The tool keeps the details and the latest state; your vault keeps what you think, decided and owe, and the way back to the rest.
+
+**Items in a tool.** An address is long to type, and at work you come back to the same few repositories and boards all day. Give each one a note, as you would a person, and write an item as the note's link followed by the item's number: `[[apollo-web]]#42` is pull request 42 in the portal's repository, and `[[apollo]]#17` is ticket APOLLO-17 on the project's board. The note's `items` line says where its numbers point:
+
+```markdown
+---
+type: repo
+part_of: apollo
+url: https://github.com/acme-example/apollo-web
+items: https://github.com/acme-example/apollo-web/issues/
+summary: The web app of the [[apollo]] portal
+aliases: [acme-example/apollo-web]
+---
+```
+
+An item's address is the `items` line with the number added at the end, so `[[apollo-web]]#42` is `https://github.com/acme-example/apollo-web/issues/42`. GitHub sends that address on to the pull request when 42 is one, so one line covers both. Any tool that numbers its items works the same way: `items: https://acme.atlassian.net/browse/APOLLO-` on a project's note for its Jira board, or `items: https://dev.azure.com/acme/apollo/_workitems/edit/` for Azure Boards. pkm knows no tool and needs no plugin for one: it adds the number to the line. `pkm new repo apollo-web` makes the note with both lines empty; an agent that makes it can fill them in from the repository's name, so you never type them.
+
+The link part is an ordinary link. The line is in the repository's backlinks, `pkm rename` keeps it right, and because the repository is `part_of: apollo`, `pkm tasks --under apollo` finds `- [ ] Review [[apollo-web]]#51` with the project's other tasks. In an editor, going to the link opens the note and going to the number opens the item in your browser: `pkm url "[[apollo-web]]#42"` prints the address, and the editor opens it. pkm only prints addresses; it never goes online. In an editor that knows none of this, or on paper, the line still says what it is about.
+
+A repository's note holds what the repository can't: **Now**, what you are doing there and what waits on you; **Decisions**, posted from their days; and **Notes**, the entries posted to it. The issues, pull requests and their comments stay in the tool, and the note links them.
 
 **Files.** Some things arrive as files: a quote as a PDF, a photo of a receipt, a scan of a school form. A file goes in a folder for its month, `files/2026/11/`, and that day's page gets an entry that links it, so the file is found the way everything else is, by its day and by the words next to it. In the family vault, the plumber's quote came on Wednesday:
 
@@ -596,7 +616,9 @@ What it costs: nothing a day beyond writing, about fifteen minutes a week to clo
 | A note | `notes/<name>.md`, lowercase with hyphens | `notes/jane-doe.md` |
 | Two things with one name | `<name>-<what tells them apart>` | `notes/joe-bloggs-plumber.md` |
 | A link to a note | `[[<name>]]`, `[[<name>\|<shown text>]]`, `[[<name>#<section>]]` | `[[jane-doe\|Jane]]` |
-| A link to the outside | A Markdown link or a plain address | `[pull request 42](https://github.com/acme-example/apollo/pull/42)` |
+| A link to the outside | A plain address, or a Markdown link | `https://ferries.example.com/booking/X7K2` |
+| An item in a tool | `[[<name>]]#<number>`: the note's `items` line with the number added at the end | `[[apollo-web]]#42` |
+| A repository | A note with `type: repo`, its address in `url` and the start of its items' addresses in `items` | `notes/apollo-web.md` |
 | An entry | `- <time> <text>` | `- 14:20 John says the budget needs sign-off` |
 | A task | `- [ ] <text>`; done `- [x]`; dropped `- [-]` | `- [ ] Send the invoice (due friday)` |
 | A due date | `(due <date>)`; on a page also a weekday, `today`, `tomorrow`, `+3d`, `+2w`, counted from that page's date | `(due 2026-11-20)` |

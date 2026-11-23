@@ -18,6 +18,8 @@ daybook/2026/11/2026-11-12.md:8: - 13:00 [[jane-doe]] shared her release plan: s
 daybook/2026/11/2026-11-12.md:9: - 17:40 Decide with the team: should we move the demo to a Tuesday?
 daybook/2026/11/2026-11-12.md:10: - 17:55 Idea: a self-service export for [[acme]], maybe next year
 daybook/2026/11/2026-11-12.md:11: - [ ] Run the [[apollo]] demo for [[acme]] (at 2026-11-20 14:00-15:00)
+daybook/2026/11/2026-11-12.md:12: - 18:10 Reviewed [[apollo-web]]#42, [[jane-doe]]'s login page: it needs a test for the redirect
+daybook/2026/11/2026-11-12.md:13: - [ ] Review [[apollo-web]]#51
 daybook/2026/11/2026-11-16.md:7: - 08:30 Still no answer from [[john-roe]] on the budget
 == tasks
 daybook/2026/11/2026-11-09.md:5: overdue: - [ ] Send [[john-roe]] the Apollo invoice for October (due 2026-11-13) (high)
@@ -32,5 +34,6 @@ daybook/2026/11/2026-11-12.md:10: - 17:55 Idea: a self-service export for [[acme
 acme            4 mentions  last 4 days ago
 apollo          4 mentions  last 4 days ago
 john-roe        4 mentions  last today
-jane-doe        2 mentions  last 4 days ago
+jane-doe        3 mentions  last 4 days ago
+apollo-web      2 mentions  last 4 days ago
 statistics-101  1 mention  last 5 days ago

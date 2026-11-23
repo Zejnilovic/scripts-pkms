@@ -24,7 +24,7 @@ aliases: [Apollo]
 ## Links
 
 - Board: https://dev.azure.com/acme-example/apollo/_boards
-- Code: https://github.com/acme-example/apollo
+- Code: [[apollo-web]]
 
 ## Risks
 

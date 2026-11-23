@@ -47,11 +47,13 @@ A note may start with frontmatter: a line `---`, the keys, and a closing line `-
 
 | Key | Use |
 |---|---|
-| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks. `overview` groups notes by the type of their top note: `area`; `project` and `writing`; `course`, `topic` and `source` |
+| `type` | The kind of note. Default: `day` in `daybook/`, `close` in `closes/`, otherwise `note`. A `type: list` note's boxes are not tasks. `overview` groups notes by the type of their top note: `area`; `project`, `writing` and `repo`; `course`, `topic` and `source` |
 | `part_of` | The one note this note belongs to, as a name (`part_of: home`) or a link (`part_of: "[[home]]"`). It is a link (see 6). A list (`[home, car]`), a note that names itself and a circle are `check` problems |
 | `aliases` | Other names for the note: `[Jane, J. Doe]`, or indented `  - Jane` lines below the key |
 | `status` | `upcoming` skips a note whose status is `done`, `dropped`, `published`, `sold`, `gone` or `archived`, and so does `overview` for a top note other than an area. `idea` marks a note for something not started |
 | `birthday`, `target`, `deadline`, `warranty` | Dates that `upcoming` lists. A birthday recurs yearly on its month and day |
+| `url` | The address of what the note is about, outside the vault, such as a repository: one `http://` or `https://` address. `pkm url <name>` prints it |
+| `items` | The start of the address of the note's numbered items, one `http://` or `https://` address; an item's address is this value with the item's number added at the end (see 6) |
 
 Any other key is stored, and `pkm list key=value` matches it. The title is the first line that starts with `# ` after the frontmatter, or the file name without `.md` when there is none.
 
@@ -62,6 +64,7 @@ Any other key is stored, and `pkm list key=value` matches it. The title is the f
 3. A day page is linked by its date: `[[2026-11-10]]`, or `[[2026-11-10-sam]]` in a shared vault.
 4. A web address is any `http://` or `https://` address outside code.
 5. A `part_of:` line in the frontmatter is a link to the note it names, written with or without brackets: `backlinks` lists it, `check` reports it when it names no note, and `rename` rewrites it.
+6. An item is a link followed at once by `#` and digits, outside code: `[[apollo-web]]#42`, or `[[apollo-web|the portal]]#42`. The link is a link to the note as in 1; a link with a section or a block (`[[apollo-web#Risks]]#42`) is not an item. The item's address is the note's `items` value with the digits added at the end. `url` prints it and `links --external` lists it. `check` reports an item whose note has no `items`, and an `items` or `url` value that is not one `http://` or `https://` address; `url` prints nothing else.
 
 ## 7. Tasks
 

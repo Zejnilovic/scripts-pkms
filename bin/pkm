@@ -44,6 +44,8 @@
 #                                 becomes an alias unless --no-alias; --dry-run lists the changes and writes nothing
 #   mv <note> <folder>            moves a note into a folder; its links keep working. Both record the move in .pkm/moves.tsv
 #   path <name>                   the path of the note, attachment or alias a [[name]] link points to, archive included
+#   url <[[name]]#number | name>  the address outside the vault: an item's (the note's items line and the number), or the
+#                                 note's url line; prints only http(s) addresses and never goes online
 #   list [<field>=<value> ...] [--show <field>,...] [--all] [--quiet <days>] [--under <note>]
 #                                 notes whose frontmatter matches, from the cache: path, type, title, then the --show fields;
 #                                 --quiet lists those no day page in the last <days> days links
@@ -251,6 +253,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/new.sh"
 # shellcheck source=../lib/pkm/cmd/path.sh
 . "$pkm_home/lib/pkm/cmd/path.sh"
+# shellcheck source=../lib/pkm/cmd/url.sh
+. "$pkm_home/lib/pkm/cmd/url.sh"
 # shellcheck source=../lib/pkm/cmd/tags.sh
 . "$pkm_home/lib/pkm/cmd/tags.sh"
 # shellcheck source=../lib/pkm/cmd/tasks.sh
@@ -311,6 +315,7 @@ case $command in
   upcoming) cmd_upcoming "$@" ;;
   backlinks) output_command backlinks "$@" ;;
   path) output_command path "$@" ;;
+  url) cmd_url "$@" ;;
   list) output_command list "$@" ;;
   overview) cmd_overview "$@" ;;
   names) output_command names "$@" ;;

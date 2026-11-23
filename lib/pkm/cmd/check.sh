@@ -59,7 +59,7 @@ cmd_check() {
   touch "$tmp/dead-problems" "$tmp/link-notices"
   cat "$tmp/dead-problems" >> "$tmp/problems"
   cat "$tmp/link-notices" >> "$tmp/notices"
-  check_part_of >> "$tmp/problems"
+  { check_part_of; check_items; } >> "$tmp/problems"
   # Alias clashes: an alias on two notes leaves links to it unclear.
   awk -F '\t' '
     $1 == "A" { key = $2 SUBSEP $3; if (!(key in seen)) { seen[key] = 1; count[$2]++; paths[$2] = paths[$2] ", " $3 } }
@@ -187,4 +187,23 @@ check_part_of() {
       }
     }
   ' "$tmp/part-of-lines" "$tmp/lb-links" | LC_ALL=C sort
+}
+
+# check_items: the problems of items (docs/format.md, Links 6): an item whose note has no items line, at the item's place,
+# and a url or items line whose value is not one http(s) address, at that line. An item of a missing note is already a
+# broken link, and an item of a note whose items value is wrong is reported at that value.
+check_items() {
+  item_addresses "$tmp/notes" | awk -F '\t' '
+    $5 == "none" { print "- " $1 ":" $2 ": [[" $3 "]]#" $4 " is an item, but " $3 " has no items line: add one to its frontmatter, or write the number apart from the link" }
+  ' > "$tmp/item-problems"
+  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
+  scan "$tmp/notes" "$(awk_items_in)"'
+    FNR == 1 { file = rel(FILENAME); front = ($0 == "---"); next }
+    front && $0 == "---" { front = 0; next }
+    front && match($0, /^(url|items):/) {
+      key = substr($0, 1, RLENGTH - 1); v = substr($0, RLENGTH + 1); gsub(/^[ \t]+|[ \t]+$/, "", v)
+      if (v != "" && web_value(v) == "") print "- " file ":" FNR ": " key " is not one http:// or https:// address: write the whole address, such as " key ": https://github.com/acme-example/apollo-web" (key == "items" ? "/issues/" : "")
+    }
+  ' >> "$tmp/item-problems"
+  LC_ALL=C sort "$tmp/item-problems"
 }

@@ -23,6 +23,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `rename` | Notes | renames a note and rewrites every link that names it; --dry-run lists the changes | no |
 | `mv` | Notes | moves a note into a folder; its links keep working | no |
 | `path` | Find | the file a name, slug, alias or link points to | yes, one path per line |
+| `url` | Find | the address outside the vault that an item (`[[apollo-web]]#42`) or a note's `url` points to; it prints only `http://` and `https://` addresses and never goes online; exit 1 when the note has no `items` or `url` | no |
 | `find` | Find | the lines with every word, in any order | yes, `path:line: text` lines |
 | `list` | Find | the notes whose frontmatter matches | yes, `path<TAB>type<TAB>title<TAB>field...` |
 | `tags` | Find | every tag with its count | no; `--json` gives `tag` and `count` |
@@ -32,7 +33,7 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `since` | Review | what happened since a date, a number of days, or a cycle: notes, log, tasks, marked entries and names; `--about NAME` | yes, `path:line: text` lines in sections; `--json` gives a `kind` per line |
 | `recall` | Review | the recall questions due today or earlier, oldest first; `recall <path:line> yes\|no` moves one on the ladder; `recall add <note> <question>` writes one | yes, `path:line: text` lines |
 | `close` | Review | the close of a period: the first line, then tasks, open questions, what is due, marked entries, names, quiet notes and ideas | no; `--json` gives a `kind` per line |
-| `links` | Find | each web address in the notes, outside code, with its place (`--external`) | yes, `path:line: address` lines; `--json` gives `url` |
+| `links` | Find | each web address in the notes, outside code, with its place (`--external`); an item (`[[apollo-web]]#42`) is listed by its address | yes, `path:line: address` lines; `--json` gives `url` |
 | `get` | Notes | a note or one section of it, between a header and a footer; `--lines` takes a range | no |
 | `post` | Notes | copies lines of a page into a note's section, with the page as their source | no |
 | `strike` | Notes | strikes a line through when it is no longer true, linking today's page | no |

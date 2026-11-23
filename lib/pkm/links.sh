@@ -82,6 +82,44 @@ link_build() {
   ' "$tmp/lb-resolved" "$tmp/lb-occurrences" > "$tmp/lb-links"
 }
 
+# item_addresses <list file>: path<TAB>line<TAB>target<TAB>number<TAB>status<TAB>address for each item outside code
+# (docs/format.md, Links 6), in the notes listed. The target resolves like any link. Status: ok (the address is the
+# note's items value and the number), dead (no note), none (the note has no items line) or bad (its items value is not
+# one http(s) address); the address is empty unless ok.
+item_addresses() {
+  local tab
+  tab=$(printf '\t')
+  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
+  scan "$1" "$(awk_items_in)"'
+    FNR == 1 { file = rel(FILENAME); fence = 0 }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    index($0, "]]#") {
+      s = $0; gsub(/`[^`]*`/, "", s)
+      n = items(s, t, d)
+      for (i = 1; i <= n; i++) print file "\t" FNR "\t" t[i] "\t" d[i]
+    }
+  ' > "$tmp/ia-places"
+  [ -s "$tmp/ia-places" ] || return 0
+  cut -f3 "$tmp/ia-places" | LC_ALL=C sort -u > "$tmp/ia-targets"
+  link_index "$tmp/ia-index"
+  link_slugs "$tmp/ia-targets" "$tmp/ia-slugs"
+  link_resolve "$tmp/ia-index" "$tmp/ia-slugs" "$tmp/ia-resolved"
+  # shellcheck disable=SC2016 # awk program: the $ in it is awk's, not the shell's
+  awk -F "$tab" -v OFS="$tab" "$(awk_items_in)"'
+    FILENAME == ARGV[1] { if ($2 == "items") items_of[$1] = $3; next }
+    FILENAME == ARGV[2] { dest[$1] = ($2 == "dead") ? "" : $3; next }
+    {
+      p = dest[$3]
+      if (p == "") { print $1, $2, $3, $4, "dead", ""; next }
+      if (!(p in items_of) || items_of[p] == "") { print $1, $2, $3, $4, "none", ""; next }
+      v = web_value(items_of[p])
+      if (v == "") print $1, $2, $3, $4, "bad", ""
+      else print $1, $2, $3, $4, "ok", v $4
+    }
+  ' "$(cache_dir)/fields.tsv" "$tmp/ia-resolved" "$tmp/ia-places"
+}
+
 # external_addresses <list file>: path<TAB>line<TAB>address for each http(s) address outside code, in the notes listed
 # (one line per address on a line; bare or in [text](url)). A trailing punctuation mark is not part of the address.
 external_addresses() {

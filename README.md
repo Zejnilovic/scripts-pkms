@@ -74,6 +74,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `names [--type <type>]` | Every note's name, type, path and aliases, from the cache. `--type person` lists the people |
 | `backlinks <name> [--since <date>] [--under <note>]` | Every line that links a note, by its file name, slug or alias, and the lines under a `###` heading that links it |
 | `path <name>` | The file a name, slug, alias or link points to |
+| `url <[[name]]#number \| name>` | The address of an item, `[[apollo-web]]#42`, from the note's `items` line, or a note's `url`; for an editor to open, since pkm never goes online |
 | `find [--live] <word> [<word>...]` | Lines with every word, in any order, as `path:line: text`. Smart case. Searches `archive/` unless `--live` |
 | `list [<field>=<value> ...] [--show <fields>] [--quiet <days>] [--under <note>]` | Notes whose frontmatter matches, from the cache: path, type, title, then the fields asked for. `--quiet <days>` lists notes that no day page has linked in that many days; `--under` keeps the notes of a note's tree |
 | `overview [--json]` | The shape of the vault: each area with the notes that are `part_of` it, as a tree, then projects, resources (courses, topics, sources) and other notes with notes under them, then the archive's count. A line is `path:<title line>: <titles from the top> (<type>, <status>)` |
@@ -83,7 +84,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `mv <note> <folder>` | Moves a note into a folder, keeping its name and its links working |
 | `check [--urls]` | Broken links, duplicate names, alias clashes, secrets and merge conflicts; notices for links that work only by slug or alias. `--urls` also checks that web addresses answer (needs curl) |
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
-| `links --external [note]` | Each web address in the notes, outside code, as `path:line: address` |
+| `links --external [note]` | Each web address in the notes, outside code, as `path:line: address`; an item is listed by its address |
 | `cycle [name] [--date D] [--json]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
 | `since [last\|YYYY-MM-DD\|N\|cycle] [--about NAME] [--under <note>] [--sum] [--limit n] [--json]` | What happened since a date: notes, log lines, tasks, marked entries and names. `--sum` adds up the time spent: entries timed as a range, such as `09:00-11:30`, and durations such as `(1h30)`. `since --seen` marks where the next `since last` starts |
 | `close [--cycle name] [--date D] [--quarter] [--json]` | The close of the period holding yesterday: tasks, open questions, what is due, marked entries, names with no note, quiet projects and people, and ideas |
@@ -103,7 +104,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 
 ## Templates
 
-New notes are made from templates in the vault's `templates/` folder, then your `~/.config/pkm/templates/`, then the defaults: [day](share/pkm/templates/day.md), [note](share/pkm/templates/note.md), [person](share/pkm/templates/person.md), [project](share/pkm/templates/project.md), [area](share/pkm/templates/area.md), [topic](share/pkm/templates/topic.md), [source](share/pkm/templates/source.md), [list](share/pkm/templates/list.md), [close](share/pkm/templates/close.md), [course](share/pkm/templates/course.md), [coaching](share/pkm/templates/coaching.md), [writing](share/pkm/templates/writing.md) and [item](share/pkm/templates/item.md). `pkm templates eject <type>` copies one into the vault to change it. A type of your own needs only a template with `type: <type>` in it.
+New notes are made from templates in the vault's `templates/` folder, then your `~/.config/pkm/templates/`, then the defaults: [day](share/pkm/templates/day.md), [note](share/pkm/templates/note.md), [person](share/pkm/templates/person.md), [project](share/pkm/templates/project.md), [area](share/pkm/templates/area.md), [repo](share/pkm/templates/repo.md), [topic](share/pkm/templates/topic.md), [source](share/pkm/templates/source.md), [list](share/pkm/templates/list.md), [close](share/pkm/templates/close.md), [course](share/pkm/templates/course.md), [coaching](share/pkm/templates/coaching.md), [writing](share/pkm/templates/writing.md) and [item](share/pkm/templates/item.md). `pkm templates eject <type>` copies one into the vault to change it. A type of your own needs only a template with `type: <type>` in it.
 
 ## Maintaining pkm
 

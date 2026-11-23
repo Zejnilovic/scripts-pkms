@@ -5,7 +5,7 @@ A vault is plain Markdown, so any editor opens it. pkm does the rules: an editor
 Three things help any editor:
 
 - **Run pkm in the vault.** Any folder inside the vault works. From an editor, pass `--vault <folder>` (or set `PKM_VAULT`) so the command does not depend on the current folder.
-- **Follow links.** `pkm path <name>` prints the file a `[[link]]` points to.
+- **Follow links.** `pkm path <name>` prints the file a `[[link]]` points to, and `pkm url "[[apollo-web]]#42"` the address of an item, for the editor to open in a browser. pkm never opens it itself.
 - **Read results.** `pkm find --json <words>` prints JSON Lines with `path`, `line` and `text`, for a picker.
 
 ## Neovim
@@ -59,13 +59,20 @@ vim.api.nvim_create_user_command("PkmFind", function(o) quickfix(vim.list_extend
 vim.api.nvim_create_user_command("PkmTasks", function() quickfix({ "tasks" }, "pkm tasks") end, {})
 vim.api.nvim_create_user_command("PkmCheck", function() quickfix({ "check" }, "pkm check") end, {})
 
--- gf on a [[link]] opens the note it names, wherever it is in the vault.
+-- gf on a [[link]] opens the note it names, wherever it is in the vault. On the number of an item, [[apollo-web]]#42,
+-- it opens the item's address in the browser (vim.ui.open, Neovim 0.10 or later).
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = vault .. "/*.md",
   callback = function(event)
     vim.keymap.set("n", "gf", function()
       local line, col = vim.api.nvim_get_current_line(), vim.fn.col(".")
       for s, inner, e in line:gmatch("()%[%[(.-)%]%]()") do
+        local number = line:sub(e):match("^#(%d+)")
+        if number and col >= e and col <= e + #number then
+          local out = pkm({ "url", "[[" .. inner .. "]]#" .. number })
+          if out and out[1] and vim.v.shell_error == 0 then return vim.ui.open(out[1]) end
+          return vim.notify(table.concat(out or {}, "\n"), vim.log.levels.WARN)
+        end
         if col >= s and col < e then
           local name = inner:match("^[^|#]+")
           return open({ "path", name })

@@ -24,6 +24,7 @@ index|Find|brings the cache up to date; --rebuild starts it again
 rename|Notes|renames a note and rewrites every link that names it; --dry-run lists the changes
 mv|Notes|moves a note into a folder; its links keep working
 path|Find|the file a name, slug, alias or link points to
+url|Find|the address outside the vault an item ([[name]]#42) or a note's url line points to
 find|Find|the lines with every word, in any order
 list|Find|the notes whose frontmatter matches
 overview|Find|the shape of the vault: areas, projects and resources, each with the notes that are part of it
