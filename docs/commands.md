@@ -66,8 +66,9 @@ Options: `--due` `--high` `--low` `--waiting` `--someday` `--start` `--every` `-
 Marks the one open task that matches as done, or as dropped with --drop; moves a routine on, or to the day --next gives.
 
 ```text
-done <words | path:line> [--drop | --next <day>]
+done [<words | path:line>] [--drop | --next <day>]
                               marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
+                              On a terminal, no words, or words that match several tasks, pick from a list.
                               A routine with an interval, such as (every 1m), keeps its box and moves its due date on
                               (--next <day>: to that day, for a routine done early or late)
 ```
@@ -80,7 +81,8 @@ Strikes a task or an event whose date changed and writes it again with the new d
 
 ```text
 moved <path:line> <when>      strikes a task or an event whose date changed and writes it again with the new date:
-                              below it in a note, on today's page from another day's page, linking that day
+                              below it in a note, on today's page from another day's page, linking that day. On a
+                              terminal, pkm moved alone picks the task and asks when
 ```
 
 ### tasks
@@ -457,6 +459,9 @@ completion bash|zsh           the shell's tab completion script, for example in 
 ```text
 Listings: find, backlinks, path, list, tasks and check take --json (JSON Lines), --abs (absolute paths) and --limit n
 (default 30). A listing with no results exits 1. since, close, overview, upcoming, tags, cycle and vaults take --json. docs/contract.md is the interface; pkm help --all lists the commands, docs/commands.md describes each.
+On a terminal, a command missing its text, task or note asks for it: done, moved, todo, add, find, get, backlinks,
+path and new. It picks with fzf when installed, else from a numbered list (the picker setting; off never asks).
+Without a terminal, as in scripts, editors and agents, a missing argument is a usage error (exit 2).
 Settings: docs/settings.md lists every key. .pkm/config is the vault's, the user's config is ~/.config/pkm/config.
 .pkmignore in the vault hides files and folders from pkm, in gitignore syntax; .gitignore is not followed.
 PKM_NOW=YYYYMMDDHHMMSS fixes the clock, for tests and for backfilling.

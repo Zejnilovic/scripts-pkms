@@ -21,6 +21,7 @@ now|vault|-|Fixes the clock of this vault at YYYY-MM-DD HH:MM, so pkm works as i
 due_soon_days|both|7|The tasks due within this many days, after the overdue ones, come first in pkm tasks.
 waiting_days|both|7|A task waiting for longer than this many days comes after the due soon ones in pkm tasks.
 limit|both|30|The most listed lines a command prints before the footer; --limit sets it for one run.
+picker|both|auto|How a command on a terminal asks for a missing task or note: auto (fzf when installed, else a numbered list), fzf, list, or off to never ask.
 writer|user|-|The name of the person who writes on this machine, for a shared vault.
 vault|user|-|The vault to use when none is given and none is above the current folder.
 vault_<name>|user|-|A named vault, chosen with -V <name>.
@@ -150,6 +151,8 @@ config_problems() {
     case $key in
       shared|cross_vault)
         case $value in yes|no) ;; *) echo "$file:$n: $key is yes or no, got: $value" ;; esac ;;
+      picker)
+        case $value in auto|fzf|list|off) ;; *) echo "$file:$n: picker is auto, fzf, list or off, got: $value" ;; esac ;;
       format)
         [ "$value" = 1 ] || echo "$file:$n: format is 1, got: $value" ;;
       cycle_*)

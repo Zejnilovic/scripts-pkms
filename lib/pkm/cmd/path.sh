@@ -5,6 +5,8 @@
 # Sourced by bin/pkm. Defines functions only.
 
 cmd_path() {
+  # On a terminal, a missing name is picked from the notes (ask.sh).
+  if [ $# -eq 0 ]; then ask_note "Usage: pkm path <name>"; set -- "$answer"; fi
   [ $# -eq 1 ] || die 2 "Usage: pkm path <name>"
   # Accepts a bare name or a whole link, such as [[apollo|the portal]] or [[apollo#Risks]].
   local name=$1 found

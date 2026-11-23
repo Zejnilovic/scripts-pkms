@@ -13,6 +13,10 @@ import unittest
 from helpers import BASH, PKM, REPO, VaultCase, pkm_env, run_pkm
 
 
+TASK_DAY = "daybook/2026/10/2026-10-25.md"
+TASK_PAGE = "# 2026-10-25\n\n## Tasks\n\n- [ ] Book the Acme venue\n- [ ] Send the Apollo report\n- [x] Old (done 2026-10-20)\n"
+
+
 def commands():
     out = subprocess.run([BASH, str(PKM), "help", "--all"], capture_output=True, text=True, env=pkm_env()).stdout
     return [line.split("\t")[0] for line in out.splitlines()]
@@ -34,6 +38,8 @@ class Script(unittest.TestCase):
         result = self.run_pkm("completion", "zsh")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(result.stdout.startswith("#compdef pkm\n"), result.stdout[:40])
+        # Tasks are offered by their path:line, with their text beside it.
+        self.assertIn(":tasks)", result.stdout)
         if shutil.which("zsh"):
             check = subprocess.run(["zsh", "-n"], input=result.stdout, capture_output=True, text=True)
             self.assertEqual(check.returncode, 0, check.stderr)
@@ -114,6 +120,21 @@ class InAVault(VaultCase):
         self.assertEqual(self.complete("strike", ""), [":files"])
         self.assertEqual(self.complete("mv", "apollo", ""), [":dirs"])
 
+    def test_open_tasks_for_done_and_moved(self):
+        self.write(TASK_DAY, TASK_PAGE)
+        lines = self.pkm("__complete", "done", "").stdout.splitlines()
+        self.assertEqual(lines[0], ":tasks")
+        self.assertIn(f"{TASK_DAY}:5\tBook the Acme venue", lines)
+        self.assertIn(f"{TASK_DAY}:6\tSend the Apollo report", lines)
+        self.assertEqual(self.pkm("__complete", "moved", "").stdout.splitlines(), lines)
+
+    def test_the_word_at_the_cursor_keeps_the_tasks_that_have_it(self):
+        self.write(TASK_DAY, TASK_PAGE)
+        lines = self.pkm("__complete", "done", "--drop", "VENUE").stdout.splitlines()
+        self.assertEqual(lines, [":tasks", f"{TASK_DAY}:5\tBook the Acme venue"])
+        lines = self.pkm("__complete", "done", f"{TASK_DAY}:6").stdout.splitlines()
+        self.assertEqual(lines, [":tasks", f"{TASK_DAY}:6\tSend the Apollo report"])
+
     def test_an_option_value_is_not_counted_as_an_argument(self):
         self.assertEqual(self.complete("backlinks", "--since", "2026-10-01", ""), self.complete("backlinks", ""))
 
@@ -160,6 +181,11 @@ class BashTabPress(VaultCase):
     def test_a_note_name_in_the_vault(self):
         self.write("notes/apollo.md", "---\ntype: project\n---\n# Apollo\n")
         self.assertEqual(self.press("pkm backlinks ap"), ["apollo"])
+
+    def test_a_word_of_a_task_becomes_its_path_and_line(self):
+        self.write(TASK_DAY, TASK_PAGE)
+        self.assertEqual(self.press("pkm done venue"), [f"{TASK_DAY}:5"])
+        self.assertEqual(sorted(self.press("pkm done ")), [f"{TASK_DAY}:5", f"{TASK_DAY}:6"])
 
     def test_a_word_with_a_colon_is_kept_whole(self):
         self.write("notes/apollo.md", "---\ntype: project\n---\n# Apollo\n")

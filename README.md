@@ -15,7 +15,9 @@ Homebrew installs ripgrep and jq with it, and tab completion for bash and zsh. W
 - **From a clone:** `make install` copies pkm to `~/.local` and links `~/.local/bin/pkm`. Use `make install PREFIX=<folder>` for another place.
 - **From a release tarball:** unpack `pkm-<version>.tar.gz` and run `sh install.sh [--prefix <folder>]`. It installs from the folder it is in and downloads nothing.
 
-Without Homebrew, turn on tab completion in your shell's startup file: `source <(pkm completion zsh)` in `~/.zshrc` (after `compinit`), or `source <(pkm completion bash)` in `~/.bashrc`. It completes commands, options, note names, template types, cycles and named vaults.
+Without Homebrew, turn on tab completion in your shell's startup file: `source <(pkm completion zsh)` in `~/.zshrc` (after `compinit`), or `source <(pkm completion bash)` in `~/.bashrc`. It completes commands, options, note names, template types, cycles, named vaults, and the open tasks after `pkm done`.
+
+On a terminal, a command missing its task, note or text asks for it: `pkm done` alone lets you pick the task. With [fzf](https://github.com/junegunn/fzf) installed you pick by typing, otherwise from a numbered list.
 
 Then run `pkm doctor`. It lists the tools pkm uses and any setting it does not understand. Exit 0 means it is ready.
 

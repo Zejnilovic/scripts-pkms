@@ -16,7 +16,8 @@ cmd_backlinks() {
       *) [ -z "$name" ] || die 2 "$usage"; name=$1; shift ;;
     esac
   done
-  [ -n "$name" ] || die 2 "$usage"
+  # On a terminal, a missing name is picked from the notes (ask.sh).
+  if [ -z "$name" ]; then ask_note "$usage"; name=$answer; fi
   [ -z "$under" ] || under_build "$under"
   target=${name#\[\[}; target=${target%\]\]}; target=${target%%|*}; target=${target%%#*}; target=${target##*/}
   printf '%s\n' "$target" > "$tmp/backlinks-target"

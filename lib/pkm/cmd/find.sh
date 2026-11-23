@@ -13,7 +13,14 @@ cmd_find() {
 "; shift ;;
     esac
   done
-  [ -n "$words" ] || die 2 "Usage: pkm find [--live] <word> [<word>...]"
+  if [ -z "$words" ]; then
+    # On a terminal, the words are asked for (ask.sh).
+    need_answer "Usage: pkm find [--live] <word> [<word>...]"
+    ask_text "Find: "
+    words=$(printf '%s\n' "$answer" | tr -s '[:blank:]' '\n' | grep -v '^$')
+    words="$words
+"
+  fi
   first=$(printf '%s' "$words" | head -n 1)
   # Smart case: lowercase words match any case; a word with a capital letter matches exactly.
   case $words in

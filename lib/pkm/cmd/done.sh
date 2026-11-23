@@ -6,7 +6,7 @@
 # routine done early or late is next due on that day, and moves on from there. Sourced by bin/pkm. Defines functions only.
 
 cmd_done() {
-  local mark=x word="done" ref line file due rule new old US record text explicit next=""
+  local mark=x word="done" ref="" line file due rule new old US record text explicit next=""
   local usage="Usage: pkm done <words of the task | path:line> [--drop | --next <day>]"
   US=$(printf '\037')
   while [ $# -gt 0 ]; do
@@ -19,8 +19,16 @@ cmd_done() {
       *) ref="${ref:+$ref }$1"; shift ;;
     esac
   done
-  [ -n "$ref" ] || die 2 "$usage"
   [ -z "$next" ] || [ "$mark" = x ] || die 2 "--next moves a routine that is done, so it doesn't go with --drop."
+  # On a terminal, no words pick from the open tasks (ask.sh).
+  local prompt=Done
+  [ "$mark" = x ] || prompt=Drop
+  if [ -z "$ref" ]; then
+    need_answer "$usage"
+    ask_tasks "$tmp/done-pick"
+    pick_one "$prompt" "$tmp/done-pick" "No open tasks."
+    ref=$answer
+  fi
   task_records no > "$tmp/done-records"
   case $ref in
     *.md:[0-9]*) REF=$ref awk -F "$US" -v OFS="$US" '$3 == "open" && ($1 ":" $2) == ENVIRON["REF"]' "$tmp/done-records" > "$tmp/done-matches" ;;
@@ -32,8 +40,16 @@ cmd_done() {
   case $count in
     0) case $ref in *.md:[0-9]*) die 1 "$ref is not an open task." ;; *) die 1 "No open task matches '$ref'." ;; esac ;;
     1) ;;
-    *) awk -F "$US" '{ print $1 ":" $2 ": " $13 }' "$tmp/done-matches" >&2
-       die 1 "$count open tasks match '$ref': add words, or give the path:line." ;;
+    *) if can_ask; then
+         # On a terminal, the matches are a list to pick from.
+         awk -F "$US" '{ print $1 ":" $2 "\t" $13 "  " $1 ":" $2 }' "$tmp/done-matches" > "$tmp/done-pick"
+         pick_one "$prompt" "$tmp/done-pick" "No open task matches '$ref'."
+         REF=$answer awk -F "$US" '($1 ":" $2) == ENVIRON["REF"]' "$tmp/done-matches" > "$tmp/done-picked"
+         mv "$tmp/done-picked" "$tmp/done-matches"
+       else
+         awk -F "$US" '{ print $1 ":" $2 ": " $13 }' "$tmp/done-matches" >&2
+         die 1 "$count open tasks match '$ref': add words, or give the path:line."
+       fi ;;
   esac
   record=$(cat "$tmp/done-matches")
   IFS=$US read -r file line _ due _ _ _ _ rule _ _ _ text <<EOF

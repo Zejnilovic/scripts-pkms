@@ -11,6 +11,9 @@ Version numbers: **major** when a command, option, output format, note name, lin
 - `pkm example [<name>] [<folder>]` copies an example vault, work or family, into a new folder to try the commands on. The examples ship with pkm in `share/pkm/examples`: `make install` and `make dist` copy them there, and nothing is downloaded.
 - The `now` vault setting fixes a vault's clock at `YYYY-MM-DD HH:MM`; `PKM_NOW` wins over it. The example vaults set it, so they open on their own day, and `pkm doctor` says when it is set.
 - The site has a First steps page, [docs/start.md](docs/start.md): from installing to an example vault, your own vault and your first close, and the tools that go well with pkm.
+- On a terminal, a command missing its text, task or note asks for it instead of printing its usage: `pkm done` and `pkm moved` pick an open task, `get`, `backlinks` and `path` pick a note, `new` picks a type and asks the title, and `todo`, `add` and `find` ask for the text. `pkm done <words>` that match several tasks lets you pick one. It picks with fzf when it is installed, else from a numbered list where words narrow the list. The new `picker` setting (auto, fzf, list or off) chooses; scripts, editors and agents, which don't run on a terminal, get the usage error as before. `pkm doctor` lists fzf.
+- Tab completion offers the open tasks after `pkm done` and `pkm moved`: the word typed so far keeps the tasks that have it, and Tab puts the task's path:line in its place. zsh shows each task's text in the menu.
+- Fix: `pkm done` with no words stopped with "ref: unbound variable" under bash 4 and 5 (Linux, or a Mac whose `bash` is Homebrew's) instead of printing its usage.
 - Fix: `pkm help --all` cut a summary at its first `|`, so recall's summary ended at `yes`.
 
 ## Released

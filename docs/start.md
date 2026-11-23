@@ -70,13 +70,15 @@ Once a week, read what is open and decide on each item.
 pkm close            # the week's open tasks, questions, what is due, and names with no note yet
 pkm new close        # the close page, to write your decisions on
 pkm done "offer"     # marks the task that matches as done
+pkm done             # no words: pick the task from a list
 ```
 
 A skipped week costs nothing: the next close finds whatever is still open. [Closing](method.md#closing) walks through it.
 
 ## 6. Find the rest as you go
 
-- **Tab** completes commands, options, note names and template types.
+- **Tab** completes commands, options, note names and template types, and after `pkm done` the open tasks.
+- **Leave it out**: on a terminal, a command missing its task, note or text asks for it, so `pkm done`, `pkm get` or `pkm todo` alone are enough. [fzf](https://github.com/junegunn/fzf), when installed, lets you pick by typing.
 - **`pkm help <command>`**, or `pkm <command> --help`, gives one command's usage and options. `pkm help` gives them all.
 - **[Commands](commands.md)** is the same as `pkm help`, on one page.
 - **`pkm config`** shows every setting, and [Settings](settings.md) explains them: cycles other than a week, folders per note type, several vaults.

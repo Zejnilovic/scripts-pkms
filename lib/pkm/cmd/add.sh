@@ -21,6 +21,11 @@ cmd_add() {
     [ "$from_stdin" = no ] || die 2 "A file goes with one line of text, not with - (stdin)."
     stored=$(add_file_place "$file" "$date") || exit $?
   fi
+  # On a terminal, no text, no file and no - ask for one line (ask.sh).
+  if [ -z "$text" ] && [ -z "$file" ] && [ "$from_stdin" = no ] && can_ask; then
+    ask_text "Log: "
+    text=$answer
+  fi
   if [ "$from_stdin" = yes ]; then cat > "$tmp/add-input"; else printf '%s\n' "$text" > "$tmp/add-input"; fi
   # Trailing blank lines are not part of the entry.
   awk '{ line[NR] = $0 } END { n = NR; while (n > 0 && line[n] ~ /^[ \t]*$/) n--; for (i = 1; i <= n; i++) print line[i] }' \

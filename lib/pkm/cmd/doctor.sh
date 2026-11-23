@@ -24,6 +24,7 @@ cmd_doctor() {
   doctor_tool jq jq required "reading JSON from boards and other tools"
   doctor_tool git git optional "a history of every change, to review and undo"
   doctor_tool curl curl optional "check --urls: whether the web addresses in the notes answer"
+  doctor_tool fzf fzf optional "picking a task or a note on a terminal (else a numbered list)"
   # The vault's config is read from the vault, which may be above the current folder; outside a vault there is none.
   local found
   found=$( (find_vault && printf '%s' "$vault") 2>/dev/null) || found=""

@@ -9,7 +9,17 @@
 
 cmd_moved() {
   local usage="Usage: pkm moved <path:line> <when>, such as pkm moved daybook/2026/11/2026-11-12.md:7 friday"
-  [ $# -ge 2 ] || die 2 "$usage"
+  # On a terminal, a missing task is picked from the open tasks, and a missing day is asked for (ask.sh).
+  if [ $# -lt 2 ]; then
+    need_answer "$usage"
+    if [ $# -eq 0 ]; then
+      ask_tasks "$tmp/moved-pick"
+      pick_one Move "$tmp/moved-pick" "No open tasks."
+      set -- "$answer"
+    fi
+    ask_text "To when (a day such as friday, +3d or 2026-12-01): "
+    set -- "$1" "$answer"
+  fi
   local spec=$1 path ln total US result status new raw prefix eol cr here page loc kind
   shift
   case $spec in

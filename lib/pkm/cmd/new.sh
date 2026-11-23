@@ -12,8 +12,19 @@ cmd_new() {
       *) if [ -z "$type" ]; then type=$1; elif [ -z "$title" ]; then title=$1; else title="$title $1"; fi; shift ;;
     esac
   done
-  [ -n "$type" ] || die 2 "Usage: pkm new <type> <title> [--name <name>]"
-  [ -n "$title" ] || die 2 "Usage: pkm new $type <title> [--name <name>]"
+  # On a terminal, a missing type is picked from the templates, and a missing title is asked for (ask.sh). Day and close
+  # pages have their own commands, so they are not in the list.
+  if [ -z "$type" ]; then
+    need_answer "Usage: pkm new <type> <title> [--name <name>]"
+    (cmd_templates) 2>/dev/null | awk -F '\t' -v OFS='\t' '$1 != "day" && $1 != "close" { print $1, $1 }' > "$tmp/new-types"
+    pick_one Type "$tmp/new-types" "No templates: pkm templates lists where they come from."
+    type=$answer
+  fi
+  if [ -z "$title" ]; then
+    need_answer "Usage: pkm new $type <title> [--name <name>]"
+    ask_text "Title of the new $type: "
+    title=$answer
+  fi
   [ "$type" != day ] || die 2 "pkm day makes the day's page; new makes notes of the other types."
   folder=$(config "folder_$type" notes)
   template=$(template_file "$type.md")

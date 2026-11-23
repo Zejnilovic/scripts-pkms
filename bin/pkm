@@ -19,8 +19,9 @@
 #                                 to the note named routines (created when missing), not to today's page, or with --in <note> to
 #                                 that note's Routines section. --start hides the task
 #                                 until that day; --someday keeps it out of the weekly views
-#   done <words | path:line> [--drop | --next <day>]
+#   done [<words | path:line>] [--drop | --next <day>]
 #                                 marks the one open task that matches as done ([x]), or as dropped ([-]) with --drop.
+#                                 On a terminal, no words, or words that match several tasks, pick from a list.
 #                                 A routine with an interval, such as (every 1m), keeps its box and moves its due date on
 #                                 (--next <day>: to that day, for a routine done early or late)
 #   tasks [open | waiting | someday | done [YYYY-MM-DD]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]
@@ -64,7 +65,8 @@
 #                                 and prints path:line; a missing section is made at the end. Refuses a heading, an open
 #                                 task, or a day or close page as the target (exit 1)
 #   moved <path:line> <when>      strikes a task or an event whose date changed and writes it again with the new date:
-#                                 below it in a note, on today's page from another day's page, linking that day
+#                                 below it in a note, on today's page from another day's page, linking that day. On a
+#                                 terminal, pkm moved alone picks the task and asks when
 #   strike <path:line>            wraps the line's text in ~~ and adds " ([[today's page]])", making today's page if it is
 #                                 missing; refuses a blank line, a heading or a struck line (exit 1)
 #   links --external [note]       each http(s) address outside code, as path:line: address (links to notes: backlinks)
@@ -108,6 +110,9 @@
 #
 # Listings: find, backlinks, path, list, tasks and check take --json (JSON Lines), --abs (absolute paths) and --limit n
 # (default 30). A listing with no results exits 1. since, close, overview, upcoming, tags, cycle and vaults take --json. docs/contract.md is the interface; pkm help --all lists the commands, docs/commands.md describes each.
+# On a terminal, a command missing its text, task or note asks for it: done, moved, todo, add, find, get, backlinks,
+# path and new. It picks with fzf when installed, else from a numbered list (the picker setting; off never asks).
+# Without a terminal, as in scripts, editors and agents, a missing argument is a usage error (exit 2).
 # Settings: docs/settings.md lists every key. .pkm/config is the vault's, the user's config is ~/.config/pkm/config.
 # .pkmignore in the vault hides files and folders from pkm, in gitignore syntax; .gitignore is not followed.
 # PKM_NOW=YYYYMMDDHHMMSS fixes the clock, for tests and for backfilling.
@@ -250,6 +255,8 @@ usage() { awk '/^# Usage:/ { on = 1 } on && /^#/ { sub(/^# ?/, ""); print; next 
 . "$pkm_home/lib/pkm/cmd/tags.sh"
 # shellcheck source=../lib/pkm/cmd/tasks.sh
 . "$pkm_home/lib/pkm/cmd/tasks.sh"
+# shellcheck source=../lib/pkm/ask.sh
+. "$pkm_home/lib/pkm/ask.sh"
 # shellcheck source=../lib/pkm/cmd/templates.sh
 . "$pkm_home/lib/pkm/cmd/templates.sh"
 # shellcheck source=../lib/pkm/cmd/todo.sh

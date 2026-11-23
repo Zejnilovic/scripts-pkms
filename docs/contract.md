@@ -97,10 +97,18 @@ Every listing is deterministic: the same vault gives the same output, in plain a
 ## Exit codes
 
 - `0`: a match, or a success.
-- `1`: nothing matched or nothing found (a listing with no records), or `check` found problems, or `version --require` is too old.
+- `1`: nothing matched or nothing found (a listing with no records), or `check` found problems, or `version --require` is too old, or an answer on a terminal was cancelled.
 - `2`: a wrong call (including an unknown option, such as `--nope`, which prints one line on stderr), a missing tool (ripgrep for searching, jq for `--json`), or no vault.
 
 Errors go to stderr. Output goes to stdout.
+
+## Asking on a terminal
+
+- When stdin and stderr are both a terminal, and the `picker` setting is not `off`, a command missing what it needs asks for it instead of failing: `done` and `moved` pick an open task, in the order of `tasks`; `get`, `backlinks` and `path` pick a note; `new` picks a type (not day or close) and asks for the title; `todo`, `add` and `find` ask for the text, and `moved` with a task asks when. Words given to `done` that match several open tasks are a list to pick from, too.
+- The options given still count: `pkm todo --due friday` asks for the text of a task due on Friday.
+- Prompts and lists go to stderr. Stdout is what the command prints when it is given the argument.
+- fzf picks when the setting is `auto` (the default) or `fzf` and fzf is installed; otherwise a numbered list does, where a number picks and words narrow the list. An empty answer, or leaving fzf, cancels: exit `1`, and nothing is written.
+- Without a terminal, as in scripts, editors and agents, nothing changes: a missing argument is a usage error (exit `2`), and words that match several tasks exit `1` with the matches on stderr.
 
 ## Renames and moves
 

@@ -4,3 +4,4 @@
 # Sourced by each module of lib/pkm/. Defines no functions.
 : "${pkm_home:=}" "${now:=}" "${today:=}" "${clock:=}" "${tmp:=}" "${vault:=}" "${vault_option:=}" "${vault_name:=}"
 : "${conflict_markers:=}" "${pkm_version:=}" "${translit:=}" "${writers_listed:=}"
+: "${answer:=}" "${picker:=}"

@@ -31,7 +31,12 @@ cmd_todo() {
       *) text="${text:+$text }$1"; shift ;;
     esac
   done
-  [ -n "$text" ] || die 2 "$usage_todo"
+  if [ -z "$text" ]; then
+    # On a terminal, the text is asked for (ask.sh); the options given still count.
+    need_answer "$usage_todo"
+    ask_text "Task: "
+    text=$answer
+  fi
   [ -z "$into" ] || [ "$kind" = every ] || die 2 "--in is for a routine: give it --every too, such as --every 1y --in $into"
   markers=""
   [ -z "$due" ] || markers="$markers (due $due)"

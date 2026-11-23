@@ -17,7 +17,8 @@ cmd_get() {
       *) [ -z "$arg" ] || die 2 "$usage"; arg=$1; shift ;;
     esac
   done
-  [ -n "$arg" ] || die 2 "$usage"
+  # On a terminal, a missing name is picked from the notes (ask.sh).
+  if [ -z "$arg" ]; then ask_note "$usage"; arg=$answer; fi
   # A whole link works too, as path accepts it: [[apollo#Decisions|text]] names apollo's Decisions section.
   case $arg in
     '[['*) arg=${arg#\[\[}; arg=${arg%\]\]} ;;

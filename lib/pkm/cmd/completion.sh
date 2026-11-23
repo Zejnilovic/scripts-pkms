@@ -25,6 +25,14 @@ _pkm() {
     :files) compopt -o filenames 2>/dev/null; COMPREPLY=($(compgen -f -- "$cur")); return ;;
   esac
   local trim=${cur%"${cur##*:}"}
+  # Tasks come as :tasks, then path:line<TAB>text, already matched to the word: the word becomes the path:line.
+  case "$out" in
+    :tasks*)
+      while IFS=$'\t' read -r word _; do
+        [ -n "$word" ] && [ "$word" != :tasks ] && COMPREPLY+=("${word#"$trim"}")
+      done <<<"$out"
+      return ;;
+  esac
   while IFS= read -r word; do
     case "$word" in "$cur"?*) COMPREPLY+=("${word#"$trim"}") ;; esac
   done <<<"$out"
@@ -41,6 +49,15 @@ _pkm() {
   case $out[1] in
     :dirs) _files -/ ;;
     :files) _files ;;
+    :tasks)
+      # path:line<TAB>text, already matched to the word: the menu shows the text, the word becomes the path:line.
+      local -a keys shown
+      local l
+      for l in "${(@)out[2,-1]}"; do
+        [ -n "$l" ] || continue
+        keys+=("${l%%$'\t'*}"); shown+=("${l#*$'\t'}  ${l%%$'\t'*}")
+      done
+      compadd -U -l -d shown -- "${(@)keys}" ;;
     *) compadd -- "${(@)out:#}" ;;
   esac
 }
@@ -71,6 +88,17 @@ complete_pkm() {
 complete_notes() { complete_pkm names --limit 100000 | cut -f 1; }
 complete_types() { complete_pkm templates | cut -f 1; }
 complete_cycles() { complete_pkm cycle | cut -f 1; }
+# complete_tasks <word>: :tasks, then path:line<TAB>text for each open task whose text has the word (any case), or
+# whose path:line starts with it. Every open task when the word is empty.
+complete_tasks() {
+  echo :tasks
+  complete_pkm tasks --limit 100000 | CUR=$1 awk '
+    BEGIN { cur = ENVIRON["CUR"]; low = tolower(cur) }
+    match($0, /^[^:]*\.md:[0-9]+: /) {
+      key = substr($0, 1, RLENGTH - 2); text = substr($0, RLENGTH + 1); sub(/^- \[ \] /, "", text)
+      if (cur == "" || index(tolower(text), low) || index(key, cur) == 1) print key "\t" text
+    }'
+}
 complete_days() { printf '%s\n' today tomorrow monday tuesday wednesday thursday friday saturday sunday; }
 
 # cmd_complete <word>... <word at the cursor>: the candidates for the word at the cursor.
@@ -125,7 +153,8 @@ cmd_complete() {
     evidence:0) echo -; complete_notes ;;
     recall:0) echo add; complete_notes ;;
     recall:1) [ "$first" != add ] || complete_notes ;;
-    post:0|strike:0|moved:0) echo :files ;;
+    done:*|moved:0) complete_tasks "$cur" ;;
+    post:0|strike:0) echo :files ;;
     post:1) complete_notes ;;
     mv:1) echo :dirs ;;
     cycle:0) complete_cycles ;;
