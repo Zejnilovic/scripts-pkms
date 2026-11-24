@@ -198,5 +198,98 @@ class PartOfFolders(VaultCase):
         self.assertNotIn("belongs in", self.pkm("check").stdout)
 
 
+class ConfigSet(VaultCase):
+    def test_a_vault_setting_is_appended_then_replaced_in_place(self):
+        self.write(".pkm/config", "format=1\nclose=week\n")
+        self.assertEqual(self.ok("config", "part_of_folders", "yes").strip(), ".pkm/config:3: part_of_folders=yes")
+        self.assertEqual(self.ok("config", "close", "sprint").strip(), ".pkm/config:2: close=sprint")
+        self.assertEqual(self.read(".pkm/config"), "format=1\nclose=sprint\npart_of_folders=yes\n")
+        self.assertIn("part_of_folders\tyes\tvault", self.ok("config", "part_of_folders"))
+
+    def test_a_user_setting_goes_to_the_user_config(self):
+        out = self.ok("config", "writer", "sam").strip()
+        self.assertTrue(out.endswith("pkm/config:1: writer=sam"), out)
+        self.assertEqual(self.user_config.read_text(), "writer=sam\n")
+        self.assertNotIn("writer", self.read(".pkm/config") if self.exists(".pkm/config") else "")
+
+    def test_user_puts_a_shared_setting_in_the_user_config(self):
+        self.ok("config", "limit", "50", "--user")
+        self.assertEqual(self.user_config.read_text(), "limit=50\n")
+
+    def test_wrong_calls_write_nothing(self):
+        self.write(".pkm/config", "format=1\n")
+        for args in (("nosuch", "x"), ("part_of_folders", "maybe"), ("cross_vault", ""), ("vault_work", "a\tb"),
+                     ("part_of_folders", "yes", "--user")):
+            with self.subTest(args):
+                self.assertEqual(self.pkm("config", *args).returncode, 2)
+        self.assertEqual(self.read(".pkm/config"), "format=1\n")
+
+    def test_line_endings_are_kept(self):
+        self.write(".pkm/config", "format=1\r\n")
+        self.ok("config", "shared", "yes")
+        self.assertEqual((self.root / ".pkm/config").read_bytes(), b"format=1\r\nshared=yes\r\n")
+
+
+class TreeMoves(VaultCase):
+    def setUp(self):
+        super().setUp()
+        self.write(".pkm/config", "part_of_folders=yes\n")
+        self.ok("new", "app", "Acme Portal")
+        self.ok("new", "project", "hermes")
+        self.ok("new", "repo", "--url", "acme-example/hermes-api", "--set", "part_of=hermes")
+        self.ok("new", "note", "Load test", "--set", "part_of=hermes-api")
+        self.write("notes/hermes/diagram.png", "png")
+
+    def test_a_new_parent_takes_the_notes_under_it_along(self):
+        out = self.ok("set", "hermes", "part_of=acme-portal")
+        self.assertIn("notes/acme-portal/hermes.md:", out)
+        for path in ("notes/acme-portal/hermes.md", "notes/acme-portal/hermes/hermes-api.md",
+                     "notes/acme-portal/hermes/hermes-api/load-test.md", "notes/acme-portal/hermes/diagram.png"):
+            self.assertTrue(self.exists(path), path)
+        self.assertFalse(self.exists("notes/hermes"))
+        moves = self.read(".pkm/moves.tsv")
+        self.assertIn("notes/hermes/hermes-api.md\tnotes/acme-portal/hermes/hermes-api.md", moves)
+        self.assertNotIn("belongs in", self.ok("check"))
+
+    def test_a_file_in_the_way_moves_nothing(self):
+        self.write("notes/acme-portal/hermes/hermes-api.md", "# In the way\n")
+        self.assertEqual(self.pkm("set", "hermes", "part_of=acme-portal").returncode, 1)
+        self.assertTrue(self.exists("notes/hermes.md"))
+        self.assertTrue(self.exists("notes/hermes/hermes-api.md"))
+        self.assertNotIn("acme-portal", self.read("notes/hermes.md"))
+
+
+class CheckNotices(VaultCase):
+    def test_a_live_note_whose_parent_is_archived(self):
+        self.ok("new", "project", "hermes")
+        self.ok("new", "repo", "--url", "acme-example/hermes-api", "--set", "part_of=hermes")
+        self.ok("mv", "hermes", "archive")
+        out = self.pkm("check").stdout
+        self.assertIn("notes/hermes-api.md:3: part_of hermes, which is in archive/: archive it too "
+                      "(pkm mv hermes-api archive) or give it another part_of (pkm set hermes-api part_of=<name>)", out)
+
+    def test_two_notes_with_one_address(self):
+        self.ok("new", "repo", "--url", "acme-example/hermes-api")
+        self.write("notes/hermes-api-copy.md", "---\ntype: note\nurl: https://github.com/acme-example/hermes-api/\n---\n\n# Copy\n")
+        self.write("archive/hermes-api-old.md", "---\ntype: repo\nurl: https://github.com/acme-example/hermes-api\n---\n")
+        out = self.pkm("check").stdout
+        self.assertIn("- https://github.com/acme-example/hermes-api is the url of 2 notes: notes/hermes-api-copy.md, "
+                      "notes/hermes-api.md: keep one", out)
+        self.assertNotIn("hermes-api-old", out)
+
+
+    def test_a_person_team_app_or_area_under_a_project(self):
+        self.write(".pkm/config", "part_of_folders=yes\n")
+        self.ok("new", "project", "hermes")
+        self.ok("new", "area", "Home")
+        self.write("notes/jane-doe.md", "---\ntype: person\npart_of: hermes\n---\n\n# Jane Doe\n")
+        self.write("notes/acme-team.md", "---\ntype: team\npart_of: home\n---\n\n# Acme team\n")
+        out = self.pkm("check").stdout
+        self.assertIn("- notes/jane-doe.md:3: a person is part of no project (part_of hermes): link it from hermes "
+                      "instead, and clear this: pkm set jane-doe part_of=", out)
+        self.assertNotIn("pkm mv jane-doe", out)
+        self.assertNotIn("acme-team.md:3: a team", out)
+
+
 if __name__ == "__main__":
     unittest.main()

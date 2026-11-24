@@ -83,7 +83,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `index [--rebuild]` | Brings the cache in `.pkm/cache` up to date. The cache is a speed-up only |
 | `rename <old> <new> [--dry-run] [--no-alias]` | Renames a note and rewrites every link to it, keeping the shown text. The old name becomes an alias unless `--no-alias`. `--dry-run` writes nothing |
 | `mv <note> ... <folder>` | Moves notes into a folder, keeping their names and their links working. One that can't move leaves them all in place |
-| `check [--urls]` | Broken links, duplicate names, alias clashes, secrets and merge conflicts; notices for links that work only by slug or alias. `--urls` also checks that web addresses answer (needs curl) |
+| `check [--urls]` | Broken links, duplicate names, alias clashes, secrets and merge conflicts; notices for links that work only by slug or alias, two notes with one `url`, notes whose `part_of` is in the archive, and people, teams, applications and areas filed under a project. `--urls` also checks that web addresses answer (needs curl) |
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
 | `links --external [note]` | Each web address in the notes, outside code, as `path:line: address`; an item is listed by its address |
 | `cycle [name] [--date D] [--json]` | The period of a cycle holding a date: its name, first and last day. The week is built in; your own cycles are set in `.pkm/config` |
@@ -95,7 +95,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `init` | Sets up a vault in this folder: `.pkm/config`, `.pkm/.gitignore` and `.pkmignore`. Never overwrites them |
 | `example [<name>] [<folder>]` | Copies an example vault that ships with pkm, `work` (the default) or `family`, into a new folder, `pkm-example-<name>`. Its `.pkm/config` sets `now`, so it opens on its own day. Never writes into a folder that exists |
 | `vault`, `vaults [--json]` | The vault's folder; the named vaults in your config, each `ok` or `missing` |
-| `config [<key>]` | Every setting with its value and where it comes from |
+| `config [<key>]`, `config <key> <value> [--user]` | Every setting with its value and where it comes from; with a value, sets one in `.pkm/config`, or in the user config for a user setting or with `--user` |
 | `recall [note]`, `recall <path:line> yes\|no`, `recall add <note> <question>` | The recall questions due today or earlier, as `path:line: text`, oldest first. `recall <path:line> yes` moves a question up the ladder (1, 3, 7, 14, 30, 60, 120 days) and `no` back to 1 day. `recall add` writes a question at the end of a note's `## Questions`, due tomorrow, with its answers indented below. A question ends with `(recall YYYY-MM-DD <N>d)` |
 | `templates`, `templates eject <type> [--user]` | Each template and where it comes from; `eject` copies a default so you can change it |
 | `doctor` | The tools pkm uses, and the settings: what is missing or wrong |

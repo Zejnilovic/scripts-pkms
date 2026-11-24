@@ -41,7 +41,7 @@ init|Setup|sets up a vault: .pkm/config, .pkm/.gitignore and .pkmignore
 example|Setup|copies an example vault that ships with pkm into a new folder, to try the commands on
 vault|Setup|the vault's folder
 vaults|Setup|the named vaults of the user config
-config|Setup|every setting, its value and where it comes from
+config|Setup|every setting, its value and where it comes from; config <key> <value> sets one
 templates|Setup|each template type and where it comes from
 version|Setup|the pkm release; --require checks a minimum
 help|Setup|the usage text; --all lists every command
@@ -76,7 +76,7 @@ command_options() {
     todo) echo "--due --high --low --waiting --someday --start --every --in" ;;
     done) echo "--drop --next" ;;
     new) echo "--name --folder --url --set" ;;
-    templates) echo "--user" ;;
+    templates|config) echo "--user" ;;
     version) echo "--require" ;;
     help) echo "--all" ;;
     *) echo "" ;;

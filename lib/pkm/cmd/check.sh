@@ -61,6 +61,7 @@ cmd_check() {
   cat "$tmp/link-notices" >> "$tmp/notices"
   { check_part_of; check_items; } >> "$tmp/problems"
   if [ "$(config part_of_folders no)" = yes ]; then check_part_of_folders >> "$tmp/notices"; fi
+  { check_archived_parents; check_same_url; check_shared_under_project; } >> "$tmp/notices"
   # Alias clashes: an alias on two notes leaves links to it unclear.
   awk -F '\t' '
     $1 == "A" { key = $2 SUBSEP $3; if (!(key in seen)) { seen[key] = 1; count[$2]++; paths[$2] = paths[$2] ", " $3 } }
@@ -150,6 +151,63 @@ cmd_check() {
   echo "No problems found."
 }
 
+# shared_types: the types that belong to many things, so to no project: people, teams, applications and areas.
+shared_types=" person team app area "
+
+# check_shared_under_project: a notice for each person, team, application or area whose part_of names a project.
+check_shared_under_project() {
+  local tab child parent ctype ptype name ln
+  tab=$(printf '\t')
+  tree_parents "$tmp/sp-parents"
+  while IFS="$tab" read -r child parent; do
+    ctype=$(awk -F "$tab" -v p="$child" '$1 == p { print $3; exit }' "$(cache_dir)/notes.tsv")
+    ptype=$(awk -F "$tab" -v p="$parent" '$1 == p { print $3; exit }' "$(cache_dir)/notes.tsv")
+    case $shared_types in *" $ctype "*) ;; *) continue ;; esac
+    [ "$ptype" = project ] || continue
+    name=$(basename "$child" .md); parent=$(basename "$parent" .md)
+    ln=$(awk '/^part_of:/ { print FNR; exit }' "$child")
+    echo "- $child:${ln:-1}: a $ctype is part of no project (part_of $parent): link it from $parent instead, and clear this: pkm set $name part_of="
+  done < "$tmp/sp-parents"
+}
+
+# check_archived_parents: a notice for each live note whose part_of names a note in archive/, which leaves it out of
+# its tree: archive it too, or give it another parent.
+check_archived_parents() {
+  local tab
+  tab=$(printf '\t')
+  index_ensure
+  awk -F "$tab" -v OFS="$tab" "$(awk_part_of)"'
+    $2 == "part_of" && $1 !~ /^archive\// { t = part_of_target($3); if (t != "") print $1, t }
+  ' "$(cache_dir)/fields.tsv" > "$tmp/ap-parts"
+  [ -s "$tmp/ap-parts" ] || return 0
+  cut -f2 "$tmp/ap-parts" | LC_ALL=C sort -u > "$tmp/ap-targets"
+  link_build "$tmp/ap-targets"
+  awk -F "$tab" 'FILENAME == ARGV[1] { if ($2 != "dead") resolved[$1] = $3; next }
+    { q = resolved[$2]; if (q ~ /^archive\//) print $1 "\t" $2 }' "$tmp/lb-resolved" "$tmp/ap-parts" | LC_ALL=C sort |
+  while IFS="$tab" read -r child parent; do
+    name=$(basename "$child" .md)
+    ln=$(awk '/^part_of:/ { print FNR; exit }' "$child")
+    echo "- $child:${ln:-1}: part_of $parent, which is in archive/: archive it too (pkm mv $name archive) or give it another part_of (pkm set $name part_of=<name>)"
+  done
+}
+
+# check_same_url: a notice for each address that is the url of two live notes or more: one thing, one note. A
+# trailing / or .git doesn't count.
+check_same_url() {
+  local tab
+  tab=$(printf '\t')
+  index_ensure
+  awk -F "$tab" '$2 == "url" && $3 != "" && $1 !~ /^archive\// {
+      u = $3; gsub(/["'"'"']/, "", u); sub(/\/+$/, "", u); sub(/\.git$/, "", u); sub(/\/+$/, "", u)
+      print u "\t" $1
+    }' "$(cache_dir)/fields.tsv" | LC_ALL=C sort |
+  awk -F "$tab" '
+    function flush() { if (n > 1) print "- " u " is the url of " n " notes: " s ": keep one" }
+    $1 != u { flush(); u = $1; n = 0; s = "" }
+    { n++; s = (s == "" ? $2 : s ", " $2) }
+    END { flush() }'
+}
+
 # check_part_of_folders: with part_of_folders=yes, a notice for each note outside its parent's folder, with the move
 # that puts it there. Notes in archive/, and types with a folder_<type> setting of their own, are left alone.
 check_part_of_folders() {
@@ -160,6 +218,10 @@ check_part_of_folders() {
     case $parent in archive/*) continue ;; esac
     type=$(awk -F "$tab" -v p="$child" '$1 == p { print $3; exit }' "$(cache_dir)/notes.tsv")
     [ -z "$(config "folder_$type" "")" ] || continue
+    # A person, team, application or area under a project has its own notice: it belongs in no project's folder.
+    case $shared_types in *" $type "*)
+      [ "$(awk -F "$tab" -v p="$parent" '$1 == p { print $3; exit }' "$(cache_dir)/notes.tsv")" != project ] || continue ;;
+    esac
     folder=$(fm_folder_of "$parent")
     [ "${child%/*}" != "$folder" ] || continue
     name=$(basename "$child" .md)

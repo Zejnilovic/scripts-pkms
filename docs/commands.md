@@ -188,7 +188,8 @@ Sets frontmatter values of a note, such as part_of or status.
 ```text
 set <note> <key=value> ...    sets frontmatter values of a note: replaced in place, or added at the end; an empty
                               value clears one. With part_of_folders=yes a new part_of moves the note into its
-                              parent's folder. Prints path:line: text of each written line
+                              parent's folder, and the folder of the notes under it goes along. Prints path:line: text
+                              of each written line
 ```
 
 ### rename
@@ -428,11 +429,15 @@ Options: `--json`
 
 ### config
 
-Every setting, its value and where it comes from.
+Every setting, its value and where it comes from; config &lt;key&gt; &lt;value&gt; sets one.
 
 ```text
 config [<key>]                every setting with its value and where it comes from (vault, user or default), or one
+config <key> <value> [--user] sets one: in .pkm/config, or the user config for a user setting (--user for one of
+                              both); replaces its line or appends one, and prints <file>:<line>: key=value
 ```
+
+Options: `--user`
 
 ### templates
 
