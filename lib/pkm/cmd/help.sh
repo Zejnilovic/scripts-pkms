@@ -17,12 +17,13 @@ cycle|Review|the period of a cycle holding a date: its first and last day
 since|Review|what happened since a date: notes, log, tasks, marked entries and names
 close|Review|the close of a period: tasks, open questions, what is due, marked entries, names, quiet notes and ideas
 recall|Review|the recall questions due today or earlier; recall <path:line> yes|no moves a question on the ladder; recall add <note> <question> writes one
-new|Notes|a note of a type, made from its template
+new|Notes|a note of a type, made from its template; --set fills its frontmatter, --url a repository's
+set|Notes|sets frontmatter values of a note, such as part_of or status
 backlinks|Find|every line that links a note, by name, slug or alias
 names|Find|every note's name, type, path and aliases, by name, from the cache
 index|Find|brings the cache up to date; --rebuild starts it again
 rename|Notes|renames a note and rewrites every link that names it; --dry-run lists the changes
-mv|Notes|moves a note into a folder; its links keep working
+mv|Notes|moves notes into a folder; their links keep working
 path|Find|the file a name, slug, alias or link points to
 url|Find|the address outside the vault an item ([[name]]#42) or a note's url line points to
 find|Find|the lines with every word, in any order
@@ -74,7 +75,7 @@ command_options() {
     add) echo "--day --file" ;;
     todo) echo "--due --high --low --waiting --someday --start --every --in" ;;
     done) echo "--drop --next" ;;
-    new) echo "--name" ;;
+    new) echo "--name --folder --url --set" ;;
     templates) echo "--user" ;;
     version) echo "--require" ;;
     help) echo "--all" ;;

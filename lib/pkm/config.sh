@@ -17,6 +17,7 @@ cycle_<name>|vault|-|A cycle of your own: <N>w from a weekday (1w only) or a dat
 cross_vault|vault|no|yes lets an agent working in another of your vaults read this one, for a brief across vaults.
 templates|vault|templates|The folder of this vault's own templates, relative to the vault.
 folder_<type>|vault|notes|The folder that new notes of this type go in.
+part_of_folders|vault|no|yes puts a note that is part_of another in a folder named after it, next to it: the notes of notes/apollo.md go in notes/apollo/. A folder_<type> setting wins.
 now|vault|-|Fixes the clock of this vault at YYYY-MM-DD HH:MM, so pkm works as if it were then. The example vaults set it; PKM_NOW wins over it.
 due_soon_days|both|7|The tasks due within this many days, after the overdue ones, come first in pkm tasks.
 waiting_days|both|7|A task waiting for longer than this many days comes after the due soon ones in pkm tasks.

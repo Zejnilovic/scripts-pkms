@@ -149,7 +149,7 @@ cmd_complete() {
     :0|help:0) { command_table | cut -d '|' -f 1; extension_table | cut -f 1; } ;;
     tasks:0) printf '%s\n' open waiting someday 'done' ;;
     new:0) { complete_types; echo close; } | LC_ALL=C sort -u ;;
-    backlinks:0|path:0|url:0|get:0|rename:0|mv:0|links:0) complete_notes ;;
+    backlinks:0|path:0|url:0|get:0|rename:0|mv:0|set:0|links:0) complete_notes ;;
     evidence:0) echo -; complete_notes ;;
     recall:0) echo add; complete_notes ;;
     recall:1) [ "$first" != add ] || complete_notes ;;

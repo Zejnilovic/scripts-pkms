@@ -70,7 +70,8 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `moved <path:line> <when>` | Strikes a task or an event whose date changed and writes it again with the new date: below the old line in a note, on today's page from another day, linking that day |
 | `tasks [open\|waiting\|someday\|done [<since>]] [--link <name>] [--for <who>] [--under <note>] [--stale <days>] [--all]` | Open tasks of every note, in groups: overdue, due soon, waiting, the rest. `--for` keeps someone's: the lines with a `(for …)` naming them, and a writer's own tasks. `--under` keeps those of a note's tree. `--all` includes `archive/` |
 | `upcoming [<days>] [--ics \| --json]` | Due tasks, routines included, events, and birthdays, target and warranty dates in the next days; `--ics` writes the events, tasks with a time and birthdays as a calendar file |
-| `new <type> <title> [--name <name>]` | A note in `notes/`, or the type's folder from its setting, made from its template; prints its path. `new close` writes the close page |
+| `new <type> <title> [--name <name>] [--folder <folder>] [--url <address>] [--set key=value ...]` | A note in `notes/`, or the type's folder from its setting, made from its template; prints its path. `--set` fills a frontmatter key, `--folder` picks the folder, and `--url` fills `url`, and for a `repo` also `items` and the title, from a GitHub, Azure DevOps or GitLab address: `pkm new repo --url acme-example/apollo-web`. `new close` writes the close page |
+| `set <note> <key=value> ...` | Sets frontmatter values of a note, such as `part_of=acme-portal` or `status=done`; an empty value clears one. A `part_of` must name a note |
 | `names [--type <type>]` | Every note's name, type, path and aliases, from the cache. `--type person` lists the people |
 | `backlinks <name> [--since <date>] [--under <note>]` | Every line that links a note, by its file name, slug or alias, and the lines under a `###` heading that links it |
 | `path <name>` | The file a name, slug, alias or link points to |
@@ -81,7 +82,7 @@ Run `pkm help` for the usage, `pkm help <command>` (or `pkm <command> --help`) f
 | `tags [--json]` | Every tag with its count |
 | `index [--rebuild]` | Brings the cache in `.pkm/cache` up to date. The cache is a speed-up only |
 | `rename <old> <new> [--dry-run] [--no-alias]` | Renames a note and rewrites every link to it, keeping the shown text. The old name becomes an alias unless `--no-alias`. `--dry-run` writes nothing |
-| `mv <note> <folder>` | Moves a note into a folder, keeping its name and its links working |
+| `mv <note> ... <folder>` | Moves notes into a folder, keeping their names and their links working. One that can't move leaves them all in place |
 | `check [--urls]` | Broken links, duplicate names, alias clashes, secrets and merge conflicts; notices for links that work only by slug or alias. `--urls` also checks that web addresses answer (needs curl) |
 | `evidence [--verify] <note\|->` | Each summary line, such as a note's `## Now`, must link its source. `--verify` checks that the links and lines exist |
 | `links --external [note]` | Each web address in the notes, outside code, as `path:line: address`; an item is listed by its address |

@@ -15,13 +15,14 @@ This file is the one description of pkm's interface: its commands, what they pri
 | `moved` | Tasks | strikes a task or an event whose date changed and writes it again with the new date; prints path:line: text | no |
 | `tasks` | Tasks | the open tasks of every note, in groups: overdue, due soon, waiting, the rest | yes, `path:line: text` lines in groups; `--json` adds `group`, `due`, `state` |
 | `upcoming` | Review | birthdays, due tasks, events, dates and the start dates of hidden tasks in the next days; `--ics` writes the events as a calendar file | no; `--json` gives `date`, `kind`, `time` and `end` |
-| `new` | Notes | a note of a type, made from its template | no |
+| `new` | Notes | a note of a type, made from its template; --set fills its frontmatter, --url a repository's | no |
+| `set` | Notes | sets frontmatter values of a note, such as part_of or status; prints `path:line: text` of each written line | no |
 | `backlinks` | Find | every line that links a note, by name, slug or alias, and the lines under a `###` heading that links it | yes, `path:line: text` lines |
 | `overview` | Find | the shape of the vault: areas, projects and resources, each with the notes that are part of it | no; `--json` gives `kind`, `type`, `status`, `parent` and `depth` |
 | `names` | Find | every note's name, type, path and aliases, by name, from the cache | yes, `name<TAB>type<TAB>path<TAB>aliases` |
 | `index` | Find | brings the cache up to date; --rebuild starts it again | no |
 | `rename` | Notes | renames a note and rewrites every link that names it; --dry-run lists the changes | no |
-| `mv` | Notes | moves a note into a folder; its links keep working | no |
+| `mv` | Notes | moves notes into a folder; their links keep working | no |
 | `path` | Find | the file a name, slug, alias or link points to | yes, one path per line |
 | `url` | Find | the address outside the vault that an item (`[[apollo-web]]#42`) or a note's `url` points to; it prints only `http://` and `https://` addresses and never goes online; exit 1 when the note has no `items` or `url` | no |
 | `find` | Find | the lines with every word, in any order | yes, `path:line: text` lines |
@@ -114,10 +115,18 @@ Errors go to stderr. Output goes to stdout.
 ## Renames and moves
 
 - `rename <old> <new>` prints `Renamed <old> to <new>: ...` on success. With `--dry-run` it prints one `path:line: before -> after` line per changed line, and the alias change to the note's frontmatter, and writes nothing.
-- `mv <note> <folder>` prints the new path.
+- `mv <note> ... <folder>` prints each new path, one per line. Every note is checked before any moves: a note that can't move exits `1` and moves none.
 - Both append one line to `.pkm/moves.tsv`: `date<TAB>old<TAB>new`. A rename records names; a move records paths.
 - Exit `0` on success, `1` when refused (a new name already taken, no single note with the old name, a day or close page, a folder that exists) or when a change could not be written. A refusal writes nothing. A failure part-way rolls every file back to its exact bytes, and says so on stderr.
 - Usage errors (a new name with spaces, a folder outside the vault) exit `2`.
+
+## Frontmatter values
+
+- **`new <type> <title> --set key=value`** fills a key of the new note: in its place when the template has it, else at the end of the frontmatter. `--set` can be given many times; the last value for a key wins. `--set type=` is a usage error: the type is the first word. A key starts with a letter and has letters, digits, `_` and `-`; a value is one line without tabs; `url` and `items` take one `http://` or `https://` address. A `part_of` that names no note (by name, slug or alias) exits `1` and writes nothing.
+- **`new <type> --url <address>`** fills `url`. For a `repo` it reads the address as a repository's: `https://github.com/<owner>/<repo>` (also `git@github.com:<owner>/<repo>.git` and the short `<owner>/<repo>`) gives `items: https://github.com/<owner>/<repo>/issues/`; Azure DevOps (`https://dev.azure.com/<org>/<project>/_git/<repo>`) gives `<url>/pullrequest/`; GitLab gives `<url>/-/issues/`; another host gives `url` alone. A trailing `/` and `.git` are dropped, and without a title the repository's name is the title. An address that is not a repository's is a usage error (exit `2`). `--set` wins over what `--url` fills.
+- **`new --folder <folder>`** puts the note in that folder, which must be inside the vault. Without it the folder is the type's `folder_<type>` setting, else, with `part_of_folders=yes` and a `part_of`, the folder named after the parent next to it (`notes/apollo.md`: `notes/apollo/`), else `notes/`. A parent in `archive/` gives `notes/`.
+- **`set <note> <key=value> ...`** changes the note's frontmatter with the same rules: a key in place, the indented `- ` lines of its old list removed, a new key at the end, and a frontmatter added to a note without one; the file's line ending and byte order mark are kept. An empty value leaves `key:` empty. It prints `path:line: key: value` for each written line. Day and close pages, a note that no name points to and a `part_of` that names no note or the note itself exit `1`; a call without a value exits `2`. With `part_of_folders=yes`, a `part_of` also moves the note into its parent's folder, as `mv` does, unless its type has a `folder_<type>` setting or it is in `archive/`; the printed path is the new one.
+- **`check`**, with `part_of_folders=yes`, lists under Notices each note outside its parent's folder: `path:line: part_of <name>, so it belongs in <folder>/: pkm mv <note> <folder>`.
 
 ## Reading, posting and striking
 

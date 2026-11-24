@@ -168,15 +168,28 @@ Options: `--json` `--abs` `--limit` `--answer`
 
 ### new
 
-A note of a type, made from its template.
+A note of a type, made from its template; --set fills its frontmatter, --url a repository's.
 
 ```text
-new <type> <title> [--name <name>]
+new <type> <title> [--name <name>] [--folder <folder>] [--url <address>] [--set key=value ...]
                               a note in notes/ (or folder_<type> from the settings), made from its template; a type with
-                              no template is made from the note template. An existing name fails (exit 1) and says so
+                              no template is made from the note template. An existing name fails (exit 1) and says so.
+                              --set fills a frontmatter key (a part_of must name a note); --folder puts it there;
+                              --url fills url, and for a repo also items and the title from a GitHub, Azure DevOps or
+                              GitLab address. With part_of_folders=yes a note goes in its parent's folder
 ```
 
-Options: `--name`
+Options: `--name` `--folder` `--url` `--set`
+
+### set
+
+Sets frontmatter values of a note, such as part_of or status.
+
+```text
+set <note> <key=value> ...    sets frontmatter values of a note: replaced in place, or added at the end; an empty
+                              value clears one. With part_of_folders=yes a new part_of moves the note into its
+                              parent's folder. Prints path:line: text of each written line
+```
 
 ### rename
 
@@ -192,10 +205,10 @@ Options: `--dry-run` `--no-alias`
 
 ### mv
 
-Moves a note into a folder; its links keep working.
+Moves notes into a folder; their links keep working.
 
 ```text
-mv <note> <folder>            moves a note into a folder; its links keep working. Both record the move in .pkm/moves.tsv
+mv <note> ... <folder>        moves notes into a folder; their links keep working. Both record the move in .pkm/moves.tsv
 ```
 
 ### get

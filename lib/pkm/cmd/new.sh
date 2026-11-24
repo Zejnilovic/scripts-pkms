@@ -5,28 +5,53 @@
 . "$pkm_home/lib/pkm/globals.sh"
 
 cmd_new() {
-  local type="" title="" name="" slug folder template retype="" taken
+  local type="" title="" name="" slug folder="" template retype="" taken address="" repo parent pairs
+  pairs="$tmp/new-pairs"; : > "$pairs"
   while [ $# -gt 0 ]; do
     case $1 in
       --name) [ $# -ge 2 ] || die 2 "--name needs a value"; name=$2; shift 2 ;;
+      --folder) [ $# -ge 2 ] || die 2 "--folder needs a folder"; folder=${2%/}; fm_folder_ok "$folder" new; shift 2 ;;
+      --url) [ $# -ge 2 ] || die 2 "--url needs an address"; address=$2; shift 2 ;;
+      --set) [ $# -ge 2 ] || die 2 "--set needs key=value"; fm_pair "$2" "$tmp/new-set" new; shift 2 ;;
       *) if [ -z "$type" ]; then type=$1; elif [ -z "$title" ]; then title=$1; else title="$title $1"; fi; shift ;;
     esac
   done
+  # --url fills url, and for a repository also items and, without a title, the title: the repository's name.
+  if [ -n "$address" ]; then
+    if [ "$type" = repo ]; then
+      repo=$(fm_repo "$address") || die 2 "pkm new: $address is not a repository address, such as https://github.com/acme-example/apollo-web or acme-example/apollo-web"
+      printf 'url\t%s\nitems\t%s\n' "$(printf '%s' "$repo" | cut -f2)" "$(printf '%s' "$repo" | cut -f3)" > "$pairs"
+      [ -n "$title" ] || title=$(printf '%s' "$repo" | cut -f1)
+    else
+      fm_pair "url=$address" "$pairs" new
+    fi
+  fi
+  if [ -f "$tmp/new-set" ]; then
+    if fm_value "$tmp/new-set" type > /dev/null; then die 2 "pkm new: the type is the first word, not --set type=: pkm new <type> <title>"; fi
+    cat "$tmp/new-set" >> "$pairs"
+  fi
   # On a terminal, a missing type is picked from the templates, and a missing title is asked for (ask.sh). Day and close
   # pages have their own commands, so they are not in the list.
   if [ -z "$type" ]; then
-    need_answer "Usage: pkm new <type> <title> [--name <name>]"
+    need_answer "Usage: pkm new <type> <title> [--name <name>] [--folder <folder>] [--url <address>] [--set key=value ...]"
     (cmd_templates) 2>/dev/null | awk -F '\t' -v OFS='\t' '$1 != "day" && $1 != "close" { print $1, $1 }' > "$tmp/new-types"
     pick_one Type "$tmp/new-types" "No templates: pkm templates lists where they come from."
     type=$answer
   fi
   if [ -z "$title" ]; then
-    need_answer "Usage: pkm new $type <title> [--name <name>]"
+    need_answer "Usage: pkm new $type <title> [--name <name>] [--folder <folder>] [--url <address>] [--set key=value ...]"
     ask_text "Title of the new $type: "
     title=$answer
   fi
   [ "$type" != day ] || die 2 "pkm day makes the day's page; new makes notes of the other types."
-  folder=$(config "folder_$type" notes)
+  parent=$(fm_parent "$pairs" new) || exit $?
+  # The folder: --folder, else the type's own folder setting, else (part_of_folders=yes) the folder of its parent.
+  if [ -z "$folder" ]; then folder=$(config "folder_$type" "")
+    if [ -z "$folder" ]; then
+      folder=notes
+      if [ -n "$parent" ] && [ "$(config part_of_folders no)" = yes ]; then folder=$(fm_folder_of "$parent"); fi
+    fi
+  fi
   template=$(template_file "$type.md")
   if [ ! -f "$template" ]; then
     # A type with no template of its own is made from the note template, with its type: set to this type.
@@ -61,6 +86,7 @@ cmd_new() {
     ENVIRON["TYPE"] != "" && /^type:/ && !typed { print "type: " ENVIRON["TYPE"]; typed = 1; next }
     { print }
   ' "$tmp/note" > "$tmp/note.new" && mv "$tmp/note.new" "$tmp/note"
+  if [ -s "$pairs" ]; then fm_apply "$tmp/note" "$pairs" "$tmp/note.new" "$tmp/new-changes" && mv "$tmp/note.new" "$tmp/note"; fi
   refuse_existing "$folder/$name.md"
   mkdir -p "$folder" && mv "$tmp/note" "$folder/$name.md"
   echo "$folder/$name.md"

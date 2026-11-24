@@ -60,6 +60,7 @@ cmd_check() {
   cat "$tmp/dead-problems" >> "$tmp/problems"
   cat "$tmp/link-notices" >> "$tmp/notices"
   { check_part_of; check_items; } >> "$tmp/problems"
+  if [ "$(config part_of_folders no)" = yes ]; then check_part_of_folders >> "$tmp/notices"; fi
   # Alias clashes: an alias on two notes leaves links to it unclear.
   awk -F '\t' '
     $1 == "A" { key = $2 SUBSEP $3; if (!(key in seen)) { seen[key] = 1; count[$2]++; paths[$2] = paths[$2] ", " $3 } }
@@ -147,6 +148,24 @@ cmd_check() {
   if [ -s "$tmp/notices" ]; then echo; echo "Notices:"; cat "$tmp/notices"; fi
   [ -s "$tmp/problems" ] && return 1
   echo "No problems found."
+}
+
+# check_part_of_folders: with part_of_folders=yes, a notice for each note outside its parent's folder, with the move
+# that puts it there. Notes in archive/, and types with a folder_<type> setting of their own, are left alone.
+check_part_of_folders() {
+  local tab child parent type folder name ln
+  tab=$(printf '\t')
+  tree_parents "$tmp/pf-parents"
+  while IFS="$tab" read -r child parent; do
+    case $parent in archive/*) continue ;; esac
+    type=$(awk -F "$tab" -v p="$child" '$1 == p { print $3; exit }' "$(cache_dir)/notes.tsv")
+    [ -z "$(config "folder_$type" "")" ] || continue
+    folder=$(fm_folder_of "$parent")
+    [ "${child%/*}" != "$folder" ] || continue
+    name=$(basename "$child" .md)
+    ln=$(awk '/^part_of:/ { print FNR; exit }' "$child")
+    echo "- $child:${ln:-1}: part_of $(basename "$parent" .md), so it belongs in $folder/: pkm mv $name $folder"
+  done < "$tmp/pf-parents"
 }
 
 # check_part_of: the problems of part_of, after link_build: a list where one note belongs (part_of names one note), a
