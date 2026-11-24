@@ -79,8 +79,10 @@ cmd_new() {
     die 1 "$taken already uses the name $name, and names are unique in the vault. Name the new one by what tells them apart, for example: pkm new $type \"$title\" --name $name-<word>"
   fi
   render "$template" "$title" "$slug" "$name" "$today" > "$tmp/note"
-  # The title becomes an alias when it differs from the name, so the words you wrote still find the note.
-  if [ "$title" != "$name" ]; then aliases="[$title]"; else aliases="[]"; fi
+  # The title becomes an alias when it differs from the name, so the words you wrote still find the note, unless a link
+  # with those words already reaches another note: then the alias would only hide which one is meant.
+  aliases="[]"
+  if [ "$title" != "$name" ] && ! fm_resolve "$title" > /dev/null; then aliases="[$title]"; fi
   ALIASES=$aliases TYPE=$retype awk '
     /^aliases:/ && !aliased { print "aliases: " ENVIRON["ALIASES"]; aliased = 1; next }
     ENVIRON["TYPE"] != "" && /^type:/ && !typed { print "type: " ENVIRON["TYPE"]; typed = 1; next }

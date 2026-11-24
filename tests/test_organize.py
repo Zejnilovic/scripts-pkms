@@ -74,6 +74,13 @@ class NewRepoFromUrl(VaultCase):
         result = self.pkm("new", "repo", "--url", "https://github.com/acme-example/apollo-web")
         self.assertEqual(result.returncode, 1)
         self.assertIn("--name apollo-web-", result.stderr)
+        path = self.ok("new", "repo", "--url", "https://github.com/acme-example/apollo-web", "--name", "apollo-web-repo").strip()
+        self.assertIn("aliases: []", self.read(path))
+
+    def test_a_title_another_note_answers_to_is_no_alias(self):
+        self.ok("new", "person", "Jane Doe")
+        self.assertIn("aliases: []", self.read(self.ok("new", "note", "Jane Doe", "--name", "jane-doe-notes").strip()))
+        self.assertIn("aliases: [Marta Kovac]", self.read(self.ok("new", "person", "Marta Kovac").strip()))
 
     def test_other_hosts_and_types_keep_the_address_only(self):
         text = self.read(self.ok("new", "repo", "--url", "https://git.acme.example/apollo/apollo-web").strip())
@@ -153,41 +160,41 @@ class PartOfFolders(VaultCase):
     def setUp(self):
         super().setUp()
         self.write(".pkm/config", "part_of_folders=yes\n")
-        self.ok("new", "project", "project-v9")
+        self.ok("new", "project", "hermes")
 
     def test_new_goes_into_the_folder_of_its_parent(self):
-        path = self.ok("new", "repo", "--url", "https://github.com/acme-example/project-v9-api",
-                       "--set", "part_of=project-v9").strip()
-        self.assertEqual(path, "notes/project-v9/project-v9-api.md")
-        path = self.ok("new", "note", "Load test", "--set", "part_of=project-v9-api").strip()
-        self.assertEqual(path, "notes/project-v9/project-v9-api/load-test.md")
+        path = self.ok("new", "repo", "--url", "https://github.com/acme-example/hermes-api",
+                       "--set", "part_of=hermes").strip()
+        self.assertEqual(path, "notes/hermes/hermes-api.md")
+        path = self.ok("new", "note", "Load test", "--set", "part_of=hermes-api").strip()
+        self.assertEqual(path, "notes/hermes/hermes-api/load-test.md")
         self.assertIn("Checked", self.ok("check"))
 
     def test_folder_and_a_type_folder_win(self):
         self.write(".pkm/config", "part_of_folders=yes\nfolder_coaching=team\n")
-        self.assertEqual(self.ok("new", "note", "Odd", "--set", "part_of=project-v9", "--folder", "notes").strip(),
+        self.assertEqual(self.ok("new", "note", "Odd", "--set", "part_of=hermes", "--folder", "notes").strip(),
                          "notes/odd.md")
-        self.assertEqual(self.ok("new", "coaching", "Jane Doe", "--set", "part_of=project-v9").strip(),
+        self.assertEqual(self.ok("new", "coaching", "Jane Doe", "--set", "part_of=hermes").strip(),
                          "team/jane-doe-coaching.md")
 
     def test_set_part_of_moves_the_note_and_says_where(self):
         self.ok("new", "note", "Budget")
-        out = self.ok("set", "budget", "part_of=project-v9")
-        self.assertIn("notes/project-v9/budget.md:", out)
-        self.assertTrue(self.exists("notes/project-v9/budget.md"))
+        out = self.ok("set", "budget", "part_of=hermes")
+        self.assertIn("notes/hermes/budget.md:", out)
+        self.assertTrue(self.exists("notes/hermes/budget.md"))
         self.assertFalse(self.exists("notes/budget.md"))
 
     def test_check_notes_a_note_outside_its_parents_folder(self):
-        self.write("notes/stray.md", "---\ntype: note\npart_of: project-v9\n---\n\n# Stray\n")
-        self.write("archive/old.md", "---\ntype: note\npart_of: project-v9\n---\n\n# Old\n")
+        self.write("notes/stray.md", "---\ntype: note\npart_of: hermes\n---\n\n# Stray\n")
+        self.write("archive/old.md", "---\ntype: note\npart_of: hermes\n---\n\n# Old\n")
         out = self.pkm("check").stdout
-        self.assertIn("notes/stray.md:3: part_of project-v9, so it belongs in notes/project-v9/: "
-                      "pkm mv stray notes/project-v9", out)
+        self.assertIn("notes/stray.md:3: part_of hermes, so it belongs in notes/hermes/: "
+                      "pkm mv stray notes/hermes", out)
         self.assertNotIn("archive/old.md", out)
 
     def test_without_the_setting_nothing_moves(self):
         self.write(".pkm/config", "")
-        self.assertEqual(self.ok("new", "note", "Flat", "--set", "part_of=project-v9").strip(), "notes/flat.md")
+        self.assertEqual(self.ok("new", "note", "Flat", "--set", "part_of=hermes").strip(), "notes/flat.md")
         self.assertNotIn("belongs in", self.pkm("check").stdout)
 
 
