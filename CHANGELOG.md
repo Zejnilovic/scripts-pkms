@@ -4,12 +4,9 @@ What changed in pkm. The next version's changes are collected here; each release
 
 Version numbers: **major** when a command, option, output format, note name, link syntax, frontmatter field or folder is renamed or removed, since agentic-pkms skills, editors and existing notes depend on them; **minor** for new commands, options and templates; **patch** for fixes. Before 1.0, a minor version may also need manual changes; its notes list them under "Manual steps". Each release is a git tag (`v0.1.0`), and `pkm version` shows which one is installed.
 
-## 0.10.1 (unreleased)
-
-- `pkm new` adds the title as an alias only when no other note answers to it: `pkm new repo --url acme-example/apollo --name apollo-repo` next to the project `apollo` no longer gets `aliases: [apollo]`, which hid which note `apollo` means.
-
 ## Released
 
+- [0.10.1](https://github.com/Zejnilovic/scripts-pkms/releases/tag/v0.10.1) (2026-11-24)
 - [0.10.0](https://github.com/Zejnilovic/scripts-pkms/releases/tag/v0.10.0) (2026-11-24)
 - [0.9.0](https://github.com/Zejnilovic/scripts-pkms/releases/tag/v0.9.0) (2026-11-23)
 - [0.8.0](https://github.com/Zejnilovic/scripts-pkms/releases/tag/v0.8.0) (2026-11-20)
